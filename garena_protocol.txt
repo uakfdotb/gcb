@@ -1,0 +1,1235 @@
+Garena Protocol Documentation
+=============================
+
+This document can be redistributed and/or modified under the terms of the
+Do What The Fuck You Want To Public License, Version 2, available at:
+
+http://sam.zoy.org/wtfpl/COPYING
+
+1 Intro
+
+1.1 Status of this documentation
+
+The following informations were found by reverse engineering (disassembly of
+the Garena client, and networking sniffing). The tools used were: IDA pro,
+tcpdump, wireshark, netcat, and OpenSSL.
+
+Because it is based on reverse engineering, this documentation is still
+incomplete. But there is enough info to connect to a server, join a room,
+talk in room, and play games. Successful tests have been made with Left 4
+Dead (dedicated L4D linux server) and Warcraft III. 
+
+1.2 Protocol overview
+
+There is 2 types of Garena Servers: main servers, and room servers. The
+Garena clients connect to the main server when you connect to garena, and
+connects to the room server when you join a room. 
+
+Garena uses 3 different protocols: 
+
+- The Garena Server Protocol (GSP) is used for talking to the main server. This
+  protocol handles authentication, and probably client version checking and
+  friends management. This protocol uses TCP port 7456 and is "encrypted" (I
+  put this in quotes since, as you will see later, this encryption is
+  totally worthless). 
+
+- The Garena Chat Room Protocol (GCRP) is used for talking to the room
+  server. This protocol handles room joining, and room traffic (such as
+  people publicly talking on the room). This protocol uses TCP port 8687.
+
+- The Garena Peer To Peer Protocol (GP2PP) is used for communicating with
+  others Garena Clients. This protocol handles client-to-client direct
+  traffic, such as private messages and VPN (game) packets. This protocol
+  uses UDP port 1513 by default, but it can be configured. The GP2PP protocol
+  is also used to perform the IP/port lookup and query the number of members
+  in each room.
+
+
+Each Garena user is identified by a User ID, which is used in all the 3
+protocols. 
+
+Each room is identified by a Room ID. The list of rooms and their IDs and
+the IPs of their room servers are in a file distributed with Garena and
+named roomEN.dat, which is actually a standard SQLite database. 
+
+Each room is associated with a VPN. Each user on the room has a (room-unique)
+IP address in the subnet 192.168.29.0/24. Two users are in the same VPN if
+they are in the same room. The VPN can be used to carry virtual UDP, and
+establish/use/close virtual TCP connections between members. Because of
+protocols limitations, it is not possible to use VPN from the same account
+on two rooms at the same time.
+
+1.3 Exemple of a typical session
+
+
+- The Garena Client connects to the main server on TCP port 7456. Using GSP,
+  it sends username & password to the main server, and the server accepts.
+  Among other things, the server sends the User ID to the client. 
+
+- The Garena Client sends a GP2PP message to main server on UDP port 1513 to
+  perform IP/port lookup. The main server replies to the client, indicating
+  the client's external ip and port. The client records the informations
+  (this is useful in case of NAT, the clients may not know its local
+  ip/port). 
+
+- The Garena Client sends a GP2PP message to main server on UDP port 1513
+  to query room usage info. The main server replies to the client,
+  indicating the number of users in each room. 
+
+[The IP/port lookup and the room usage query are the only times we use GP2PP
+with a host that is not another garena client] 
+
+- The user wants to connect to a room. The room server IP and room ID are found
+  in the roomEN.dat file. The client connects to the room server on TCP port
+  8687. Using GCRP it sends the Room ID to the room server, along with his
+  user name, user ID, password and other informations). The room server
+  accepts the join, sends to the client the Welcome Message, and the Room
+  Member List. The Member List includes each member's name, user ID,
+  experience level, and IP/ports. 
+
+- The Garena Client uses GP2PP to send a HELLO message to each member of the
+  room. It also replies to any GP2PP HELLO message received from a member.
+  Once HELLO a member has replied to one of our HELLO message, we can know
+  his ping, and we can exchange useful packets (VPN game packets) with him. 
+
+- The user wants to start a game. The Garena Client sends a GCRP message to
+  the room server to enable the VPN. This message is forwarded by the room
+  server to the other members. The other members start sending us GP2PP
+  packets containing VPN traffic (encapsulated UDP, and virtual TCP
+  connections).
+
+- The user plays the game, all the game packets are forwarded by the Garena
+  Clients in both directions via the GP2PP protocol with other members.
+
+- When the user stops the game, the Garena Client sends a GCRP message to
+  the room server, indicating that the VPN is now off. The other members see
+  this message, and stop sending us the GP2PP VPN packets. 
+ 
+- The client sends a GCRP message to the room server to leave the room, and
+  disconnect the TCP session
+
+- The clients disconnect the main server TCP session. 
+
+
+1.4 Some important notes 
+
+Some fields in the protocol will me marked as MBZ (Must Be Zero). These
+fields have been observed to be 0 in all the packet captures. 
+
+Some fields have been marked "unknown". If it is in a message to the client,
+it means that we should ignore this field. If it is in a message to be sent,
+usually it is explained what to put in these fields.
+
+A lot of fields represents integers. Unless specified, the integers are in
+Little Endian. The integers that represents TCP/UDP port numbers are
+sometime in Little Endian, and sometime in Big Endian, depending on the
+message type (what a crappy protocol). In this document, the endianness will
+be specified, each time we encounter such cases.
+
+
+2 The Garena Server Protocol
+
+2.1 Concepts
+
+To connect to the server, the client must first do the Session opening,
+involving cryptographic key exchange. Then, Hello message are exchanged.
+Then, the client sends Authentication info to the server, and the server
+replies. These steps are described in the following subsections.
+
+2.1.1 Session opening
+
+To connect to the server, the client must connect to the main server on TCP
+port 7456 and perform session opening. 
+
+For the session opening, the client generates a 256-bits AES session key, and a
+128-bits AES session IV (Initialisation Vector). 
+
+The client sends a GSP SESSION INIT message to the server, encrypted with
+the client's RSA private key (that is, encrypted with the *private* key). 
+The RSA private key is the same for all Garena Clients, has been ripped 
+from the windows EXE, and is given at the end of this file :)
+Because of this, the encryption is worthless: if someone is able to sniff
+the GSP session, he can get the encrypted GSP SESSION INIT message, decrypt
+it with the RSA public key (which can be derived from the RSA private key
+very easily with OpenSSL), and so get the AES session key and IV. 
+
+After the GSP SESSION INIT message, all the other GSP messages are encrypted
+in AES CBC with the session key and IV. The key and IV stay the same during
+all the session, in both directions (that is, the IV used for the encryption
+of each subsequent message is really the *starting IV* and not the last 
+ciphertext block like it should be).
+
+After this, the server replies with an encrypted GSP SESSION INIT REPLY message. 
+
+2.1.2 Hello
+
+After the session opening, the clients sends a GSP HELLO message to the main
+server, and the main server replies with another GSP HELLO message. It is
+not clear what is the purpose of these messages, it appears to be used to
+check that the client is up to date. 
+
+2.1.3 Authentication
+
+After the hello, the clients sends a GSP LOGIN message to the main server.
+This message contains the username and password (hashed as MD5), and also 
+the local (LAN) IP and port of the client. This info will be used by GP2PP, 
+like explained later. 
+
+The main server replies with a GSP LOGIN REPLY message indicating success,
+or with a GSP LOGIN FAIL indicating a problem with the authentication.
+
+The GSP LOGIN REPLY contains infos that will be sent when connecting to the
+room servers: username, user ID, country, experience level, ...
+
+2.2 Message formats
+
+All GSP messages except SESSION INIT are AES-encrypted, and so, their
+plaintext size is a multiple of the AES block size (which is 16 bytes). If 
+the plaintext size is not a multiple of 16, the remaining bytes are filled
+by a padding value. The padding value varies between message types. 
+
+The outgoing message formats are usually well described, because we need to
+generate our own. For the incoming messages, we describe only the fields we
+need for the client, the other infos can be safely ignored.
+
+2.2.0 Format of the MYINFO block
+
+This is not a message, but this block is used in more than one message, so I
+figured I should put a common definition. 
+
+This block contains various informations related to the user. 
+
+Format of the MYINFO block: 
+
+Bytes 0..3:
+  Client's User ID, in little endian.
+
+Bytes 4..19:
+  Client's username.
+  When sending this block, the client should set a null-terminated string.
+  When receiving this block, the client should be prepared to handle a
+  non-null terminated string, if the situation arises.
+ 
+Bytes 20..21:
+  Client's country (two-character strings, NOT INCLUDING null byte)
+
+Bytes 32..23:
+  Must be zero.
+
+Byte 24:
+  Unknown 1 (RECORD THIS VALUE)
+
+Byte 25:
+  Experience level
+
+Byte 26:
+  Unknown 2 (RECORD THIS VALUE) 
+
+Byte 27:
+  Must be zero.
+
+Bytes 28..31:
+  External IP of the client.
+  Stored in standard network byte-order format.
+  When receiving a message containing a MYINFO block, the client should 
+  ignore this value, and instead, rely on the IP/Port Lookup method. 
+  When sending a message containing a MYINFO block, the client should
+  fill the correct value.
+
+Bytes 32..35:
+  Internal IP of the client.
+  Stored in standard network byte-order format.
+  When receiving a message containing a MYINFO block, the client should 
+  ignore this value, and instead, rely on getsockname();
+  When sending a message containing a MYINFO block, the client should
+  fill the correct value.
+
+Bytes 36..39:
+  Must be zero.
+
+Bytes 40..41:
+  External GP2PP port of the client.
+  Stored in big endian. 
+  When receiving a message containing a MYINFO block, the client should 
+  ignore this value, and instead, rely on IP/Port Lookup method.
+  When sending a message containing a MYINFO block, the client should
+  fill the correct value.
+
+Bytes 42..43:
+  Internal GP2PP port of the client.
+  Stored in big endian. 
+  When receiving a message containing a MYINFO block, the client should 
+  ignore this value, and instead, rely on getsockname();
+  When sending a message containing a MYINFO block, the client should
+  fill the correct value.
+
+Bytes 44..63:
+  Must be zero.
+
+Bytes 64..65:
+  Unknown 3 (RECORD THIS VALUE) 
+
+Bytes 66..84:
+  Must be zero.
+
+Bytes 85..86:
+  Unknown 4 (RECORD THIS VALUE)
+
+Bytes 87..89:
+  Must be zero. 
+
+
+
+2.2.1 GSP SESSION INIT
+
+Bytes 0..3: 
+  Packet size in little endian, excluding this field. 
+  Usually 0x102.
+
+Byte 4..5: 
+  SESSION INIT MAGIC 2 number in little endian.
+  This is 0xAD00.
+
+Bytes 6..end:
+  Block encrypted with the Garena RSA Private key. 
+  
+
+Format of the encrypted block, before encryption: 
+
+Bytes 0..31: 
+  Randomly-generated AES session key
+
+Bytes 32..47: 
+  Randomly-generated IV session key 
+
+Bytes 48..79:
+  SESSION INIT MAGIC 1 number in little endian.
+  This is 0xF00F.
+
+
+2.2.2 GSP SESSION INIT REPLY
+
+Bytes 0..2: 
+  Size of the encrypted block, in little endian. 
+
+Byte 3: 
+  The value 1.
+
+Bytes 4..end:
+  Block encrypted using AES-CBC, with the AES session key and IV. 
+
+Format of the encrypted bloc, before encryption:
+
+Byte 0: 
+  SESSION INIT REPLY message type identifier.
+  This is 0xAE.
+
+The padding for this message type is 0x0F. 
+ 
+2.2.3 GSP SESSION INIT HELLO
+
+Bytes 0..2: 
+  Size of the encrypted block, in little endian. 
+
+Byte 3: 
+  The value 1.
+
+Bytes 4..end:
+  Block encrypted using AES-CBC, with the AES session key and IV. 
+
+Format of the encrypted bloc, before encryption, WHEN SENT BY CLIENT:
+
+Byte 0:
+  HELLO message type identifier.
+  This is 0xD3.
+
+Bytes 1..2:
+  Client language identifier.
+  This is the string "EN", NOT INCLUDING the terminating null byte. 
+
+Bytes 3..6:
+  Apparently, client version identifier in little endian.
+  Currently, value 0x00000782.
+
+The padding for this message type is 0x09. 
+
+Format of the encrypted bloc, before encryption, WHEN SENT BY SERVER:
+
+Byte 0:
+  HELLO message type identifier.
+  This is 0xD3.
+
+Bytes 1..end:
+  Unknown
+
+2.2.4 GSP SESSION LOGIN
+
+Bytes 0..2: 
+  Size of the encrypted block, in little endian. 
+
+Byte 3: 
+  The value 1.
+
+Bytes 4..end:
+  Block encrypted using AES-CBC, with the AES session key and IV. 
+
+Format of the encrypted bloc, before encryption:
+
+Byte 0:
+  LOGIN message type identifier.
+  This is 0x1F.
+
+Bytes 1..4:
+  Must be zero.
+
+Bytes 5..20:
+  User name, null-terminated. 
+
+Bytes 21..24:
+  Must be zero.
+
+Byte 25..28:
+  Size of the password hash, in little-endian.
+  This is 0x20.
+
+Bytes 29..61:
+  String representation of the hexadecimal value of the password's MD5 hash.
+  This is a simple MD5 hash of the password, with no salt. 
+  The string shall be in lowercase. 
+  Null terminated string.
+
+Bytes 62..65:
+  Internal IP address of the client.
+  Stored in standard network byte-order format. 
+
+The padding for this message type is 0x0A. 
+
+2.2.5 GSP SESSION LOGIN REPLY
+
+
+Bytes 0..2: 
+  Size of the encrypted block, in little endian. 
+
+Byte 3: 
+  The value 1.
+
+Bytes 4..end:
+  Block encrypted using AES-CBC, with the AES session key and IV. 
+
+Format of the encrypted bloc, before encryption:
+
+Byte 0:
+  LOGIN REPLY message type identifier.
+  This is 0x45.
+  
+Bytes 1..4: 
+  Must be zero.
+
+Bytes 5..8:
+  Unknown.
+
+Bytes 9..end:
+  The MYINFO block.
+
+
+2.2.6 GSP SESSION LOGIN FAIL
+
+
+Bytes 0..2: 
+  Size of the encrypted block, in little endian. 
+
+Byte 3: 
+  The value 1.
+
+Bytes 4..end:
+  Block encrypted using AES-CBC, with the AES session key and IV. 
+
+Format of the encrypted bloc, before encryption:
+
+Byte 0:
+  LOGIN FAIL message type identifier.
+  This is 0x2E. 
+
+3 The Garena Chat Room Protocol
+
+3.1 Concepts
+
+The client must first join a room. Then, the client may exchange room
+traffic messages. The details are described in the following sections. 
+
+3.1.1 Joining a room
+
+To connect to a room, the client must connect to the room server on TCP port
+8687 and send a GCRP ME JOIN message.
+
+The GCRP ME JOIN message contains the room ID, the username, the user ID, the
+user password, the country, the experience level, the internal/external IP
+and port. Some info will cause rejection by the room server if incorrect
+(like username or password); some info will be ignored by the room server
+(like experience level - spoofing it doesn't work), and some info will be
+accepted by the room server (like the internal ip/port, and the external
+port). The password is sent in a MD5 hash, and the other fields are put in a
+block that is compressed using the deflate algorithm (implemented in zlib).
+This compressed block is checksummed using a CRC32, even though it is
+useless (since this is over TCP). 
+
+The room server either rejects the join and sends a GCRP JOIN FAILED
+message, or accepts the join.
+
+In the latter case, the room server sends a GCRP WELCOME message, specifying
+the room welcome message.
+
+The room server also sends (the order is not specified) a GCRP MEMBERS
+message specyifing the list of members in the room. For each member, the
+following info is sent: 
+- User ID
+- User Name
+- User Country Code
+- Experience Level
+- VPN status (if the users is playing currently or not)
+- External (WAN, post-NAT) IP
+- Internal (LAN, pre-NAT) IP
+- External (WAN, post-NAT) GP2PP port
+- Internal (LAN, pre-NAT) GP2PP port
+- Virtual IP (in the range 192.168.29.0/24)
+
+3.1.2 Room traffic 
+
+Room traffic messages represents various actions on the room, like
+joining/leaving the channel, talking, and enabling/disabling the VPN (when a
+user starts or stop a game). Room traffic messages can be both sent or
+received, with the exception of the GCRP JOIN message, that can be only
+received: that is because when we want to join a room, we send the GCRP ME
+JOIN message, and not the GCRP JOIN message. The GCRP JOIN message is only 
+for the room server informing us that another user joined. 
+
+List of Room Traffic messages with their parameters (unknown fields are not
+shown):
+
+GCRP JOIN:
+- User ID
+- User Name
+- User Country Code
+- Experience Level
+- VPN status (if the users is playing currently or not)
+- External (WAN, post-NAT) IP
+- Internal (LAN, pre-NAT) IP
+- External (WAN, post-NAT) GP2PP port
+- Internal (LAN, pre-NAT) GP2PP port
+- Virtual IP (in the range 192.168.29.0/24)
+
+GCRP TALK:
+- Room ID
+- User ID
+- Message text
+
+GCRP PART:
+- User ID
+
+GCRP START VPN
+- User ID
+
+GCRP STOP VPN
+- User ID
+
+
+3.2 Message formats
+
+3.2.0 MEMBER INFO block
+
+This block is not a message, but it is found in more than one message, so it
+has a common definition here.
+
+MEMBER INFO block format:
+
+Bytes 0..3:
+  User ID, in little endian.
+
+Bytes 4..19:
+  User name, NULL-terminated string.
+  When it receives this block, it should be prepared to handle the case when 
+  it is not null terminated.
+
+Bytes 20..21:
+  User country, NOT null terminated.
+
+Bytes 22..23:
+  Must be zero.
+
+Byte 24:
+  Unknown
+
+Byte 25:
+  Experience level;
+
+Byte 26:
+  Unknown
+
+Byte 27:
+  Set to 1 if the user is currently playing (VPN enabled), else set to 0
+
+Byte 28..31:
+  External IP of the client.
+  Stored using standard network byte-order format.
+
+Byte 32..35:
+  Ditto, for Internal IP address
+
+Bytes 36..39:
+  Must be zero.
+
+Bytes 40..41:
+  External GP2PP port of the client.
+  Stored in Big endian.
+
+Bytes 42..43:
+  Ditto, for internal GP2PP port
+
+Bytes 44:
+  Virtual suffix
+
+Bytes 45..63:
+  Unknown
+
+3.2.1 GCRP ME JOIN 
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  JOIN message type identifier.
+  This is 0x22.
+
+Bytes 5..8:
+  Room ID in little endian.
+
+Bytes 9..12:
+  Must be zero.
+
+Bytes 13..16:
+  (Length of MYINFO block + length of CRC field), in little endian.
+
+Bytes 17..20:
+  Checksum of the MYINFO block. Algorithm CRC32B, as found in mhash lib. 
+
+Starting at byte 21:
+  MYINFO block, compressed with the Deflate algorithm, as found in zlib. 
+  This MYINFO block should contain the same informations as the MYINFO block
+  received with the LOGIN REPLY message. In particular, the "unknown" fields
+  of the MYINFO block should be the same as the ones received in the LOGIN
+  REPLY message.
+  HOWEVER, the exceptions are the external/internal IP and ports: the client
+  should send the ip and ports that it has determined with IP/port lookup
+  and getsockname(), rather than copying the ip and ports received with the
+  LOGIN REPLY message. 
+
+Directly after the compressed MYINFO block, there is the ME JOIN SUFFIX
+block, whose format is:
+
+Bytes 0..14:
+  Must be zero.
+
+Bytes 14..33:
+  String representation, in hex, of the MD5 hash of the password.
+  NOT null terminated.
+
+Bytes 34..35
+  Must be zero.
+
+3.2.2 GCRP JOIN
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  JOIN message type identifier.
+  This is 0x22.
+
+Bytes 5..end:
+  MEMBER INFO block. 
+
+3.2.3 GCRP TALK
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  TALK message type identifier.
+  This is 0x25.
+
+Byte 5..8:
+  Room ID, in little endian.
+
+Byte 9..12:
+  Sender's User ID, in little endian.
+
+Byte 13..16:
+  Text string length. The length does not count the NULL terminating
+  character, but each character counts for 2 bytes (see below). 
+  In fact this field is useless because we know the total message size, but
+  on outgoing messages we have to set it anyway to be compatible...
+
+Bytes 17..end:
+  The text message typed by the user on the room.
+  Null-terminated text string, probably encoded in UTF-16. The
+  NULL-terminating char is 16-bits wide, too... 
+  The client should be prepared to handle the case when this string is not
+  null-terminated, but when sending this message type, the client should set
+  a null-terminated string. 
+
+3.2.4 GCRP PART
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  JOIN message type identifier.
+  This is 0x23.
+
+Bytes 5..8:
+  Leaver's User ID, in little endian. 
+
+3.2.5 GCRP START VPN
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  START VPN message type identifier.
+  This is 0x3a.
+
+Bytes 5..8:
+  User ID of the user starting the VPN, in little endian.
+
+3.2.6 GCRP STOP VPN
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  STOP VPN message type identifier.
+  This is 0x39.
+
+Bytes 5..8:
+  User ID of the user stopping the VPN, in little endian.
+
+3.2.7 GCRP MEMBERS
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  MEMBERS message type identifier.
+  This is 0x2c.
+
+Bytes 5..8: 
+  The Room ID, in little endian.
+
+Bytes 9..12:
+  Number of members in this room.
+
+Bytes 13..end:
+  Array of MEMBER INFO blocks (one block for each member)
+
+3.2.8 GCRP WELCOME
+
+Bytes 0..3:
+  Message size in little endian (excluding this field)
+
+Byte 4:
+  WELCOME message type identifier.
+  This is 0x30.
+
+Byte 5..8:
+  The Room ID, in little endian.
+
+Bytes 9..end:
+  Welcome message.
+  Null-terminated text string, probably encoded in UTF-16. The
+  NULL-terminating char is 16-bits wide, too... 
+  The client should be prepared to handle the case when this string is not
+  null-terminated.
+
+
+4 The Garena Peer To Peer Protocol
+
+4.1 Concepts
+
+GP2PP messages are usually exchanged with others clients. The only
+exceptions are:
+
+- the IP/port lookup
+- the Room usage query
+
+The IP/port lookup and Room usage query occurs when the client connects,
+before any room is joined. This is discussed in the section 4.1.1. Other
+usages of the GP2PP protocol (that is, exchange with others clients) occurs
+when we are in a room, and that is discussed in section 4.1.2. 
+
+The GP2PP protocol implements a mechanism for NAT traversal. All the GP2PP 
+messages must be sent from the same local port (usually 1513), disobeying 
+this rule will cause problems with NAT traversal.
+
+4.1.1 Messages exchanged with the main server
+
+The IP/Port lookup and Room usage query must be done before any channel is
+joined, but they may be done in any order.
+
+4.1.1.1 IP/Port lookup
+
+The GP2PP protocol uses the UDP port 1513 both on local end and remote end.
+Because of NAT, the local IP address (as seen by our client) may not be the
+same as the external IP address (as seen by others hosts). The local UDP
+port (1513) may also be remapped by the NAT box. This is why the IP/Port
+lookup is necessary to enable the client to know his external IP and Port.
+To do this, the client sends a GP2PP IP_LOOKUP message to the main
+server. The main server receive the message and records the source IP 
+address and port, then sends back a GP2PP IP_LOOKUP_REPLY message to the 
+client, containing the correct external IP and port. 
+
+
+4.1.1.2 Room usage query
+
+The Room ID is 24-bits, and can be split into Room ID prefix (most
+significant 16bits) and Room ID suffix (least significant 8bits). 
+
+To know how many users there are in each room, the client must send a GP2PP
+ROOM_USAGE to the main server on UDP port 1513. 
+
+For each existing Room ID prefix, the server will send a GP2PP ROOM_USAGE_REPLY
+to the client. The message gives the usage count of all the rooms that have
+this prefix, by listing all their suffixes along with the corresponding usage 
+count.
+
+4.1.2 Messages exchanged with other clients
+
+Before any other things, two clients must exchange GP2PP HELLO messages.
+This allows each client to know each other's ping, and plays an important
+role on NAT traversal. 
+
+Then, the clients can exchange GP2PP packets to handle Virtual UDP datagrams
+and Virtual TCP streams on the VPN associated with the room the clients are
+on. Each client on the room has a virtual IP in 192.168.29.XXX, this virtual
+IP can be known from the virtual suffix field in the GCRP JOIN and GCRP
+MEMBERS messages. When a game to send or receive UDP or TCP data from/to one
+of these virtual IP addresses, the Garena client will instead handle this
+traffic by exchanging the right GP2PP messages with the corresponding
+clients.
+
+4.1.2.1 HELLOs and NAT traversal
+
+At regular intervals, the client will send a GP2PP HELLO message to all the 
+others client on the room. The client should send the GP2PP HELLO message to
+other clients on their external ip/port, and on their internal ip/port
+(these informations are given by the GCRP protocol, especially by GCRP JOIN
+and GCRP MEMBERS messages). This ensures that the remote client receive the
+HELLO message regardless of whether he is on the LAN or not (i.e. it manages
+the situation when two Garena users play from the same LAN). 
+
+When other clients replies (with GP2PP HELLO REPLY messages) to our local
+client, our local client must record the source IP and port. Thus, from now
+on, when we need to send a GP2PP message to that client, we know what is
+the IP and port we need to send to (and so we do not need to send the
+messages both on the external and internal addresses). 
+
+When our local client receives a GP2PP HELLO message, it must respond a 
+GP2PP HELLO_REPLY to the source IP and port. 
+
+When a client sends a GP2PP HELLO message, and the client is behind a NAT
+box, it will cause the NAT router to allow incoming replies to this message,
+provided that the source and destination IP/ports match. When a client sends
+a GP2PP message, it tries to use always the same source port, precisely the
+port that was used in the IP/Port lookup phase of the main server
+connection, and this is the info that is published in the GCRP JOIN and 
+GCRP MEMBERS messages. 
+Because of that, when two clients behind NAT exchange GP2PP HELLO 
+messages, the source IP/port of the client 1 will be the destination IP/port
+of the client 2, and vice versa. Thus, after one exchange, both NAT routers
+will allow incoming messages from the remote client. This mechanism enables
+two Garena users behind NAT boxes to communicate without having to configure
+any port forwarding, as long as the external source ports remains the same
+all the time.
+
+
+4.1.2.2 Virtual UDP
+
+Sending a virtual (encapsulated) UDP datagram to another client is very 
+simple: we need to send a GP2PP UDP ENCAP message to the remote client. This
+message contains the following informations:
+- the sender's User ID
+- the virtual UDP source port 
+- the virtual UDP destination port
+- the virtual UDP payload (actual UDP data) 
+
+The virtual UDP source and destination ports are the ports as seen in the
+VPN, not the source/destination ports of the GP2PP packet. 
+
+Virtual UDP are received in a similar fashion. It can be noted that the
+GP2PP UDP ENCAP message does not contain the virtual source and destination
+IPs. Indeed, this is useless because the virtual source IP can be retrieved
+from the User ID, together with the user informations sent by GCRP JOIN and
+GCRP MEMBERS messages. Likewise, when we need to send a datagram to a
+virtual IP, we need to lookup the room member that has the desired virtual
+suffix.
+
+
+4.1.2.3 Virtual TCP
+
+The Virtual TCP is reliable and connection-oriented, and handles connection establishment, 
+data exchange (and acknowledgmements), and connection teardown. 
+
+The description of this protocol assumes that you are familiar with the TCP
+protocol. If not, please read the RFC793. 
+
+a) Connection establishment
+
+To establish a connection, the client sends a GP2PP INITCONN message to the
+other client. This message contains the following informations:
+- Connection ID
+- Destination port
+
+The Connection ID is a 32-bit number that identifies this virtual
+connection. Apparently, the Garena windows client always picks the connection 
+ID such that (conn_id >> 16) == ((conn_id & 0xFFFF) + 1). I have no fucking 
+idea why, but apparently it is so. 
+
+This message is unconfirmed, once a client has sent a GP2PP INITCONN message, 
+for his point of view, the connection is established. The connection is
+established from the point of view of the receiver, as soon as it has got
+the GP2PP INITCONN message. If the receiver does not want the connection,
+he has to close it using a GP2PP CONN FIN message (see later). Strangely,
+the Windows clients does not send GP2PP CONN FIN message even if we try to
+connect to it on a closed TCP port, but any sane implementation should do it...
+ 
+b) Connection data exchange
+
+To send a data packet on a Virtual TCP connection, the client must send to
+the other client a GP2PP CONN DATA message. This message contains the
+following important informations:
+- Connection ID (the same as the Connection ID used in the INITCONN)
+- This packet's sequence number (SEQ)
+- Our current acknowledgmenet number (ACK)
+- Obviously, the packet payload
+
+The SEQ and ACK are used like in TCP, but they always start at 0 (and are
+not randonly initialized like with TCP), and they count number of packets,
+not number of bytes (and so, it's not possible to partially acknowledge a
+packet). The SEQ represents this packet's sequence number, while the ACK
+represents the next SEQ expected from the peer (like in TCP). 
+
+The sender should keep the sent packets until they are acknowledged (that
+is, until it receives a packet a greater ACK), to retransmit them after a
+timeout if they are lost. 
+ 
+c) Data acknowledgement, and Fast Retransmission
+
+When a client receive a data packet, and the data packet is new (it is not a
+duplicate of an already-received pacet), it should reply a GP2PP CONN ACK
+message (this is not clear if it is mandatory or not, since the ACK is
+already conveyed by the CONN DATA messages... but sending CONN ACK messages
+allows us to do Fast Retransmission as we will see later, and thus enable a
+faster recovery in case of packet loss. Clients written based on this spec
+should send CONN ACK messages for every CONN DATA received, but should also
+tolerate that the peer doesn't do so, by taking into account the ACK field
+in the CONN DATA messages). 
+
+The CONN DATA message contains two informations:
+- The Connection ID
+- The Sequence number of the packet we are acknowledging (SEQ)
+- Our current acknowledgement number (ACK)
+
+
+When a client receive a CONN ACK packet, it should interpretet the ACK field 
+like in the CONN DATA message, and mark all the sent packets whose sequence
+numbers are inferior to the ACK field, as acknowledged. Furthermore, it should
+mark the packet whose sequence number is exactly equal to the SEQ field, as
+acknowledged. 
+
+If ACK number is less than SEQ+1, this means that packets sent by the
+client with sequence numbers between ACK and (SEQ-1) included were lost.
+Indeed, the CONN ACK message tells us that the peer received the packet number
+SEQ, but that the next packet it expects must have sequence number ACK. In
+that case, the client should fast-retransmit all these packets, to prevent
+lag due to timeout before standard retransmission. Fast-retransmission
+should be done only once for each packet. If the fast-retransmission fails
+to deliver the packet, wait for the standard retransmission. 
+
+d) Connection teardown
+
+To close the connection, the client shall send a GP2PP CONN CLOSE message to
+the peer, containing the following informations:
+- Connection ID
+
+The Windows Garena implementation sends the GP2PP CONN CLOSE message four
+times, I have no idea why. A reimplementation of the client based on the
+present document shall send the GP2PP CONN CLOSE four times too, but
+tolerate that other implementations may send it one, two, three, or four 
+times. 
+
+
+4.2 Message formats
+
+4.2.1 GP2PP IP LOOKUP
+
+Byte 0: 
+  IP LOOKUP message type identifier.
+  This is 0x05.
+
+Bytes 1..8:
+  Must be zero.
+
+4.2.2 GP2PP IP LOOKUP REPLY
+
+Byte 0:
+  IP LOOKUP REPLY message type identifier.
+  This is 0x06.
+
+Bytes 1..7:
+  Must be zero.
+
+Bytes 8..11:
+  Client's external IP, as detected by the IP/Port lookup.
+  Stored in standard network byte-order format.
+
+Bytes 12..13:
+  Client's external GP2PP port;
+  Stored in Big endian.
+
+Bytes 14..15:
+  Must be zero.
+
+4.2.3 GP2PP ROOM USAGE
+
+Byte 0: 
+  ROOM USAGE message type identifier.
+  This is 0x02.
+
+Bytes 1..4:
+  Must be zero.
+
+
+4.2.4 GP2PP ROOM USAGE REPLY
+
+Byte 0: 
+  ROOM USAGE REPLY message type identifier.
+  This is 0x3F.
+
+Byte 1..2:
+  Room ID prefix (little endian)
+
+Byte 3:
+  Number of rooms existing with this prefix. 
+
+Byte 4..end:
+  Array of USERNUM blocks (one per room existing with this prefix)
+
+USERNUM block format:
+
+Byte 0:
+  Room ID Suffix (to be merged with the corresponding Room ID prefix) 
+
+Byte 1:
+  Number of users in the room (corresponding to the Room ID prefix 
+  and suffix)
+
+4.2.5 GP2PP HELLO 
+
+Byte 0:
+  HELLO message type identifier.
+  This is 0x02.
+
+Bytes 1..3:
+  Must be zero.
+
+Bytes 4..7:
+  Sender's User ID, in little endian. 
+
+Bytes 8..15:
+  Must be zero.
+
+4.2.6 GP2PP HELLO REPLY
+
+Byte 0:
+  HELLO REPLY message type identifier.
+  This is 0x0f.
+
+Bytes 1..3:
+  Must be zero.
+
+Bytes 4..7:
+  Sender's User ID, in little endian. 
+
+Bytes 8..11:
+  Must be zero.
+
+Bytes 12..15:
+  Receiver's User ID, in little endian.
+
+4.2.7 GP2PP UDP ENCAP
+
+Byte 0:
+  UDP ENCAP message type identifier.
+  This is 0x01.
+
+Bytes 1..3:
+  Must be zero.
+
+Bytes 4..7:
+  Sender's User ID, in little endian. 
+
+Bytes 8..9:
+  UDP source port (big endian)
+
+Bytes 10..11:
+  Must be zero.
+
+Bytes 12..13:
+  UDP destination port (big endian)
+
+Bytes 14..15:
+  Must be zero.
+
+Bytes 16..end:
+  Packet payload.
+
+4.2.8 GP2PP INITCONN
+
+Byte 0:
+  INITCONN message type identifier
+  This is 0x0b.
+
+Bytes 1..3:
+  Must be zero.
+
+Bytes 4..7:
+  Sender's User ID, in little endian.
+
+Bytes 8..11:
+  Connection ID, in little endian. 
+
+Bytes 12..15:
+  The IP address 127.0.0.1, stored in network byte-order format. 
+  (wtf? no idea why that is needed here.) 
+
+Bytes 16..17:
+  Destination port, IN LITTLE ENDIAN! 
+
+Bytes 18..19:
+  Must be zero.
+
+4.2.9 GP2PP CONN DATA
+
+Byte 0:
+  CONN message type identifier.
+  This is 0x0d.
+
+Byte 1:
+  DATA message subtype identifier.
+  This is 0x14.
+
+Byte 2..3:
+  Timestamp. This is apparently, the number of microseconds elapsed since
+  the last packet sent on this connection ID, divided by 256 (value derived
+  approximatively from measurements, not from code disassembly). I'm not
+  sure what this is used for.
+
+Bytes 4..7:
+  Connection ID, in little endian.
+
+Bytes 8..11:
+  Sender User ID, in little endian.
+
+Bytes 12..15:
+  Sequence number, in little endian.
+
+Bytes 16..19:
+  Acknowledgement number, in little endian.
+
+Bytes 20..end:
+  Packet payload. 
+
+4.2.10 GP2PP CONN ACK
+
+Byte 0:
+  CONN message type identifier.
+  This is 0x0d.
+
+Byte 1:
+  ACK message subtype identifier.
+  This is 0x0e.
+
+Byte 2..3:
+  Timestamp. This is apparently, the number of microseconds elapsed since
+  the last packet sent on this connection ID, divided by 256 (value derived
+  approximatively from measurements, not from code disassembly). I'm not
+  sure what this is used for.
+
+Bytes 4..7:
+  Connection ID, in little endian.
+
+Bytes 8..11:
+  Sender User ID, in little endian.
+
+Bytes 12..15:
+  Sequence number, in little endian.
+
+Bytes 16..19:
+  Acknowledgement number, in little endian.
+
+4.2.11 GP22P CONN FIN
+
+Byte 0:
+  CONN message type identifier.
+  This is 0x0d.
+
+Byte 1:
+  FIN message subtype identifier.
+  This is 0x01.
+
+Byte 2..3:
+  Timestamp. This is apparently, the number of microseconds elapsed since
+  the last packet sent on this connection ID, divided by 256 (value derived
+  approximatively from measurements, not from code disassembly). I'm not
+  sure what this is used for.
+
+Bytes 4..7:
+  Connection ID, in little endian.
+
+Bytes 8..11:
+  Sender User ID, in little endian.
+
+Bytes 12..15:
+  Should be sequence number, but is in fact the value 0. 
+
+Bytes 16..19:
+  Should be acknowledgement number, but is in fact the value 0.
+
+5 Garena RSA private key
+
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEA3XK9BWuIHIS3R6za4WU/mQ0WlsPD/ErtzSTw2ZmbhI0lyKcQ
+Ugk0aRIOaq4vTE+EpRtI6hvhH4AIm+15sWPqxpfuNR0Dvigse+BhuypFsqI+AWiL
+dj5RrPSzrLcqWgjE5zSjUG4OmxS4NJJRY9UMNaEhtqsrgrFFj4iMX07bz6Joyp85
+CHpGJhmFjPwU60OlUkGKwvs6TeQXUZlH9ypzXkNAhF4uDchTgEX7A/8yrqHzPx7/
+r2T0Lww7kp106ACdy9wXTpq5v3tmfNZbZ7K0bEB4g8Ez43Hew1P5b/tabUV4pZL0
+LkvDCA78ll8FHeuJjZA3+DKlEgyA2EWTs98VTQIDAQABAoIBAC65evCd08ZQqmtR
+KY3NUzHz9QQyojOli69xT/BZ3NqG/aXsuiDVGF3jFW+k+Q3c6Vv8+dGLuGBxH1/n
+J3oqXuswO26xhIym5Vvt6DEZpkMewH6DlImKdKlNqGuU6ja9Cu7NyHe8ARDvuj49
+cTbjSQQ3z2k/jJqy1L6ITTX+6ZpRgZd9m/Ng5O0GBcoSiUjysfLgs5m5lHWCojL+
+ppxqhsWXDM2ejIFGncGok798NNps+OkAM9EwEHcEI7qBo/UEsgXwnmlUvsyBvtq3
+7NS/znsJlOT/PfbS3i0gIac6AmA0qh86zN+uC5yl44aY+WpwPqBua6eeKkpk3xAo
+LrCRxHECgYEA/689gaRf0ihJ5WpD/cq6XLFwxuu4/CmmNjYpTwol2S3lGnq03RLZ
+FhklvMKIkhfuaOLyrHgUWaYZVr2KBUU81qwHTVEZeN6rWPeXTsfgBnpShIYYXqBN
+ePyqVDuISs44Lsi74fhSNrqai6ow6GQYlZewcdjS2zVc35G1of/cWNMCgYEA3biv
+L49okrATQfBbdl5L6hueqNc8pfrv6EKYcw5SE48fFeHCToorKpaf4kf7GemITldD
+29FFwukhyt1rJJI9Kvj6jKN49QZr3xS1d8QY0lOHnRRRLIg3x+VaD7RYOWuHbqs1
+MKyzgeKkpWq6EkuaW2ZEQwL6cvzqGsbo1CRqBV8CgYBMNqEf1q5VR3sXbkCMEvTQ
+EngqYzNFvuhzelt/2ueDQCHtbawhxa993csY4+evnICNNTDe5gAy5MbiyyasAYJr
+/uVCT61HESCEKXEpo3yMkcOtCweSlTfim3XuG7y5h5TJpT4T0mA3PhI5FWb0rnmB
+hbCrjtTzUIm5foZkno7AzwKBgD2PTXSTCKHRqUchiQNwYvt497BBMmGTLpD6DIHF
+dBxiHGti5yQPULTeZT3aZmlnYaT+raSWkhvvxqYgm+Lnh3wq7MWnjanaQpEJmujJ
+1WpwLrL6NR98IqCpmTvLAsPOiye6+WWuTZi+aKBU5Zy2yQCfgExqw0ax2f3dRD/C
+bH1ZAoGAOJ/pLNpetFyE/aaD0jBfMA6UACdutjWT4vFGmk/GwBh3/sHoMbON2c/P
+OeEM/N3/ZODOZHzXB1ALgWIjeoP2TegBfbniHf2d+j1/VRMTiYEMv3ws06YiWMLJ
+ioX2ZNntCCPlIti48TeFs0etqcHQgQ5rSLblyde3RIuRcqatQko=
+-----END RSA PRIVATE KEY-----

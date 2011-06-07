@@ -1,0 +1,35 @@
+gcb_bot 0c
+----------
+
+gcb bot is a very simple Garena chat bot.
+The current version is meant to only provide basic functionality so that others can see how it may be extended for specific purposes.
+
+Installation
+------------
+
+In addition to gcb installation, you also have to create a MySQL database using install.sql.
+Then, add a user to the database, and specify login information in SQLThread.java.
+
+You probably want to manually add an admin to the database, or nothing will work:
+    INSERT INTO gcb.admins (username) VALUE ('garenauser');
+
+To enable gcb_bot, set "gcb_bot" to true in the configuration file.
+
+Compilation
+-----------
+
+When compiling, you can set the main class as GChatBot.java.
+Then, "gcb_bot" does not have to be set in the configuration file.
+
+Commands
+--------
+
+Admin commands:
+    !addadmin <username>: adds an admin
+    !deladmin <username>: deletes an admin
+    !say <message>: say <message>
+    !w <username> <message>: whisper <message> to <username>
+    !exit: exit
+
+Public commands:
+    !myip: get user's external IP address
