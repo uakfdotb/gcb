@@ -81,44 +81,79 @@ public class GChatBot implements GarenaListener {
     }
     
     public String command(MemberInfo member, String command, String payload) {
-        boolean isadmin = admins.contains(member.username);
+        boolean isadmin = admins.contains(member.username.toLowerCase());
 
         String str_admin = isadmin ? "admin" : "non-admin";
         Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" +
                 payload + "\" from " + str_admin + " " + member.username);
 
-        if(isadmin && command.equalsIgnoreCase("addadmin")) {
-            boolean success = sqlthread.addAdmin(payload);
-            admins.add(payload);
+        if(isadmin) {
+            //ADMIN COMMANDS
 
-            if(success) {
-                return "Successfully added admin " + payload;
-            } else {
-                return "Failed to add admin" + payload;
-            }
-        } else if(isadmin && command.equalsIgnoreCase("deladmin")) {
-            boolean success = sqlthread.delAdmin(payload);
-            admins.remove(payload);
+            if(command.equalsIgnoreCase("addadmin")) {
+                boolean success = sqlthread.addAdmin(payload.toLowerCase());
+                admins.add(payload.toLowerCase());
 
-            if(success) {
-                return "Successfully deleted admin " + payload;
-            } else {
-                return "Failed to delete admin" + payload;
+                if(success) {
+                    return "Successfully added admin " + payload;
+                } else {
+                    return "Failed to add admin" + payload;
+                }
+            } else if(command.equalsIgnoreCase("deladmin")) {
+                boolean success = sqlthread.delAdmin(payload.toLowerCase());
+                admins.remove(payload.toLowerCase());
+
+                if(success) {
+                    return "Successfully deleted admin " + payload;
+                } else {
+                    return "Failed to delete admin" + payload;
+                }
+            } else if(command.equalsIgnoreCase("say")) {
+                chatthread.queueChat(payload, -1);
+            } else if(command.equalsIgnoreCase("exit")) {
+                exit();
+            } else if(command.equalsIgnoreCase("w")) {
+                String[] parts = payload.split(" ", 2);
+                String username = parts[0];
+                MemberInfo target = garena.memberFromName(username);
+
+                if(parts.length >= 2) {
+                    String message = parts[1];
+                    chatthread.queueChat(message, target.userID);
+                }
+            } else if(command.equalsIgnoreCase("ban")) {
+                String[] parts = payload.split(" ", 2);
+                String username = parts[0];
+                int time = 24; //24 hours
+
+                if(parts.length >= 2) {
+                    try {
+                        time = Integer.parseInt(parts[1]);
+                    } catch(NumberFormatException e) {
+                        Main.println("[GChatBot] Warning: ignoring invalid number " + parts[1]);
+                    }
+                }
+
+                garena.ban(username, time);
+                return "Successfully banned " + username + " for " + time + " hours!";
+            } else if(command.equalsIgnoreCase("unban")) {
+                garena.unban(payload);
+                return "Successfully unbanned " + payload + " (banned for 0 seconds)!";
+            } else if(command.equalsIgnoreCase("ann") || command.equalsIgnoreCase("announce")) {
+                garena.announce(payload);
+            } else if(command.equalsIgnoreCase("kick")) {
+                MemberInfo victim = garena.memberFromName(payload);
+                if(victim != null) {
+                    garena.kick(victim);
+                    return "Kicked user " + payload;
+                } else {
+                    return "Unable to locate user " + payload + " in room";
+                }
             }
-        } else if(isadmin && command.equalsIgnoreCase("say")) {
-            chatthread.queueChat(payload, -1);
-        } else if(isadmin && command.equalsIgnoreCase("exit")) {
-            exit();
-        } else if(isadmin && command.equalsIgnoreCase("w")) {
-            String[] parts = payload.split(" ", 2);
-            String username = parts[0];
-            MemberInfo target = garena.memberFromName(username);
-            
-            if(parts.length >= 2) {
-                String message = parts[1];
-                chatthread.queueChat(message, target.userID);
-            }
-        } else if(command.equalsIgnoreCase("myip")) {
+        }
+
+        //PUBLIC COMMANDS
+        if(command.equalsIgnoreCase("myip")) {
             return "Your IP address is " + member.externalIP;
         }
 
@@ -132,7 +167,7 @@ public class GChatBot implements GarenaListener {
     
     public void chatReceived(MemberInfo player, String chat, boolean whisper) {
         //do we have a command?
-        if(chat.startsWith(trigger)) {
+        if(player != null && chat.startsWith(trigger)) {
             //remove trigger from string, and split with space separator
             String[] array = chat.substring(trigger.length()).split(" ", 2);
             String command = array[0];
@@ -183,7 +218,7 @@ public class GChatBot implements GarenaListener {
 
         GChatBot bot = new GChatBot();
         bot.init();
-        if(!bot.initGarena()) System.exit(-1);
-        if(!bot.initRoom()) System.exit(-1);
+        if(!bot.initGarena()) return;
+        if(!bot.initRoom()) return;
     }
 }

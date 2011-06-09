@@ -141,11 +141,11 @@ public class Main {
         }
 
         if(!main.initGarena()) {
-            System.exit(-1);
+            return;
         }
 
         if(!main.initRoom()) {
-            System.exit(-1);
+            return;
         }
         
         main.helloLoop();

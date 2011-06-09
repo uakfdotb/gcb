@@ -30,6 +30,11 @@ Admin commands:
     !say <message>: say <message>
     !w <username> <message>: whisper <message> to <username>
     !exit: exit
+    
+    These will only work if the bot is a channel admin:
+    !ban <username> <hours>: ban <username> for <hours> hours
+    !unban <username>: same as !ban <username> 0
+    !announce <message>: announce <message> to the room
 
 Public commands:
     !myip: get user's external IP address

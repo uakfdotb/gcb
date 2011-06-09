@@ -80,7 +80,7 @@ public class SQLThread extends Thread {
                 bot.admins.clear();
 
                 while(result.next()) {
-                    bot.admins.add(result.getString("username"));
+                    bot.admins.add(result.getString("username").toLowerCase());
                 }
 
                 if(initial) {

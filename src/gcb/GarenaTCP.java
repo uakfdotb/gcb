@@ -115,6 +115,10 @@ public class GarenaTCP extends Thread {
         }
     }
 
+    public boolean initReverse(InetAddress remote_address, int remote_port, int remote_id) {
+        return false;
+    }
+
     public void connAck(int seq, int ack) {
         if(terminated) return;
 
