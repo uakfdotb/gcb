@@ -135,7 +135,7 @@ public class Main {
         Main main = new Main();
         main.init(args);
 
-        if(GCBConfig.configuration.getBoolean("gcb_bot", false) && !GCBConfig.configuration.getBoolean("gcb_disable", true)) {
+        if(GCBConfig.configuration.getBoolean("gcb_bot", false) && GCBConfig.configuration.getBoolean("gcb_bot_disable", true)) {
             GChatBot.main(args);
             return;
         }

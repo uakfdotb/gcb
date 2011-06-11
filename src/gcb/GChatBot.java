@@ -524,6 +524,7 @@ public class GChatBot implements GarenaListener, ActionListener {
         GChatBot bot = new GChatBot();
         bot.init();
         if(!bot.initGarena()) return;
+        bot.initBot();
         if(!bot.initRoom()) return;
     }
 }
