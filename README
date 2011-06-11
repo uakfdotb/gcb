@@ -1,8 +1,5 @@
-gcb (Garena Client Broadcast) 0c
+gcb (Garena Client Broadcast) 0d
 --------------------------------
-
-Usage
------
 
 gcb is meant to be used to broadcast games from a Warcraft III game host (GHost++ or Warcraft III)
     to other clients, and facilitate connections between the host and these clients.
@@ -14,17 +11,6 @@ gcb_bot is an example chat bot for Garena. See README_BOT for details.
 
 The source code for both gcb and gcb_bot are in the same package.
 gcb_bot will only be used if the key "gcb_bot" is set to true in the configuration file.
-
-Progress
---------
-
-gcb is currently fully functional and I have tested playing over Garena.
-
-Pings have been decreased, but the game is still relatively unstable.
-Thus, currently gcb should only be used for testing.
-
-Configuration has been implemented through Apache Commons Configuration.
-Configuration filename can be sent as parameter through command line.
 
 Requirements
 ------------
@@ -46,7 +32,8 @@ The download will include installation instructions that you should follow.
 Installation
 ------------
 
-Installation only consists of unzipping the gcb0c.zip file.
+Installation only consists of unzipping the ZIP file.
+The latest version may be downloaded from http://code.google.com/p/gcb/
 
 Configuration
 -------------

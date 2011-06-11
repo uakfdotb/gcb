@@ -1,8 +1,8 @@
-gcb_bot 0c
+gcb_bot 0d
 ----------
 
-gcb bot is a very simple Garena chat bot.
-The current version is meant to only provide basic functionality so that others can see how it may be extended for specific purposes.
+gcb bot is a Garena chat bot.
+The current version has been significantly extended by XIII.Dragon and can be used with a GHost database.
 
 Installation
 ------------
@@ -10,10 +10,10 @@ Installation
 In addition to gcb installation, you also have to create a MySQL database using install.sql.
 Then, add a user to the database, and specify login information in SQLThread.java.
 
-You probably want to manually add an admin to the database, or nothing will work:
-    INSERT INTO gcb.admins (username) VALUE ('garenauser');
+Alternatively, you can specify a GHost database.
 
 To enable gcb_bot, set "gcb_bot" to true in the configuration file.
+gcb will also run unless gcb_bot_disable is true.
 
 Compilation
 -----------
