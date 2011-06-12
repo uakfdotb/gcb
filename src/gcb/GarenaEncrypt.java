@@ -396,4 +396,14 @@ public class GarenaEncrypt {
         }
         return null;
     }
+
+    //expensive but most correct integer checking
+    public static boolean isInteger(String string) {
+        try {
+            Integer.valueOf(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }

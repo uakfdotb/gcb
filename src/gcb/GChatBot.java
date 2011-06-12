@@ -36,6 +36,9 @@ public class GChatBot implements GarenaListener, ActionListener {
     ChatThread chatthread;
     String root_admin; //root admin for this bot; null if root is disabled
 
+    //conig
+    int publicdelay;
+
     //thread safe objects
     public Vector<String> admins; //admin usernames
     public Vector<String> safelist;
@@ -71,6 +74,8 @@ public class GChatBot implements GarenaListener, ActionListener {
         if(root_admin != null && root_admin.trim().equals("")) {
             root_admin = null;
         }
+
+        publicdelay = GCBConfig.configuration.getInt("gcb_bot_publicdelay", 3000);
         
         registerCommand("addadmin", LEVEL_ADMIN);
         registerCommand("deladmin", LEVEL_ADMIN);
@@ -157,7 +162,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 
         //flood protection if public user
         if(!isAdmin && !isSafelist) {
-            if(System.currentTimeMillis() - member.lastCommandTime < 3000) {
+            if(System.currentTimeMillis() - member.lastCommandTime < publicdelay) {
                 return null;
             } else {
                 member.lastCommandTime = System.currentTimeMillis();
@@ -222,7 +227,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                 chatthread.queueChat(payload, -1);
                 return null;
             } else if(command.equalsIgnoreCase("exit")) {
-                if(isRoot) {
+                if(isRoot || root_admin == null) {
                     exit();
                 }
 
@@ -267,6 +272,11 @@ public class GChatBot implements GarenaListener, ActionListener {
             } else if(command.equalsIgnoreCase("message")) {
                 if(payload.length() > 0) {
                     String[] parts = payload.split(" ", 2);
+
+                    if(!GarenaEncrypt.isInteger(parts[0]) || parts.length < 2) { //in case of bad input
+                        return null;
+                    }
+
                     int interval = Integer.parseInt(parts[0]);
                     announcement = parts[1];
 
@@ -355,10 +365,22 @@ public class GChatBot implements GarenaListener, ActionListener {
         
         //PUBLIC COMMANDS
         if(command.equalsIgnoreCase("version")) {
-            return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
+            boolean disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
+
+            if(!disable_version) {
+                return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
+            } else {
+                return null;
+            }
         } else if(command.equalsIgnoreCase("owner")) {
-            //don't put root admin here: owner might not know it's displayed and
-            return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner");
+            //don't put root admin here: owner might not know it's displayed and then it may be security risk
+            String owner = GCBConfig.configuration.getString("gcb_bot_owner", null);
+
+            if(owner != null && !owner.trim().equals("")) {
+                return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner");
+            } else {
+                return null;
+            }
         } else if(command.equalsIgnoreCase("whoami")) {
             return whois(member.username);
         }

@@ -11,6 +11,8 @@ In addition to gcb installation, you also have to create a MySQL database using 
 Then, add a user to the database, and specify login information in SQLThread.java.
 
 Alternatively, you can specify a GHost database.
+If using a GHost++ database, you should set the database type to "ghostpp"; safelisting will not work.
+If using a GHostOne database, you should set the database type to "ghostone".
 
 To enable gcb_bot, set "gcb_bot" to true in the configuration file.
 gcb will also run unless gcb_bot_disable is true.
@@ -27,14 +29,28 @@ Commands
 Admin commands:
     !addadmin <username>: adds an admin
     !deladmin <username>: deletes an admin
-    !say <message>: say <message>
+    !addsafelist <username>: safelist <username>
+    !delsafelist <username>: unsafelist <username>
+    !say <message>: say <message> to the room
     !w <username> <message>: whisper <message> to <username>
-    !exit: exit
+    !exit: exit (if root admin is specified, then you must be root to use this)
     
     These will only work if the bot is a channel admin:
     !ban <username> <hours>: ban <username> for <hours> hours
     !unban <username>: same as !ban <username> 0
     !announce <message>: announce <message> to the room
+    !kick <username>: kick <username> from the room
+    !message <interval> <message>: announce <message> every <interval> seconds
+    !message: stop announcing messages
+    !bot <command>: send <command> to a GHost bot set in configuration file (only for GHost bots with the commands through MySQL modification)
+
+Safelist commands:
+    !whois <username>: get information on <username>
+    !ip <username>: query ip address of <username>; IP should also be provided in whois
+    !usage <command>: check usage of <command> (command must not include the trigger)
+    !alias <command>: find all aliases of <command> set in gcb.cfg
 
 Public commands:
-    !myip: get user's external IP address
+    !whoami: whois information on sender
+    !version: gcb version information, if available
+    !owner: bot owner information, if available
