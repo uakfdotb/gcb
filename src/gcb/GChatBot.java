@@ -82,6 +82,7 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("ban", LEVEL_ADMIN);
         registerCommand("unban", LEVEL_ADMIN);
         registerCommand("announce", LEVEL_ADMIN);
+        registerCommand("kick", LEVEL_ADMIN);
         registerCommand("message", LEVEL_ADMIN);
         registerCommand("bot", LEVEL_ADMIN);
         registerCommand("whois", LEVEL_SAFELIST);
@@ -254,6 +255,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                 return "Successfully unbanned " + payload + " (banned for 0 seconds)!";
             } else if(command.equalsIgnoreCase("announce")) {
                 garena.announce(payload);
+                return null;
             } else if(command.equalsIgnoreCase("kick")) {
                 MemberInfo victim = garena.memberFromName(payload);
                 if(victim != null) {
@@ -335,9 +337,9 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else if(payload.equalsIgnoreCase("commands")) {
                     return "Example: !commands. Lists all the commands available based on your access level.";
                 } else if(payload.equalsIgnoreCase("alias")) {
-                    return "Example: !alias admincommands. Displays all alias's of the command.";
+                    return "Example: !alias commands. Displays all alias's of the command.";
                 } else if(payload.equalsIgnoreCase("message")) {
-                    return "Example: !message Hello World 100. Message is case sensitive. Sends a system announcement every X seconds. If no message is given, system will stop messaging.";
+                    return "Example: !message 100 Hello World. Message is case sensitive. Sends a system announcement every X seconds. If no message is given, system will stop messaging.";
                 } else {
                     return "Command not found!";
                 }
@@ -385,7 +387,7 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
 
         String accessLevel = getAccessLevel(target.username);
-        return "Username: <" + target.username + "> UID: " + target.userID + " is:" + accessLevel + " " + wc3status + " IP: " + target.externalIP;
+        return "Username: <" + target.username + "> UID: " + target.userID + " is: " + accessLevel + " " + wc3status + " IP: " + target.externalIP;
     }
 
     public String getAccessLevel(String username) {

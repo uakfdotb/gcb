@@ -137,7 +137,8 @@ public class GarenaTCP extends Thread {
                 GarenaTCPPacket curr = packets.get(i);
                 if(curr.seq >= ack && curr.seq <= seq - 1) {
                     curr.send_time = System.currentTimeMillis();
-                    garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, curr.data, curr.data.length, buf);
+                    garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+                    System.out.println("fast retransmitting a packet of length " + curr.data.length);
                 }
             }
         }
@@ -148,7 +149,8 @@ public class GarenaTCP extends Thread {
             GarenaTCPPacket curr = packets.get(i);
             if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
                 curr.send_time = System.currentTimeMillis();
-                garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, curr.data, curr.data.length, buf);
+                garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+                System.out.println("retransmitting2 a packet of length " + curr.data.length);
             }
         }
     }
@@ -156,6 +158,7 @@ public class GarenaTCP extends Thread {
     public void data(int seq, int ack, byte[] data, int offset, int length) {
         if(terminated) return;
 
+        System.out.println("receive: " + seq + " with ack " + ack + "; ack now at: " + this.ack);
         //acknowledge packets
         for(int i = 0; i < packets.size(); i++) {
             GarenaTCPPacket curr = packets.get(i);
@@ -170,9 +173,11 @@ public class GarenaTCP extends Thread {
             GarenaTCPPacket curr = packets.get(i);
             if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
                 curr.send_time = System.currentTimeMillis();
-                garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, curr.data, curr.data.length, buf);
+                garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+                System.out.println("retransmitting a packet of length " + curr.data.length);
             }
         }
+
 
         //pass data on to local server
         //todo: decrease latency... how?
@@ -213,6 +218,7 @@ public class GarenaTCP extends Thread {
             packet.data = copy;
 
             out_packets.put(seq, packet);
+            System.out.println("storing packet of length " + copy.length);
         } //ignore packet if seq is less than our ack
 
         //send conn ack
@@ -220,13 +226,13 @@ public class GarenaTCP extends Thread {
     }
 
     public void run() {
-        byte[] rbuf = new byte[32768];
+        byte[] rbuf = new byte[2048];
 
         while(!terminated) {
             try {
                 //read as many bytes as we can and relay them onwards to remote
                 int len = in.read(rbuf); //definitely _don't_ want to readfully here!
-
+System.out.println(len);
                 if(len == -1) {
                     end();
                     break;
@@ -244,6 +250,7 @@ public class GarenaTCP extends Thread {
 
                 garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, data, len, buf);
                 seq++;
+                System.out.println("sent!");
             } catch(IOException ioe) {
                 end();
                 ioe.printStackTrace();
