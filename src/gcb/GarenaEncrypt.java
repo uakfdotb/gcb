@@ -218,11 +218,6 @@ public class GarenaEncrypt {
                 null_index = i;
                 break;
             }
-
-            if(input[i + 1] == 0 && (input[i] < 32 || input[i] > 126)) {
-                //bad character, probably for formatting that we don't want
-                input[i] = 46; //period
-            }
         }
 
         try {
@@ -231,6 +226,19 @@ public class GarenaEncrypt {
             Main.println("[GEncrypt] UnicodeLittleUnmarked is unsupported: " + e.getLocalizedMessage());
             return null;
         }
+    }
+
+    public static String cleanString(String string) {
+        byte[] input = string.getBytes();
+
+        for(int i = 0; i < input.length; i++) {
+            if(input[i] < 32 || input[i] > 126) {
+                //bad character, probably for formatting that we don't want
+                input[i] = 46; //period
+            }
+        }
+        
+        return new String(input);
     }
 
     /**

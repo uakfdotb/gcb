@@ -542,7 +542,7 @@ public class GChatBot implements GarenaListener, ActionListener {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         GCBConfig.load(args);
 
         GChatBot bot = new GChatBot();

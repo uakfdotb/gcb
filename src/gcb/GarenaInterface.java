@@ -830,7 +830,8 @@ public class GarenaInterface {
 
         byte[] str_bytes = new byte[packet_size - 4];
         rin.readFully(str_bytes);
-        Main.println("[GInterface] Server says: " + crypt.strFromBytes16(str_bytes));
+        String welcome_str = crypt.strFromBytes16(str_bytes);
+        Main.println("[GInterface] Server says: " + welcome_str);
     }
 
     public void processMemberList(int packet_size, ByteBuffer lbuf) throws IOException {
