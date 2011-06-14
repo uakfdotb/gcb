@@ -45,13 +45,13 @@ public class GChatBot implements GarenaListener, ActionListener {
     //thread safe objects
     public Vector<String> admins; //admin usernames
     public Vector<String> safelist;
+    public Vector<String> bannedWords;
 
     HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
     HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
     Vector<String> adminCommands; //includes all commands accessible by admins, including safelist/public commands
     Vector<String> safelistCommands;
     Vector<String> publicCommands;
-    public Vector<String> bannedWords;
 
     public GChatBot() {
         admins = new Vector<String>();
@@ -96,12 +96,9 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("kick", LEVEL_ADMIN);
         registerCommand("message", LEVEL_ADMIN);
         registerCommand("bot", LEVEL_ADMIN);
-<<<<<<< .mine
         registerCommand("clear", LEVEL_ADMIN);
-=======
         registerCommand("addbannedword", LEVEL_ADMIN);
         registerCommand("delbannedword", LEVEL_ADMIN);
->>>>>>> .r28
         registerCommand("whois", LEVEL_SAFELIST);
         registerCommand("usage", LEVEL_SAFELIST);
         registerCommand("alias", LEVEL_SAFELIST);
@@ -161,7 +158,6 @@ public class GChatBot implements GarenaListener, ActionListener {
     }
 
     public String command(MemberInfo member, String command, String payload) {
-
         if(command.equals("?trigger")) return "Trigger: " + trigger;
 
         boolean isRoot = false;
@@ -185,7 +181,7 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
 
         command = processAlias(command.toLowerCase()); //if it's alias, convert it to original command
-		
+
         if(command.equals("commands")) {
             String str = "Commands: ";
 
@@ -317,10 +313,8 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else {
                     return "Failed!";
                 }
-<<<<<<< .mine
             } else if(command.equalsIgnoreCase("clear")) {
                 chatthread.clearQueue();
-=======
             } else if(command.equalsIgnoreCase("addbannedword")) {
                 boolean success = sqlthread.addBannedWord(payload.toLowerCase());
                 
@@ -339,7 +333,6 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else {
                     return "Failed to delete banned word " + payload;
                 }
->>>>>>> .r28
             }
         }
 
@@ -364,7 +357,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else if(payload.equalsIgnoreCase("addadmin")) {
                     return "Example: !addadmin XIII.Dragon. Adds user to admin list and replies with result.";
                 } else if(payload.equalsIgnoreCase("deladmin")) {
-                    return "Example: !deladmin XIII.Dragon. Adds user to admin list and replies with result.";
+                    return "Example: !deladmin XIII.Dragon. Deletes user from admin list and replies with result.";
                 } else if(payload.equalsIgnoreCase("say")) {
                     return "Example: !say Hello World. Message is case sensitive, replies in main chat.";
                 } else if(payload.equalsIgnoreCase("exit")) {
@@ -393,6 +386,8 @@ public class GChatBot implements GarenaListener, ActionListener {
                     return "Example: !addbannedword fuck. Adds word or phrase to banned word list";
                 } else if(payload.equalsIgnoreCase("delbannedword")) {
                     return "Example: !delbannedword fuck. Removes word or phrase from banned word list";				
+                } else if(payload.equalsIgnoreCase("clear")) {
+                    return "Example: !clear. Clears the chat queue, in case bot got flooded with requests.";
                 } else if(payload.equalsIgnoreCase("addsafelist")) {
                     return "Example: !addsafelist XIII.Dragon. Adds user to safelist and replies with result";
                 } else if(payload.equalsIgnoreCase("delsafelist")) {
@@ -569,6 +564,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                 }
             }
         }
+        
         if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
             boolean isAdmin = admins.contains(player.username.toLowerCase());
             boolean isSafelist = safelist.contains(player.username.toLowerCase());
