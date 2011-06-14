@@ -196,7 +196,7 @@ public class SQLThread extends Thread {
                     Main.println("[SQLThread] Initial refresh: found " + bot.admins.size() + " admins");
                 }
                 
-                if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false) {
+                if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
                     statement = connection.createStatement();
                     result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
                     bot.bannedWords.clear();
