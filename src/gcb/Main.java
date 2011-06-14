@@ -130,7 +130,11 @@ public class Main {
         System.exit(0);*/
 
         //init log
-        log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+        String log_file = GCBConfig.getString("gcb_log");
+
+        if(log_file != null) {
+            log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+        }
 
         Main main = new Main();
         main.init(args);
@@ -167,8 +171,11 @@ public class Main {
 
     public static void println(String str) {
         System.out.println(str);
-        Date date = new Date();
-        log_out.println("[" + DateFormat.getDateTimeInstance().format(date) + "] " + str);
+
+        if(log_out != null) {
+            Date date = new Date();
+            log_out.println("[" + DateFormat.getDateTimeInstance().format(date) + "] " + str);
+        }
     }
 
     //hexadecimal string to byte array

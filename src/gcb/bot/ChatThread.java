@@ -44,6 +44,14 @@ public class ChatThread extends Thread {
         }
     }
 
+    //in case we're flooding or something
+    public void clearQueue() {
+        synchronized(chat_queue) {
+            chat_queue.clear();
+            chat_queue.notifyAll();
+        }
+    }
+
     public void run() {
         while(true) {
             //wait until we get a message

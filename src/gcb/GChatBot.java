@@ -9,6 +9,8 @@ import gcb.bot.SQLThread;
 import gcb.bot.ChatThread;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.Timer;
 import java.util.Vector;
@@ -38,6 +40,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 
     //conig
     int publicdelay;
+    boolean publiccommands;
 
     //thread safe objects
     public Vector<String> admins; //admin usernames
@@ -78,6 +81,7 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
 
         publicdelay = GCBConfig.configuration.getInt("gcb_bot_publicdelay", 3000);
+        publiccommands = GCBConfig.configuration.getBoolean("gcb_bot_publiccommands", true);
         
         registerCommand("addadmin", LEVEL_ADMIN);
         registerCommand("deladmin", LEVEL_ADMIN);
@@ -92,8 +96,12 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("kick", LEVEL_ADMIN);
         registerCommand("message", LEVEL_ADMIN);
         registerCommand("bot", LEVEL_ADMIN);
+<<<<<<< .mine
+        registerCommand("clear", LEVEL_ADMIN);
+=======
         registerCommand("addbannedword", LEVEL_ADMIN);
         registerCommand("delbannedword", LEVEL_ADMIN);
+>>>>>>> .r28
         registerCommand("whois", LEVEL_SAFELIST);
         registerCommand("usage", LEVEL_SAFELIST);
         registerCommand("alias", LEVEL_SAFELIST);
@@ -102,6 +110,8 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("version", LEVEL_PUBLIC);
         registerCommand("owner", LEVEL_PUBLIC);
         registerCommand("whoami", LEVEL_PUBLIC);
+        registerCommand("time", LEVEL_PUBLIC);
+        registerCommand("rand", LEVEL_PUBLIC);
     }
 
     public boolean initGarena() {
@@ -307,6 +317,10 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else {
                     return "Failed!";
                 }
+<<<<<<< .mine
+            } else if(command.equalsIgnoreCase("clear")) {
+                chatthread.clearQueue();
+=======
             } else if(command.equalsIgnoreCase("addbannedword")) {
                 boolean success = sqlthread.addBannedWord(payload.toLowerCase());
                 
@@ -325,6 +339,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else {
                     return "Failed to delete banned word " + payload;
                 }
+>>>>>>> .r28
             }
         }
 
@@ -396,25 +411,31 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
         
         //PUBLIC COMMANDS
-        if(command.equalsIgnoreCase("version")) {
-            boolean disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
+        if(publiccommands) {
+            if(command.equalsIgnoreCase("version")) {
+                boolean disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
 
-            if(!disable_version) {
-                return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
-            } else {
-                return null;
-            }
-        } else if(command.equalsIgnoreCase("owner")) {
-            //don't put root admin here: owner might not know it's displayed and then it may be security risk
-            String owner = GCBConfig.configuration.getString("gcb_bot_owner", null);
+                if(!disable_version) {
+                    return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
+                } else {
+                    return null;
+                }
+            } else if(command.equalsIgnoreCase("owner")) {
+                //don't put root admin here: owner might not know it's displayed and then it may be security risk
+                String owner = GCBConfig.configuration.getString("gcb_bot_owner", null);
 
-            if(owner != null && !owner.trim().equals("")) {
-                return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner");
-            } else {
-                return null;
+                if(owner != null && !owner.trim().equals("")) {
+                    return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner");
+                } else {
+                    return null;
+                }
+            } else if(command.equalsIgnoreCase("whoami")) {
+                return whois(member.username);
+            } else if(command.equalsIgnoreCase("time")) {
+                return DateFormat.getDateTimeInstance().format(new Date());
+            } else if(command.equalsIgnoreCase("rand")) {
+                return Math.random() + "";
             }
-        } else if(command.equalsIgnoreCase("whoami")) {
-            return whois(member.username);
         }
 
         if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {

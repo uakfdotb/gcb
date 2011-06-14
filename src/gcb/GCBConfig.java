@@ -31,4 +31,15 @@ public class GCBConfig {
             Main.println("[GCBConfig] Error while loading config file: " + e.getLocalizedMessage());
         }
     }
+
+    //special get string that will return null if key is not found
+    public static String getString(String key) {
+        String s = configuration.getString(key, null);
+
+        if(s == null || s.trim().equals("")) {
+            return null;
+        } else {
+            return s;
+        }
+    }
 }
