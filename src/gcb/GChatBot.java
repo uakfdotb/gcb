@@ -38,9 +38,12 @@ public class GChatBot implements GarenaListener, ActionListener {
     ChatThread chatthread;
     String root_admin; //root admin for this bot; null if root is disabled
 
-    //conig
+    //config
     int publicdelay;
     boolean publiccommands;
+    String access_message;
+    String owner;
+    boolean disable_version;
 
     //thread safe objects
     public Vector<String> admins; //admin usernames
@@ -74,14 +77,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 
         //configuration
         trigger = GCBConfig.configuration.getString("gcb_bot_trigger", "!");
-        root_admin = GCBConfig.configuration.getString("gcb_bot_root", null);
-
-        if(root_admin != null && root_admin.trim().equals("")) {
-            root_admin = null;
-        }
+        root_admin = GCBConfig.getString("gcb_bot_root");
 
         publicdelay = GCBConfig.configuration.getInt("gcb_bot_publicdelay", 3000);
         publiccommands = GCBConfig.configuration.getBoolean("gcb_bot_publiccommands", true);
+        access_message = GCBConfig.getString("gcb_bot_access_message");
+        owner = GCBConfig.getString("gcb_bot_owner");
+        disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
         
         registerCommand("addadmin", LEVEL_ADMIN);
         registerCommand("deladmin", LEVEL_ADMIN);
@@ -103,12 +105,22 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("usage", LEVEL_SAFELIST);
         registerCommand("alias", LEVEL_SAFELIST);
         registerCommand("ip", LEVEL_SAFELIST);
-        registerCommand("commands", LEVEL_PUBLIC);
-        registerCommand("version", LEVEL_PUBLIC);
-        registerCommand("owner", LEVEL_PUBLIC);
-        registerCommand("whoami", LEVEL_PUBLIC);
-        registerCommand("time", LEVEL_PUBLIC);
-        registerCommand("rand", LEVEL_PUBLIC);
+
+        int public_level = LEVEL_PUBLIC;
+        if(!publiccommands) {
+            public_level = LEVEL_SAFELIST;
+        }
+
+        registerCommand("commands", public_level);
+        registerCommand("whoami", public_level);
+        registerCommand("time", public_level);
+        registerCommand("rand", public_level);
+
+        if(owner != null) {
+            registerCommand("owner", public_level);
+        } if(!disable_version) {
+            registerCommand("version", public_level);
+        }
     }
 
     public boolean initGarena() {
@@ -158,8 +170,6 @@ public class GChatBot implements GarenaListener, ActionListener {
     }
 
     public String command(MemberInfo member, String command, String payload) {
-        if(command.equals("?trigger")) return "Trigger: " + trigger;
-
         boolean isRoot = false;
         if(root_admin != null) {
             isRoot = root_admin.equalsIgnoreCase(member.username);
@@ -406,20 +416,15 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
         
         //PUBLIC COMMANDS
-        if(publiccommands) {
+        if(publiccommands || isSafelist || isAdmin) {
             if(command.equalsIgnoreCase("version")) {
-                boolean disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
-
                 if(!disable_version) {
                     return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
                 } else {
                     return null;
                 }
             } else if(command.equalsIgnoreCase("owner")) {
-                //don't put root admin here: owner might not know it's displayed and then it may be security risk
-                String owner = GCBConfig.configuration.getString("gcb_bot_owner", null);
-
-                if(owner != null && !owner.trim().equals("")) {
+                if(owner != null) {
                     return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner");
                 } else {
                     return null;
@@ -433,10 +438,12 @@ public class GChatBot implements GarenaListener, ActionListener {
             }
         }
 
-        if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
-            return "You do not have access to this command";
-        } else if (!isAdmin && isSafelist && adminCommands.contains(command.toLowerCase())) {
-            return "You do not have access to this command";
+        if(access_message != null) {
+            if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
+                return access_message;
+            } else if (!isAdmin && isSafelist && adminCommands.contains(command.toLowerCase())) {
+                return access_message;
+            }
         }
 
         return null;
@@ -541,6 +548,16 @@ public class GChatBot implements GarenaListener, ActionListener {
     }
 
     public void chatReceived(MemberInfo player, String chat, boolean whisper) {
+        if(player != null && chat.startsWith("?trigger")) {
+            String trigger_msg = "Trigger: " + trigger;
+
+            if(whisper) {
+                chatthread.queueChat(trigger_msg, player.userID);
+            } else {
+                chatthread.queueChat(trigger_msg, -1);
+            }
+        }
+
         //do we have a command?
         if(player != null && chat.startsWith(trigger)) {
             //remove trigger from string, and split with space separator
@@ -557,10 +574,8 @@ public class GChatBot implements GarenaListener, ActionListener {
             if(response != null) {
                 if(whisper) {
                     chatthread.queueChat(response, player.userID);
-                    response = null;
                 } else {
                     chatthread.queueChat(response, -1);
-                    response = null;
                 }
             }
         }
@@ -582,6 +597,8 @@ public class GChatBot implements GarenaListener, ActionListener {
                         } else {
                             garena.announce(detectAnnouncement);
                         }
+
+                        break;
                     }
                 }
             }

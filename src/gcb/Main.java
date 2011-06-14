@@ -130,14 +130,15 @@ public class Main {
         System.exit(0);*/
 
         //init log
+
+        Main main = new Main();
+        main.init(args);
+        
         String log_file = GCBConfig.getString("gcb_log");
 
         if(log_file != null) {
             log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
         }
-
-        Main main = new Main();
-        main.init(args);
 
         if(GCBConfig.configuration.getBoolean("gcb_bot", false) && GCBConfig.configuration.getBoolean("gcb_bot_disable", true)) {
             GChatBot.main(args);
