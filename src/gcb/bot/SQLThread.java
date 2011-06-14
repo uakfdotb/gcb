@@ -111,8 +111,7 @@ public class SQLThread extends Thread {
             Statement statement = connection.createStatement();
 
             if(dbtype == TYPE_GHOSTONE) {
-                statement.executeUpdate("INSERT INTO safelist (server, name, voucher) VALUES"
-                        + " ('" + realm + "', '" + username + "', '" + voucher + "')");
+                statement.executeUpdate("INSERT INTO safelist (server, name, voucher) VALUES" + " ('" + realm + "', '" + username + "', '" + voucher + "')");
             } else if(dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
                 statement.executeUpdate("INSERT INTO safelist (name) VALUES ('" + username + "')");
             }
@@ -136,6 +135,30 @@ public class SQLThread extends Thread {
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
+        }
+
+        return false;
+    }
+
+    public boolean addBannedWord(String bannedWord) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', '" + bannedWord + "')");
+            return true;
+        } catch(SQLException e) {
+            Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
+        }
+
+        return false;
+    }
+
+    public boolean delBannedWord(String bannedWord) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("DELETE FROM phrases WHERE phrase='" + bannedWord + "' and type='bannedword'");
+            return true;
+        } catch(SQLException e) {
+            Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
         }
 
         return false;
@@ -171,6 +194,19 @@ public class SQLThread extends Thread {
 
                 if(initial) {
                     Main.println("[SQLThread] Initial refresh: found " + bot.admins.size() + " admins");
+                }
+                
+                if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false) {
+                    statement = connection.createStatement();
+                    result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
+                    bot.bannedWords.clear();
+                    while(result.next()) {
+                        bot.bannedWords.add(result.getString("phrase").toLowerCase());
+                    }
+
+                    if(initial) {
+                        Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " banned words");
+                    }
                 }
             } catch(SQLException e) {
                 Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
