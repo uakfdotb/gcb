@@ -10,6 +10,7 @@ import gcb.GChatBot;
 import gcb.Main;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -71,17 +72,19 @@ public class SQLThread extends Thread {
 
     public boolean addAdmin(String username) {
         try {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = null;
 
             if(dbtype == TYPE_GHOSTONE) {
-                statement.executeUpdate("INSERT INTO admins (botid, name, server, access) VALUES"
-                        + "(0, '" + username + "', '" + realm + "', 4095)");
+                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES"
+                        + "(0, ?, '" + realm + "', 4095)");
             } else if(dbtype == TYPE_GHOSTPP || dbtype == TYPE_GHOSTPP_EXTENDED) {
-                statement.executeUpdate("INSERT INTO admins (botid, name, server) VALUES (0, '" + username + "', 'gcb')");
+                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server) VALUES (0, ?, 'gcb')");
             } else if(dbtype == TYPE_GCB) {
-                statement.executeUpdate("INSERT INTO admins (name) VALUES ('" + username + "')");
+                statement = connection.prepareStatement("INSERT INTO admins (name) VALUES (?)");
             }
+            statement.setString(1, username);
 
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
@@ -92,8 +95,9 @@ public class SQLThread extends Thread {
 
     public boolean delAdmin(String username) {
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("DELETE FROM admins WHERE name='" + username + "'");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name = ?");
+            statement.setString(1, username);
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
@@ -108,14 +112,19 @@ public class SQLThread extends Thread {
         }
 
         try {
-            Statement statement = connection.createStatement();
+            PreparedStatement statement = null;
 
             if(dbtype == TYPE_GHOSTONE) {
-                statement.executeUpdate("INSERT INTO safelist (server, name, voucher) VALUES" + " ('" + realm + "', '" + username + "', '" + voucher + "')");
+                statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES"
+                        + " ('" + realm + "', ?, ?)");
+                statement.setString(1, username);
+                statement.setString(2, voucher);
             } else if(dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
-                statement.executeUpdate("INSERT INTO safelist (name) VALUES ('" + username + "')");
+                statement = connection.prepareStatement("INSERT INTO safelist (name) VALUES (?)");
+                statement.setString(1, username);
             }
 
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
@@ -130,8 +139,9 @@ public class SQLThread extends Thread {
         }
         
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("DELETE FROM safelist WHERE name='" + username + "'");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name = ?");
+            statement.setString(1, username);
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
@@ -142,8 +152,10 @@ public class SQLThread extends Thread {
 
     public boolean addBannedWord(String bannedWord) {
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', '" + bannedWord + "')");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase)"
+                    + " VALUES (NULL, 'bannedword', ?)");
+            statement.setString(1, bannedWord);
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
@@ -154,8 +166,10 @@ public class SQLThread extends Thread {
 
     public boolean delBannedWord(String bannedWord) {
         try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("DELETE FROM phrases WHERE phrase='" + bannedWord + "' and type='bannedword'");
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases"
+                    + " WHERE phrase=' ? and type='bannedword'");
+            statement.setString(1, bannedWord);
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
@@ -170,9 +184,12 @@ public class SQLThread extends Thread {
         }
 
         try {
-            Statement statement = connection.createStatement();
             int target_botid = GCBConfig.configuration.getInteger("gcb_bot_id", 1);
-            statement.executeUpdate("INSERT INTO commands (botid, command) VALUES ('" + target_botid + "', '" + command + "')");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command)"
+                    + " VALUES (?, ?)");
+            statement.setString(1, target_botid + "");
+            statement.setString(2, command);
+            statement.execute();
             return true;
         } catch(SQLException e) {
             Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
