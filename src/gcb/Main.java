@@ -5,6 +5,7 @@
 
 package gcb;
 
+import gcb.plugin.PluginManager;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,10 +17,11 @@ import java.util.Date;
  * @author wizardus
  */
 public class Main {
-    public static String VERSION = "gcb 0c";
+    public static String VERSION = "gcb 0e";
 
     static PrintWriter log_out;
 
+    PluginManager plugins;
     GarenaInterface garena;
     WC3Interface wc3i;
     GarenaThread gsp_thread;
@@ -32,9 +34,15 @@ public class Main {
         GCBConfig.load(args);
     }
 
+    public void initPlugins() {
+        plugins = new PluginManager();
+        plugins.initPlugins();
+        plugins.loadPlugins();
+    }
+
     public boolean initGarena() {
         //connect to garena
-        garena = new GarenaInterface();
+        garena = new GarenaInterface(plugins);
         garena.registerListener(new GarenaReconnect(this));
 
         if(!garena.init()) {
@@ -145,6 +153,8 @@ public class Main {
             return;
         }
 
+        main.initPlugins();
+
         if(!main.initGarena()) {
             return;
         }
@@ -159,6 +169,7 @@ public class Main {
             bot.garena = main.garena;
             bot.gsp_thread = main.gsp_thread;
             bot.gcrp_thread = main.gcrp_thread;
+            bot.plugins = main.plugins;
             bot.initBot();
         }
         
@@ -188,7 +199,7 @@ public class Main {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
                                  + Character.digit(s.charAt(i+1), 16));
         }
-        
+
         return data;
     }
 

@@ -5,6 +5,7 @@
 
 package gcb;
 
+import gcb.plugin.PluginManager;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileWriter;
@@ -35,6 +36,9 @@ public class GarenaInterface {
 
     //login server address
     InetAddress main_address;
+
+    //plugin manager
+    PluginManager plugins;
     
     //login server objects
     Socket socket;
@@ -77,7 +81,9 @@ public class GarenaInterface {
     //myinfo block
     byte[] myinfo;
 
-    public GarenaInterface() {
+    public GarenaInterface(PluginManager plugins) {
+        this.plugins = plugins;
+        
         buf = ByteBuffer.allocate(2048);
         crypt = new GarenaEncrypt();
         members = new Vector<MemberInfo>();
@@ -537,6 +543,9 @@ public class GarenaInterface {
                 in.readFully(bb);
                 byte[] data = crypt.aesDecrypt(bb);
 
+                //notify plugins
+                plugins.onPacket(GARENA_MAIN, -1, data, 0, data.length);
+
                 if(data[0] == 68) {
                     processQueryResponse(data);
                 } else {
@@ -807,6 +816,9 @@ public class GarenaInterface {
                     if(size < 1000000000 && size >= 2) {
                         byte[] tmp = new byte[size - 1]; //we already read type
                         rin.read(tmp);
+
+                        //notify plugins
+                        plugins.onPacket(GARENA_ROOM, type, tmp, 0, size - 1);
                     }
                 }
             } catch(IOException ioe) {
@@ -1246,6 +1258,10 @@ public class GarenaInterface {
         listeners.add(listener);
     }
 
+    public void deregisterListener(GarenaListener listener) {
+        listeners.remove(listener);
+    }
+
     public void readPeerLoop() {
         byte[] buf_array = new byte[65536];
         ByteBuffer lbuf = ByteBuffer.allocate(65536);
@@ -1257,6 +1273,9 @@ public class GarenaInterface {
             try {
                 DatagramPacket packet = new DatagramPacket(buf_array, buf_array.length);
                 peer_socket.receive(packet);
+
+                //notify plugins
+                plugins.onPacket(GARENA_PEER, -1, buf_array, packet.getOffset(), packet.getLength());
 
                 int length = packet.getLength();
                 lbuf.put(buf_array, 0, length);
@@ -1625,5 +1644,7 @@ public class GarenaInterface {
         for(GarenaListener listener : listeners) {
             listener.disconnected(x);
         }
+
+        plugins.onDisconnect(x);
     }
 }

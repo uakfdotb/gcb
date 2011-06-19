@@ -253,7 +253,7 @@ public class GarenaTCP extends Thread {
         }
     }
 
-    public long lastTime() {
+    private long lastTime() {
         //return current last_time and set last_time to current time
         if(last_time == -1) {
             last_time = System.nanoTime();

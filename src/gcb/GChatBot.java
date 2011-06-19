@@ -7,6 +7,7 @@ package gcb;
 
 import gcb.bot.SQLThread;
 import gcb.bot.ChatThread;
+import gcb.plugin.PluginManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -21,7 +22,7 @@ import org.apache.commons.configuration.ConversionException;
  * @author wizardus
  */
 public class GChatBot implements GarenaListener, ActionListener {
-    public static String VERSION = "gcb_bot 0d";
+    public static String VERSION = "gcb_bot 0e";
     public static int LEVEL_PUBLIC = 0;
     public static int LEVEL_SAFELIST = 1;
     public static int LEVEL_ADMIN = 2;
@@ -34,6 +35,7 @@ public class GChatBot implements GarenaListener, ActionListener {
     GarenaInterface garena;
     GarenaThread gsp_thread;
     GarenaThread gcrp_thread;
+    PluginManager plugins;
     SQLThread sqlthread;
     ChatThread chatthread;
     String root_admin; //root admin for this bot; null if root is disabled
@@ -101,6 +103,8 @@ public class GChatBot implements GarenaListener, ActionListener {
         registerCommand("clear", LEVEL_ADMIN);
         registerCommand("addbannedword", LEVEL_ADMIN);
         registerCommand("delbannedword", LEVEL_ADMIN);
+        registerCommand("loadplugin", LEVEL_ADMIN);
+        registerCommand("unloadplugin", LEVEL_ADMIN);
         registerCommand("whois", LEVEL_SAFELIST);
         registerCommand("usage", LEVEL_SAFELIST);
         registerCommand("alias", LEVEL_SAFELIST);
@@ -123,9 +127,15 @@ public class GChatBot implements GarenaListener, ActionListener {
         }
     }
 
+    public void initPlugins() {
+        plugins = new PluginManager();
+        plugins.initPlugins();
+        plugins.loadPlugins();
+    }
+
     public boolean initGarena() {
         //connect to garena
-        garena = new GarenaInterface();
+        garena = new GarenaInterface(plugins);
         garena.registerListener(new GarenaReconnect(this));
 
         if(!garena.init()) {
@@ -177,6 +187,12 @@ public class GChatBot implements GarenaListener, ActionListener {
         
         boolean isAdmin = isRoot || admins.contains(member.username.toLowerCase());
         boolean isSafelist = safelist.contains(member.username.toLowerCase());
+
+        //notify plugins
+        String pluginResponse = plugins.onCommand(member, command, payload, isAdmin, isSafelist);
+        if(pluginResponse != null) {
+            return pluginResponse;
+        }
         
         String str_level = getAccessLevel(member.username);
         Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + str_level + " " + member.username);
@@ -343,6 +359,12 @@ public class GChatBot implements GarenaListener, ActionListener {
                 } else {
                     return "Failed to delete banned word " + payload;
                 }
+            } else if(command.equalsIgnoreCase("loadplugin")) {
+                plugins.loadPlugin(payload);
+                return null;
+            } else if(command.equalsIgnoreCase("unloadplugin")) {
+                plugins.unloadPlugin(payload);
+                return null;
             }
         }
 
@@ -634,6 +656,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 
         GChatBot bot = new GChatBot();
         bot.init();
+        bot.initPlugins();
         if(!bot.initGarena()) return;
         bot.initBot();
         if(!bot.initRoom()) return;
