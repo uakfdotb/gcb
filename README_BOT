@@ -2,26 +2,30 @@ gcb_bot 0d
 ----------
 
 gcb bot is a Garena chat bot.
-The current version has been significantly extended by XIII.Dragon and can be used with a GHost database.
 
 Installation
 ------------
 
-In addition to gcb installation, you also have to create a MySQL database using install.sql.
-Then, add a user to the database, and specify login information in SQLThread.java.
+First, follow gcb general requirements and installation guidelines in README.
 
-Alternatively, you can specify a GHost database.
-If using a GHost++ database, you should set the database type to "ghostpp"; safelisting will not work.
-If using a GHostOne database, you should set the database type to "ghostone".
+In addition to gcb installation, you also have to create a MySQL database. If you do not plan on using gcb with a GHost bot, then you should run install.sql and create a new database.
 
-To enable gcb_bot, set "gcb_bot" to true in the configuration file.
-gcb will also run unless gcb_bot_disable is true.
+Alternatively, you can specify a GHost database. If using a GHost++ database, you should set gcb_bot_db_type to "ghostpp"; safelisting will not work. If using a GHostOne database, you should set the database type to "ghostone".
 
-Compilation
------------
+An "extended GHost++" database can also be specified. This means that the modification at http://www.codelain.com/forum/index.php?topic=17803.0 is implemented and a safelist table based on the gcb install.sql file has been created.
 
-When compiling, you can set the main class as GChatBot.java.
-Then, "gcb_bot" does not have to be set in the configuration file.
+To enable gcb_bot, set "gcb_bot" to true in the configuration file. gcb will also run unless gcb_bot_disable is true (which it is by default). You then must specify database settings.
+
+Additional configuration
+------------------------
+
+First, you may wish to improve security by disable the !version command (gcb_bot_noversion = true). You may additionally want to disable public commands all together (gcb_bot_publiccommands = false) or increase the delay that users can use public commands (gcb_bot_publicdelay = 5000 for five seconds; default is 3000 ms). Note that the '?trigger' will still be available to everyone.
+
+Next, users in crowded rooms probably want to disable the no access message (gcb_bot_detect_announcement = ) and change the bot trigger (gcb_bot_trigger = #, if you want # to be the command trigger). Because the Garena flood-protection is implemented client side, you can also decrease the message delay (gcb_bot_delay = 10, for 10 ms).
+
+Aliases for any command can be added. See the examples in gcb.cfg for details.
+
+For gcb_bot_detect to work, you need to create an additional table specified in phrases_table.sql.
 
 Commands
 --------
@@ -33,6 +37,12 @@ Admin commands:
     !delsafelist <username>: unsafelist <username>
     !say <message>: say <message> to the room
     !w <username> <message>: whisper <message> to <username>
+    !bot <command>: send <command> to a GHost bot set in configuration file (will only work properly for GHost bots with the commands through MySQL modification)
+    !clear: clear the message queue, in case it was flooded
+    !addbannedword <word>: add a banned word (in case gcb_bot_detect is on)
+    !delbannedword <word>: delete a banned word
+    !loadplugin <plugin>: load plugin with classname = <plugin>
+    !unloadplugin <plugin>: unload a plugin
     !exit: exit (if root admin is specified, then you must be root to use this)
     
     These will only work if the bot is a channel admin:
@@ -42,7 +52,6 @@ Admin commands:
     !kick <username>: kick <username> from the room
     !message <interval> <message>: announce <message> every <interval> seconds
     !message: stop announcing messages
-    !bot <command>: send <command> to a GHost bot set in configuration file (only for GHost bots with the commands through MySQL modification)
 
 Safelist commands:
     !whois <username>: get information on <username>
@@ -51,6 +60,10 @@ Safelist commands:
     !alias <command>: find all aliases of <command> set in gcb.cfg
 
 Public commands:
-    !whoami: whois information on sender
+    ?trigger: what is the command trigger?
+    !commands: get a list of commands
+    !whoami: whois information on sender (equivalent to !whois myname)
     !version: gcb version information, if available
     !owner: bot owner information, if available
+    !time: retrieve server-side time
+    !rand: generate a random double between 0 and 1

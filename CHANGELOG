@@ -1,3 +1,11 @@
+0e
+- Autoban based on presence of specific words in user chat
+- Two more public commands, rand and time
+- Admins can now clear the output queue to prevent bot from being flooded
+- No access message and public commands can be disabled
+- Support for plugins that implement gcb.plugin.Plugin
+- fix: SQL queries should now be safe from injections
+
 0d
 - Added channel admin commands (will only work if gcb is logged in to room as channel admin)
 - gcb_bot: added several commands and functionality (by XIII.Dragon)

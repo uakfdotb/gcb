@@ -1,0 +1,9 @@
+Besides Java platform packages, gcb uses the following libraries:
+
+bouncycastle
+MySQL Connector/J
+Apache Commons Configuration
+
+gcb_list additionally uses:
+
+SqliteJDBC

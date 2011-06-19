@@ -1,6 +1,6 @@
 gcb_list generates a list of rooms based on roomen.sqlite.
 
-You must copy roomen.dat from your Garena installation to gcb_list/bin/roomen.sqlite.
-Then, run gcb_list.jar. A rooms.txt text file will be outputted with a list of rooms.
+Usage
+-----
 
-Note that roomen.sqlite must be in the directory from which you run gcb_list.jar.
+Copy roomen.dat from your Garena installation to gcb_list/bin/roomen.sqlite. Then, run gcb_list.jar. A rooms.txt text file will be outputted with a list of rooms. Note that roomen.sqlite must be in the directory from which you run gcb_list.jar. Also remember that file names are case sensitive on Unix-based operating systems.

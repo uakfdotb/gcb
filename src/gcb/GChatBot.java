@@ -187,15 +187,15 @@ public class GChatBot implements GarenaListener, ActionListener {
         
         boolean isAdmin = isRoot || admins.contains(member.username.toLowerCase());
         boolean isSafelist = safelist.contains(member.username.toLowerCase());
+        
+        String str_level = getAccessLevel(member.username);
+        Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + str_level + " " + member.username);
 
         //notify plugins
         String pluginResponse = plugins.onCommand(member, command, payload, isAdmin, isSafelist);
         if(pluginResponse != null) {
             return pluginResponse;
         }
-        
-        String str_level = getAccessLevel(member.username);
-        Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + str_level + " " + member.username);
 
         //flood protection if public user
         if(!isAdmin && !isSafelist) {

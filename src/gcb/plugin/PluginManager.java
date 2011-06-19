@@ -147,9 +147,13 @@ public class PluginManager {
     }
 
     public void loadPlugin(String name) {
+        Main.println("[PluginManager] Loading " + name + "...");
+
         Plugin plugin = plugins.get(name);
         if(plugin != null) {
             plugin.load();
+        } else {
+            Main.println("[PluginManager] Load failed: plugin not found!");
         }
     }
 

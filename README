@@ -1,16 +1,11 @@
-gcb (Garena Client Broadcast) 0d
+gcb (Garena Client Broadcast) 0e
 --------------------------------
 
-gcb is meant to be used to broadcast games from a Warcraft III game host (GHost++ or Warcraft III)
-    to other clients, and facilitate connections between the host and these clients.
+gcb facilitates connections between Garena clients and a Warcraft III server (theoretically, it should be possible to configure other games by altering certain configuration options, but this has not been tested). Hopefully it will be ported to C++ and implemented directly with GHost++ so that relaying packets from GHost++ to gcb will not be necessary, but for now it acts similarly to GProxy++, except in a reverse manner.
 
-Hopefully it will be ported to C++ and implemented directly with GHost++,
-    so that relaying packets from GHost++ to gcb will not be necessary.
+First, gcb listens to broadcasts to UDP port 6112, and then forwards these game broadcasts via Garena's encapsulated UDP protocol. Then, eventually a user should join the game; gcb will receive a TCP connection request over Garena's virtual TCP protocol, and will begin relaying packets between the Garena client and a Warcraft III server (the server hostname and port are preset; multiple connection ports can be specified). Note that any Warcraft III server over LAN can be used, including GHost (and, of course, normal Warcraft III LAN hosting).
 
-gcb_bot is an example chat bot for Garena. See README_BOT for details.
-
-The source code for both gcb and gcb_bot are in the same package.
-gcb_bot will only be used if the key "gcb_bot" is set to true in the configuration file.
+gcb_bot is a chat bot for Garena. See README_BOT for details on this. The source code for both gcb and gcb_bot are in the same package. The activition of gcb_bot requires a change in gcb.cfg. The remainded of this document will focus on gcb; requirements, installation, configuration, and parts of running also apply to gcb_bot, however.
 
 Requirements
 ------------
@@ -19,109 +14,107 @@ JRE >= 5.0.
 bouncycastle library for RSA
 MySQL Connector/J
 Apache Commons Configuration
+Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
 
-bouncycastle can be downloaded at http://www.bouncycastle.org/latest_releases.html
-    The specific JAR file you need is "bcprov-jdk15-146.jar".
-MySQL Connector/J can be downloaded at http://www.mysql.com/downloads/connector/j/
-Apache Commons Configuration can be downloaded at http://commons.apache.org/configuration/
+bouncycastle can be downloaded at http://www.bouncycastle.org/latest_releases.html. The specific JAR file you need is "bcprov-jdk15-146.jar".
 
-Before running, you need to install the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6.
-This can be downloaded at https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jce_policy-6-oth-JPR@CDS-CDS_Developer
-The download will include installation instructions that you should follow.
+MySQL Connector/J can be downloaded at http://www.mysql.com/downloads/connector/j/.
+
+Apache Commons Configuration can be downloaded at http://commons.apache.org/configuration/.
+
+Note that the above libraries are now included with gcb, so there is no need to download them. You can find the JAR files in gcb/bin/lib/; if you plan to move gcb.jar away from it's directory, make sure you move the lib/ folder as well because gcb will fail without it.
+
+Before running, you do need to install the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6. This can be downloaded at https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jce_policy-6-oth-JPR@CDS-CDS_Developer. The download will include installation instructions that you should follow.
+
+The JRE can be downloaded at http://www.java.com/en/download/index.jsp.
 
 Installation
 ------------
 
-Installation only consists of unzipping the ZIP file.
-The latest version may be downloaded from http://code.google.com/p/gcb/
+Installation only consists of unzipping the ZIP file and making sure you have the requirements (particularly the cryptography extension). The latest version may be downloaded from http://code.google.com/p/gcb/. Alternatively, you can run the following command to check out the latest SVN:
+
+svn checkout http://gcb.googlecode.com/svn/trunk/ gcb-read-only
 
 Configuration
 -------------
 
-Currently, configuration values can be specified in gcb.cfg.
-See that file, bin/gcb.cfg, for details.
+Most variables that may need to be configured can be configured in gcb.cfg. See that file, bin/gcb.cfg, for deatils; each key should have a short description of how to determine it's appropriate value.
 
-To set "gcb_roomid" and "gcb_roomhost", either follow these instructions or skip to the "ID from RoomEN.dat" section:
+The keys that you need to set are: gcb_username, your Garena username; gcb_password, your Garena password; gcb_roomid, the ID of the room you wish to join; and gcb_roomhost, the hostname of the room you wish to join.
 
-    Open rooms.txt in a text file, and search for the room name you are looking for.
-        (for example: USA DotA Room 01)
-    Then, write the id for "gcb_roomid" and the server for "gcb_roomhost".
+To set "gcb_roomid" and "gcb_roomhost", open rooms.txt and search for the room name you are looking for (for example: USA DotA Room 01). Then, write the id on that line for "gcb_roomid" and the server for "gcb_roomhost". See the ID from RoomEN.dat section later for details on how to generate rooms.txt or retrieve the ID/IP address manually in case the included rooms.txt goes out of date (Garena frequently updates its rooms).
 
 Running
 -------
 
-Just run the JAR file under JVM and everything should work.
+To run gcb, you should only have to execute the JAR file under JVM:
 
-Port 6112 UDP must be available, because gcb listens for Warcraft III game broadcasts on that port.
-Port 1513 UDP must be available, because gcb sends and receives GP2PP messages on that port.
-Thus, you can only run one instance of gcb on a machine.
-
-The configuration file to use (default is gcb.cfg) can be passed as a command line argument.
-This allows you to run multiple instances of gcb from one directory.
-
-With default gcb.cfg:
 java -jar gcb.jar
 
-With mygcb.cfg:
-java -jar gcb.jar mygcb.cfg
+Note that you can simply double click on the gcb.jar file; however, in this case, gcb will run exclusively in background and a console will not open with log data. Also, you should not run gcb with root pemissions!
 
-gkey.pem contains the private RSA key that all Garena clients use.
-Note that this means Garena's encryption can easily be broken, and the password hash can be retrieved.
+You can also specify a configuration file for gcb to use. This allows you to theoretically use one JAR file for multiple bots (but as you'll see later this can't actually be done; and there's no point anyway). The default configuration file is gcb.cfg.
 
-Compiling
+java -jar gcb.jar myconfigfile.cfg
+
+Port 6112 UDP must be available, because gcb listens for Warcraft III game broadcasts on that port. Port 1513 UDP must also be available, because gcb sends and receives GP2PP messages on that port. Thus, you can only run one instance of gcb on a machine.
+
+gkey.pem contains the private RSA key that all Garena clients use. It should be updated in the event that Garena uses another key (although this is not likely). Note that this means Garena's encryption can easily be broken, and the password hash can be retrieved; this is not an issue with gcb.
+
+Plugins
+-------
+
+To install a plugin, download the plugin ZIP file and then unzip in gcb/bin/plugins/. The plugin can then be loaded via !loadplugin <pluginname>. Note that a restart is required so that gcb can find the plugins (this may be changed in a later release).
+
+You can automatically load specific plugins at startup. From the plugin configuration file (for example: example.plugin.cfg or example.gcbp.cfg), take the classname; include this classname in the configuration key gcb_plugins in gcb.cfg.
+
+WARNING: plugins are not secure and can do whatever they want. If you do not trust a plugin, then DON'T install it!
+
+-------------------------------------------------------------------------------
+Compilation
 ---------
 
-To compile gcb, you need JDK >= 5.0.
-Run something similar to:
-    javac -classpath "src/:bin/lib/" src/gcb/Main.java
+To compile gcb, you need JDK >= 5.0. This can be downloaded from http://www.oracle.com/technetwork/java/javase/downloads/index.html. Compilation of gcb has not been tested with GNU's gcj, but it should work.
 
-Note that on Windows, ':' should be replaced by ';'.
+To compile:
 
------------------------------------------------
+javac -classpath "src/:bin/lib/*" src/gcb/Main.java
+
+Note that on Windows, the Linux ':' path separator should be replaced by ';'.
 
 ID from RoomEN.dat
 ------------------
-RoomEN.dat in your Garena installation is actually an sqlite database.
-This can be opened with an sqlite client, such as:
-    Firefox SQLite Manager, available at https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/
+RoomEN.dat in your Garena installation is actually an sqlite database. This can be opened with an sqlite client, such as the Firefox SQLite Manager, available at https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/.
 
-To retrieve the ID, you can either manually use an sqlite client, or you can use gcb_list.
-Instruction for gcb_list are available at gcb_list/README. To manually retrieve:
+To retrieve the ID, you can either manually use an sqlite client like the one above, or you can use gcb_list. Instruction for gcb_list are available at gcb_list/README. To manually retrieve:
 
-    The Room ID and Server ID can be found by searching the table named "RoomTab". For example:
-        SELECT RoomID, ServerId FROM RoomTab WHERE RoomName=' WC3 ROC USA Room'
+The Room ID and Server ID can be found by searching the table named "RoomTab". For example:
+
+SELECT RoomID, ServerId FROM RoomTab WHERE RoomName=' WC3 ROC USA Room'
         
-        Note the space preceeding the room name.
+Note the space preceeding the room name. The Room ID should be recorded as "gcb_roomid".
 
-    The Room ID should be recorded as "gcb_roomid".
+To find the Room IP address, execute:
 
-    To find the Room IP address, execute:
-        SELECT IP FROM RoomServerTab WHERE ServerId=<server_id>
+SELECT IP FROM RoomServerTab WHERE ServerId=<server_id>
         
-        where <server_id> is the Server ID you found earlier.
+Were <server_id> is the Server ID you found earlier.
 
-    The IP address is stored as an integer.
-    It can be converted into an actual address:
-        it is the integer representation of the IP address stored in little endian.
-        
-    This tool may help you: http://www.silisoftware.com/tools/ipconverter.php
-        Type the integer in for "Integer IP".
-        You will receive the four parts under "Decimal IP".
-        Reverse these parts (1.2.3.4 -> 4.3.2.1) to retrieve the original IP address.
-        Set "gcb_roomhost" to the original IP address.
+The IP address is stored as an integer. It can be converted into an actual address: it is the integer representation of the IP address stored in little endian. This tool may help you: http://www.silisoftware.com/tools/ipconverter.php. To use it with the integer from the SQLite database, type the integer in for "Integer IP". You will receive the four parts under "Decimal IP". Reverse these parts (1.2.3.4 -> 4.3.2.1) to retrieve the original IP address.
+
+Set "gcb_roomhost" to the original IP address.
+
+Creating plugins
+----------------
+
+Plugins are relatively powerful as they have access to packets and commands from users, among other things. A guide for creating your own plugins is available at: http://code.google.com/p/gcb/wiki/CreatingPlugins. You may also wish to look at the included gcb example plugins.
 
 Protocol
 --------
 
-Much of the code is based off of the included garena_protocol.txt.
-This was not created by me, and was essential to the creation of this client.
+Much of the code is based off of the included garena_protocol.txt. This was not created by me, and was essential to the creation of this client. Note that some details inside the text file are outdated. For example:
 
-Note that some details inside the text file are outdated.
-For example:
-
-version identifier is currently: 0x0000027C
-GSP session login packet is a bit different
-    A byte with value 1 precedes the internal IP address
-    There's two bytes after the internal IP address, I don't know what they are for
+version identifier at the time this document was created: 0x0000027C
+GSP session login packet is a bit different: a byte with value 1 precedes the internal IP address and there seem to be two bytes after the internal IP address, I don't know what they are for.
 
 There may be other differences. See gcb source code for more information.
