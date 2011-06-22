@@ -32,6 +32,10 @@ public class WC3Interface {
             socket = new DatagramSocket(broadcast_port);
             return true;
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+            
             Main.println("[WC3Interface] Error: cannot bind to broadcast port");
             return false;
         }
@@ -53,6 +57,10 @@ public class WC3Interface {
 
             garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[WC3Interface] Error: " + ioe.getLocalizedMessage());
         }
     }

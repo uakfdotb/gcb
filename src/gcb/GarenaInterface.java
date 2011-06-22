@@ -106,6 +106,10 @@ public class GarenaInterface {
             String main_hostname = GCBConfig.configuration.getString("gcb_mainhost", "con2.garenaconnect.com");
             main_address = InetAddress.getByName(main_hostname);
         } catch(UnknownHostException uhe) {
+            if(Main.DEBUG) {
+                uhe.printStackTrace();
+            }
+
             Main.println("[GInterface] Unable to locate main host: " + uhe.getLocalizedMessage());
             disconnected(GARENA_MAIN);
             return false;
@@ -117,6 +121,10 @@ public class GarenaInterface {
             socket = new Socket(main_address, 7456);
             Main.println("[GInterface] Using local port: " + socket.getLocalPort());
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
             disconnected(GARENA_MAIN);
             return false;
@@ -126,6 +134,10 @@ public class GarenaInterface {
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
             disconnected(GARENA_MAIN);
             return false;
@@ -135,6 +147,10 @@ public class GarenaInterface {
         try {
             peer_socket = new DatagramSocket(peer_port);
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GInterface] Unable to establish peer socket on port " + peer_port + ": " + ioe.getLocalizedMessage());
             disconnected(GARENA_PEER);
             return false;
@@ -152,6 +168,10 @@ public class GarenaInterface {
             String room_hostname = GCBConfig.configuration.getString("gcb_roomhost", "174.36.26.84"); //default server 9
             address = InetAddress.getByName(room_hostname);
         } catch(UnknownHostException uhe) {
+            if(Main.DEBUG) {
+                uhe.printStackTrace();
+            }
+
             Main.println("[GInterface] Unable to locate room host: " + uhe.getLocalizedMessage());
             disconnected(GARENA_ROOM);
             return false;
@@ -163,6 +183,10 @@ public class GarenaInterface {
             room_socket = new Socket(address, 8687);
             Main.println("[GInterface] Using local port: " + room_socket.getLocalPort());
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
             disconnected(GARENA_ROOM);
             return false;
@@ -172,6 +196,10 @@ public class GarenaInterface {
             rout = new DataOutputStream(room_socket.getOutputStream());
             rin = new DataInputStream(room_socket.getInputStream());
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
             disconnected(GARENA_ROOM);
             return false;
@@ -556,6 +584,10 @@ public class GarenaInterface {
                 disconnected(GARENA_MAIN);
                 return;
             } catch(Exception e) {
+                if(Main.DEBUG) {
+                    e.printStackTrace();
+                }
+
                 Main.println("[GInterface] GSLoop: error: " + e.getLocalizedMessage());
             }
         }
@@ -826,6 +858,10 @@ public class GarenaInterface {
                 disconnected(GARENA_ROOM);
                 return;
             } catch(Exception e) {
+                if(Main.DEBUG) {
+                    e.printStackTrace();
+                }
+
                 Main.println("[GInterface] Error: " + e.getLocalizedMessage());
             }
         }

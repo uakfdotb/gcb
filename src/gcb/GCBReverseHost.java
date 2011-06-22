@@ -26,6 +26,10 @@ public class GCBReverseHost {
         try {
             server = new ServerSocket(port);
         } catch(IOException ioe) {
+            if(Main.DEBUG) {
+                ioe.printStackTrace();
+            }
+
             Main.println("[GCBReverseHost] Error while initiating server: " + ioe.getLocalizedMessage());
         }
     }
@@ -36,6 +40,10 @@ public class GCBReverseHost {
             try {
                 client = server.accept();
             } catch(IOException ioe) {
+                if(Main.DEBUG) {
+                    ioe.printStackTrace();
+                }
+
                 Main.println("[GCBReverseHost] Accept failed: " + ioe.getLocalizedMessage());
             }
 

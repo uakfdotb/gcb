@@ -70,6 +70,7 @@ public class GarenaTCP extends Thread {
                 }
             }
         } catch(ConversionException e) {
+            Main.println("[GarenaTCP] Configuration error: while parsing gcb_tcp_port as string array");
             local_ports = new int[] {};
         }
     }

@@ -66,6 +66,10 @@ public class SQLThread extends Thread {
         try {
             connection = DriverManager.getConnection(host, username, password);
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+            
             Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
         }
     }
@@ -87,6 +91,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+            
             Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
         }
 
@@ -100,6 +108,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
         }
 
@@ -127,6 +139,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
         }
 
@@ -144,6 +160,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
         }
 
@@ -158,6 +178,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
         }
 
@@ -172,6 +196,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
         }
 
@@ -192,6 +220,10 @@ public class SQLThread extends Thread {
             statement.execute();
             return true;
         } catch(SQLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+
             Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
         }
 
@@ -226,6 +258,10 @@ public class SQLThread extends Thread {
                     }
                 }
             } catch(SQLException e) {
+                if(Main.DEBUG) {
+                    e.printStackTrace();
+                }
+
                 Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
             }
 
@@ -243,7 +279,11 @@ public class SQLThread extends Thread {
                         Main.println("[SQLThread] Initial refresh: found " + bot.safelist.size() + " safelist");
                     }
                 } catch(SQLException e) {
-                        Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
+                    if(Main.DEBUG) {
+                        e.printStackTrace();
+                    }
+                    
+                    Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
                 }
             }
 

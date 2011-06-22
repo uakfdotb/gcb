@@ -532,6 +532,7 @@ public class GChatBot implements GarenaListener, ActionListener {
             try {
                 aliases = GCBConfig.configuration.getStringArray("gcb_bot_alias_" + command);
             } catch(ConversionException e) {
+                Main.println("[GChatBat] Warning: unable to parse entry for alias of " + command);
                 aliases = new String[] {command};
             }
         }

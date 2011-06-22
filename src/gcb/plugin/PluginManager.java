@@ -59,6 +59,10 @@ public class PluginManager {
             URL[] urls = new URL[]{url};
             loader = new URLClassLoader(urls);
         } catch(MalformedURLException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+            
             Main.println("[PluginManager] Malformed URL: " + e.getLocalizedMessage());
             return;
         }
@@ -71,6 +75,10 @@ public class PluginManager {
                 try {
                     pluginConfig = new PropertiesConfiguration(file);
                 } catch(ConfigurationException e) {
+                    if(Main.DEBUG) {
+                        e.printStackTrace();
+                    }
+                    
                     Main.println("[PluginManager] Warning: unable to parse plugin configuration file " + file.getAbsolutePath());
                 }
 
@@ -84,7 +92,10 @@ public class PluginManager {
                     pluginList.add(plugin);
                     plugins.put(fullyQualifiedName, plugin);
                 } catch(Exception e) {
-                    e.printStackTrace();
+                    if(Main.DEBUG) {
+                        e.printStackTrace();
+                    }
+                    
                     Main.println("[PluginManager] Error while initiating " + fullyQualifiedName + " in " + pluginFile + ":" + e.getLocalizedMessage());
                 }
             } else {

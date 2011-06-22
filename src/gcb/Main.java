@@ -18,6 +18,7 @@ import java.util.Date;
  */
 public class Main {
     public static String VERSION = "gcb 0e";
+    public static boolean DEBUG = false;
 
     static PrintWriter log_out;
 
@@ -147,6 +148,8 @@ public class Main {
         if(log_file != null) {
             log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
         }
+
+        DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
 
         if(GCBConfig.configuration.getBoolean("gcb_bot", false) && GCBConfig.configuration.getBoolean("gcb_bot_disable", true)) {
             GChatBot.main(args);

@@ -28,6 +28,10 @@ public class GCBConfig {
         try {
             configuration = new PropertiesConfiguration(config_file);
         } catch(ConfigurationException e) {
+            if(Main.DEBUG) {
+                e.printStackTrace();
+            }
+            
             Main.println("[GCBConfig] Error while loading config file: " + e.getLocalizedMessage());
         }
     }
