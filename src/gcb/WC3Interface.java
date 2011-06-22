@@ -55,6 +55,10 @@ public class WC3Interface {
                 data[22] = 119;
             }
 
+            if(Main.DEBUG) {
+                Main.println("[WC3Interface] Broadcasting UDP packet from " + packet.getAddress());
+            }
+
             garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
         } catch(IOException ioe) {
             if(Main.DEBUG) {

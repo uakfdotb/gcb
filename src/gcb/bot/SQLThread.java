@@ -232,6 +232,10 @@ public class SQLThread extends Thread {
 
     public void run() {
         while(true) {
+            if(Main.DEBUG) {
+                Main.println("[SQLThread] Refreshing internal lists with database...");
+            }
+
             try {
                 //refresh admin list
                 Statement statement = connection.createStatement();

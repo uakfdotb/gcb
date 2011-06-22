@@ -150,6 +150,10 @@ public class PluginManager {
 
             Main.println("[PluginManager] Loading " + pluginNames.length + " plugins...");
             for(String pluginName : pluginNames) {
+                if(pluginName.equals("")) {
+                    continue;
+                }
+
                 loadPlugin(pluginName);
             }
         } catch(ConversionException e) {
