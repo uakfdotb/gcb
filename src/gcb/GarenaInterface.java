@@ -993,6 +993,8 @@ public class GarenaInterface {
             out.write("\tinternal IP: " + member.internalIP);
             out.write("\texternal port: " + member.externalPort);
             out.write("\tinternal port: " + member.internalPort);
+            out.write("\tcorrect IP: " + member.correctIP);
+            out.write("\tcorrect port: " + member.correctPort);
             out.write("\tvirtual suffix: " + member.virtualSuffix);
             out.write("\n");
         }
@@ -1413,8 +1415,9 @@ public class GarenaInterface {
                     } else {
                         Main.println("[GInterface] PeerLoop: unknown CONN type received: " + buf_array[1]);
                     }
-                }
-                else {
+                } else if(buf_array[0] == 0x01) {
+                    // received UDP encapsulated; ignore
+                } else {
                     Main.println("[GInterface] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
                 }
             } catch(IOException ioe) {
@@ -1429,7 +1432,8 @@ public class GarenaInterface {
         byte[] tmp = new byte[8];
         tmp[0] = 0x05;
 
-        DatagramPacket packet = new DatagramPacket(tmp, tmp.length, main_address, peer_port);
+        //we don't use peer_port because even if we're hosting Garena on 1515, server is still 1513
+        DatagramPacket packet = new DatagramPacket(tmp, tmp.length, main_address, 1513);
 
         try {
             peer_socket.send(packet);
@@ -1442,13 +1446,14 @@ public class GarenaInterface {
         //lookup external IP, port
         buf.clear();
         buf.order(ByteOrder.LITTLE_ENDIAN);
-        buf.put(0, (byte) 0x02);
-        buf.putInt(1, user_id);
+        buf.put(0, (byte) 0x02); //room usage lookup identifier
+        buf.putInt(1, user_id); //our user ID
         buf.position(0);
         byte[] tmp = new byte[5];
         buf.get(tmp);
 
-        DatagramPacket packet = new DatagramPacket(tmp, tmp.length, main_address, peer_port);
+        //we don't use peer_port because even if we're hosting Garena on 1515, server is still 1513
+        DatagramPacket packet = new DatagramPacket(tmp, tmp.length, main_address, 1513);
 
         try {
             peer_socket.send(packet);
@@ -1463,7 +1468,7 @@ public class GarenaInterface {
                 continue;
             }
 
-            //LAN FIX
+            //LAN FIX: correct IP address of target user
             if(GCBConfig.configuration.getBoolean("gcb_lanfix", false)) {
                 if(target.username.equalsIgnoreCase(GCBConfig.configuration.getString("gcb_lanfix_username", "garena"))) {
                     try {

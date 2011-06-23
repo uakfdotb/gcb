@@ -162,6 +162,8 @@ public class Main {
             return;
         }
 
+        main.lookup();
+
         if(!main.initRoom()) {
             return;
         }
