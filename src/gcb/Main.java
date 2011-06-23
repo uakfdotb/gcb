@@ -105,6 +105,12 @@ public class Main {
 
     public void helloLoop() {
         while(true) {
+            try {
+                garena.displayMemberInfo();
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
+
             garena.sendHello();
             
             try {
