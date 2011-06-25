@@ -7,6 +7,7 @@
 - Support for plugins that implement gcb.plugin.Plugin
 - fix: SQL queries should now be safe from injections
 - fix: TCP FIN is sent four times to emulate Garena client
+- fix: UDP broadcasts only sent to playing members
 
 0d
 - Added channel admin commands (will only work if gcb is logged in to room as channel admin)
