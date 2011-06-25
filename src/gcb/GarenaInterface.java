@@ -1090,6 +1090,7 @@ public class GarenaInterface {
         MemberInfo member = memberFromID(user_id);
 
         if(member != null) {
+            member.playing = false;
             Main.println("[GInterface] Member " + member.username + " with ID " + member.userID + " has stopped playing");
         } else {
             Main.println("[GInterface] Unlisted member " + user_id + " has stopped playing");
@@ -1629,6 +1630,7 @@ public class GarenaInterface {
     public void broadcastUDPEncap(int source, int destination, byte[] data, int offset, int length) {
         for(MemberInfo target : members) {
             if(target.userID == this.user_id) continue;
+            if(!target.playing) continue; //don't broadcast if they don't have WC3 open
 
             if(target.correctIP == null) {
                 //send on both external and internal
