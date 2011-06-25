@@ -10,18 +10,10 @@ package gcb;
  * @author wizardus
  */
 public class GarenaReconnect implements GarenaListener {
-    boolean isMain;
     Main main;
-    GChatBot bot;
 
     public GarenaReconnect(Main main) {
         this.main = main;
-        isMain = true;
-    }
-
-    public GarenaReconnect(GChatBot bot) {
-        this.bot = bot;
-        isMain = false;
     }
 
     public void chatReceived(MemberInfo member, String chat, boolean whisper) {}
@@ -41,21 +33,17 @@ public class GarenaReconnect implements GarenaListener {
             return;
         }
 
-        GarenaReconnectThread rt = new GarenaReconnectThread(main, bot, isMain, x);
+        GarenaReconnectThread rt = new GarenaReconnectThread(main, x);
         rt.start();
     }
 }
 
 class GarenaReconnectThread extends Thread {
-    boolean isMain;
     Main main;
-    GChatBot bot;
     int x;
 
-    public GarenaReconnectThread(Main main, GChatBot bot, boolean isMain, int x) {
-        this.isMain = isMain;
+    public GarenaReconnectThread(Main main, int x) {
         this.main = main;
-        this.bot = bot;
         this.x = x;
     }
 
@@ -65,33 +53,19 @@ class GarenaReconnectThread extends Thread {
         } catch(InterruptedException e) {
 
         }
-        GarenaInterface garena;
-        if(isMain) {
-            garena = main.garena;
-        } else {
-            garena = bot.garena;
-        }
+        GarenaInterface garena = main.garena;
 
+        //TODO:make this work...
         if(garena.socket.isClosed()) {
-            if(isMain) {
-                main.initGarena();
-            } else {
-                bot.initGarena();
-            }
+            main.initGarena();
         }
 
         if(garena.room_socket.isClosed()) {
-            if(isMain) {
-                main.initRoom();
-            } else {
-                bot.initRoom();
-            }
+            main.initRoom();
         }
 
         if(garena.peer_socket.isClosed()) {
-            if(isMain) {
-                main.initPeer();
-            }
+            main.initPeer();
         }
     }
 }

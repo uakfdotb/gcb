@@ -33,8 +33,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 
     String trigger;
     GarenaInterface garena;
-    GarenaThread gsp_thread;
-    GarenaThread gcrp_thread;
     PluginManager plugins;
     SQLThread sqlthread;
     ChatThread chatthread;
@@ -71,11 +69,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 
     public void init() {
         Main.println(VERSION);
-
-        //initiate mysql thread
-        sqlthread = new SQLThread(this);
-        sqlthread.init();
-        sqlthread.start();
 
         //configuration
         trigger = GCBConfig.configuration.getString("gcb_bot_trigger", "!");
@@ -125,52 +118,6 @@ public class GChatBot implements GarenaListener, ActionListener {
         } if(!disable_version) {
             registerCommand("version", public_level);
         }
-    }
-
-    public void initPlugins() {
-        plugins = new PluginManager();
-        plugins.initPlugins();
-        plugins.loadPlugins();
-    }
-
-    public boolean initGarena() {
-        //connect to garena
-        garena = new GarenaInterface(plugins);
-        garena.registerListener(new GarenaReconnect(this));
-
-        if(!garena.init()) {
-            return false;
-        }
-
-        //authenticate with login server
-        if(!garena.sendGSPSessionInit()) return false;
-        if(!garena.readGSPSessionInitReply()) return false;
-        if(!garena.sendGSPSessionHello()) return false;
-        if(!garena.readGSPSessionHelloReply()) return false;
-        if(!garena.sendGSPSessionLogin()) return false;
-        if(!garena.readGSPSessionLoginReply()) return false;
-
-        gsp_thread = new GarenaThread(garena, null, GarenaThread.GSP_LOOP);
-        gsp_thread.start();
-
-        return true;
-    }
-
-    public void initBot() {
-        garena.registerListener(this);
-        chatthread = new ChatThread(garena);
-        chatthread.start();
-    }
-
-    public boolean initRoom() {
-        //connect to room
-        if(!garena.initRoom()) return false;
-        if(!garena.sendGCRPMeJoin()) return false;
-
-        gcrp_thread = new GarenaThread(garena, null, GarenaThread.GCRP_LOOP);
-        gcrp_thread.start();
-
-        return true;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -647,19 +594,5 @@ public class GChatBot implements GarenaListener, ActionListener {
     public void disconnected(int x) {
         //try to reconnect
 
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        GCBConfig.load(args);
-
-        GChatBot bot = new GChatBot();
-        bot.init();
-        bot.initPlugins();
-        if(!bot.initGarena()) return;
-        bot.initBot();
-        if(!bot.initRoom()) return;
     }
 }

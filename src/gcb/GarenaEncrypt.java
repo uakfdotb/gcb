@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -413,5 +414,25 @@ public class GarenaEncrypt {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static String getTerminatedString(ByteBuffer buf) {
+        return new String(getTerminatedArray(buf));
+    }
+
+    public static byte[] getTerminatedArray(ByteBuffer buf) {
+        int start = buf.position();
+
+        while(buf.get() != 0) {}
+        int end = buf.position();
+
+        byte[] bytes = new byte[end - start - 1]; //don't include terminator
+        buf.position(start);
+        buf.get(bytes);
+
+        //put position after array
+        buf.position(end); //skip terminator
+
+        return bytes;
     }
 }

@@ -116,8 +116,23 @@ public class GarenaTCP extends Thread {
         }
     }
 
-    public boolean initReverse(InetAddress remote_address, int remote_port, int remote_id) {
-        return false;
+    public void initReverse(InetAddress remote_address, int remote_port, int remote_id, int conn_id, Socket socket) {
+        this.remote_address = remote_address;
+        this.remote_port = remote_port;
+        this.remote_id = remote_id;
+        this.conn_id = conn_id;
+        this.socket = socket;
+
+        try {
+            out = socket.getOutputStream();
+            in = socket.getInputStream();
+        } catch(IOException ioe) {
+            end();
+            ioe.printStackTrace();
+        }
+
+        Main.println("[GarenaTCP] Starting new reverse virtual TCP " + conn_id + " with " + remote_address + " on port " + remote_port);
+        start();
     }
 
     public void connAck(int seq, int ack) {
@@ -139,6 +154,10 @@ public class GarenaTCP extends Thread {
                 if(curr.seq >= ack && curr.seq <= seq - 1) {
                     curr.send_time = System.currentTimeMillis();
                     garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+
+                    if(Main.DEBUG) {
+                        Main.println("[GarenaTCP] debug@connack: fast retransmitting in connection " + conn_id);
+                    }
                 }
             }
         }
@@ -150,6 +169,10 @@ public class GarenaTCP extends Thread {
             if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
                 curr.send_time = System.currentTimeMillis();
                 garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+                
+                if(Main.DEBUG) {
+                    Main.println("[GarenaTCP] debug@connack: standard retransmitting in connection " + conn_id);
+                }
             }
         }
     }
@@ -172,6 +195,10 @@ public class GarenaTCP extends Thread {
             if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
                 curr.send_time = System.currentTimeMillis();
                 garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
+
+                if(Main.DEBUG) {
+                    Main.println("[GarenaTCP] debug@data: standard retransmitting in connection " + conn_id);
+                }
             }
         }
 
@@ -278,6 +305,10 @@ public class GarenaTCP extends Thread {
             }
         }
 
+        //send four times because that's what Windows client does
+        garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
+        garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
+        garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
         garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
     }
 }
