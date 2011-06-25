@@ -7,6 +7,8 @@ First, gcb listens to broadcasts to UDP port 6112, and then forwards these game 
 
 gcb_bot is a chat bot for Garena. See README_BOT for details on this. The source code for both gcb and gcb_bot are in the same package. The activition of gcb_bot requires a change in gcb.cfg. The remainded of this document will focus on gcb; requirements, installation, configuration, and parts of running also apply to gcb_bot, however.
 
+REVERSE is a tool that allows you to use gcb to connect to remote Garena client hosts on Garena-unsupported systems.
+
 Requirements
 ------------
 
