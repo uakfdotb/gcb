@@ -176,7 +176,6 @@ public class Main {
             bot.init();
             bot.garena = garena;
             bot.plugins = plugins;
-            bot.sqlthread = sqlthread;
             bot.chatthread = chatthread;
 
             garena.registerListener(bot);
@@ -187,6 +186,10 @@ public class Main {
             sqlthread = new SQLThread(bot);
             sqlthread.init();
             sqlthread.start();
+
+            if(loadBot) {
+                bot.sqlthread = sqlthread;
+            }
         }
     }
 
