@@ -16,6 +16,8 @@ import java.util.LinkedList;
 public class ChatThread extends Thread {
     LinkedList<ChatMessage> chat_queue;
     GarenaInterface garena;
+	public static final int MAIN_CHAT = -1;
+	public static final int ANNOUNCEMENT = -2;
 
     int delay;
 
@@ -69,9 +71,11 @@ public class ChatThread extends Thread {
                 continue;
             }
 
-            if(message.target_user == -1) {
+            if(message.target_user == MAIN_CHAT) {
                 garena.chat(message.str);
-            } else {
+            } else if(message.target_user == ANNOUNCEMENT) {
+				garena.announce(message.str);
+			} else {
                 garena.whisper(message.target_user, message.str);
             }
 
@@ -80,6 +84,12 @@ public class ChatThread extends Thread {
             } catch(InterruptedException e) {}
         }
     }
+	
+	public void sleep(int time) {
+		try {
+			Thread.sleep(delay);
+		} catch(InterruptedException e) {}
+	}
 }
 
 class ChatMessage {
