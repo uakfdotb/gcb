@@ -10,6 +10,6 @@ package gcb;
  * @author wizardus
  */
 public class RoomInfo {
-    int roomId;
-    int numUsers;
+	int roomId;
+	int numUsers;
 }

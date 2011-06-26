@@ -22,136 +22,136 @@ import org.apache.commons.configuration.ConversionException;
  * @author wizardus
  */
 public class GChatBot implements GarenaListener, ActionListener {
-    public static String VERSION = "gcb_bot 0e";
-    public static int LEVEL_PUBLIC = 0;
-    public static int LEVEL_SAFELIST = 1;
-    public static int LEVEL_ADMIN = 2;
+	public static String VERSION = "gcb_bot 0e";
+	public static int LEVEL_PUBLIC = 0;
+	public static int LEVEL_SAFELIST = 1;
+	public static int LEVEL_ADMIN = 2;
 	public static final int MAIN_CHAT = -1;
 	public static final int ANNOUNCEMENT = -2;
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	public static final String EXPIRE_DATE_FORMAT = "yyyy-MM-dd";
 
-    private Timer announcement_timer;
-    public String announcement;
+	private Timer announcement_timer;
+	public String announcement;
 	public int numberBanned = 0;
 	public int numberKicked = 0;
 	public int numberWarned = 0;
 	public String startTime;
 
-    String trigger;
-    GarenaInterface garena;
+	String trigger;
+	GarenaInterface garena;
 	PluginManager plugins;
-    SQLThread sqlthread;
-    ChatThread chatthread;
-    String root_admin; //root admin for this bot; null if root is disabled
+	SQLThread sqlthread;
+	ChatThread chatthread;
+	String root_admin; //root admin for this bot; null if root is disabled
 
-    //config
-    int publicdelay;
-    boolean publiccommands;
-    String access_message;
-    String owner;
-    boolean disable_version;
+	//config
+	int publicdelay;
+	boolean publiccommands;
+	String access_message;
+	String owner;
+	boolean disable_version;
 
-    //thread safe objects
-    public Vector<String> admins; //admin usernames
-    public Vector<String> safelist;
+	//thread safe objects
+	public Vector<String> admins; //admin usernames
+	public Vector<String> safelist;
 
-    HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
-    HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
-    Vector<String> adminCommands; //includes all commands accessible by admins, including safelist/public commands
-    Vector<String> safelistCommands;
-    Vector<String> publicCommands;
+	HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
+	HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
+	Vector<String> adminCommands; //includes all commands accessible by admins, including safelist/public commands
+	Vector<String> safelistCommands;
+	Vector<String> publicCommands;
 	
 	public Vector<String> bannedWords;
 	public Vector<String> bannedIpAddress;
 
-    public GChatBot() {
-        admins = new Vector<String>();
-        safelist = new Vector<String>();
-        aliasToCommand = new HashMap<String, String>();
-        commandToAlias = new HashMap<String, String[]>();
-        adminCommands = new Vector<String>();
-        safelistCommands = new Vector<String>();
-        publicCommands = new Vector<String>();
-        bannedWords = new Vector<String>();
+	public GChatBot() {
+		admins = new Vector<String>();
+		safelist = new Vector<String>();
+		aliasToCommand = new HashMap<String, String>();
+		commandToAlias = new HashMap<String, String[]>();
+		adminCommands = new Vector<String>();
+		safelistCommands = new Vector<String>();
+		publicCommands = new Vector<String>();
+		bannedWords = new Vector<String>();
 		bannedIpAddress = new Vector<String>();
 		startTime = time();
-    }
+	}
 
-    public void init() {
-        Main.println(VERSION);
+	public void init() {
+		Main.println(VERSION);
 
-        //configuration
-        trigger = GCBConfig.configuration.getString("gcb_bot_trigger", "!");
-        root_admin = GCBConfig.getString("gcb_bot_root");
+		//configuration
+		trigger = GCBConfig.configuration.getString("gcb_bot_trigger", "!");
+		root_admin = GCBConfig.getString("gcb_bot_root");
 
-        publicdelay = GCBConfig.configuration.getInt("gcb_bot_publicdelay", 3000);
-        publiccommands = GCBConfig.configuration.getBoolean("gcb_bot_publiccommands", true);
-        access_message = GCBConfig.getString("gcb_bot_access_message");
-        owner = GCBConfig.getString("gcb_bot_owner");
-        disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
-        
-        registerCommand("addadmin", LEVEL_ADMIN);
-        registerCommand("deladmin", LEVEL_ADMIN);
-        registerCommand("addsafelist", LEVEL_ADMIN);
-        registerCommand("delsafelist", LEVEL_ADMIN);
-        registerCommand("say", LEVEL_ADMIN);
-        registerCommand("exit", LEVEL_ADMIN);
-        registerCommand("w", LEVEL_ADMIN);
-        registerCommand("ban", LEVEL_ADMIN);
-        registerCommand("unban", LEVEL_ADMIN);
-        registerCommand("announce", LEVEL_ADMIN);
-        registerCommand("kick", LEVEL_ADMIN);
-        registerCommand("message", LEVEL_ADMIN);
-        registerCommand("bot", LEVEL_ADMIN);
-        registerCommand("clear", LEVEL_ADMIN);
-        registerCommand("addbannedword", LEVEL_ADMIN);
-        registerCommand("delbannedword", LEVEL_ADMIN);
+		publicdelay = GCBConfig.configuration.getInt("gcb_bot_publicdelay", 3000);
+		publiccommands = GCBConfig.configuration.getBoolean("gcb_bot_publiccommands", true);
+		access_message = GCBConfig.getString("gcb_bot_access_message");
+		owner = GCBConfig.getString("gcb_bot_owner");
+		disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
+		
+		registerCommand("addadmin", LEVEL_ADMIN);
+		registerCommand("deladmin", LEVEL_ADMIN);
+		registerCommand("addsafelist", LEVEL_ADMIN);
+		registerCommand("delsafelist", LEVEL_ADMIN);
+		registerCommand("say", LEVEL_ADMIN);
+		registerCommand("exit", LEVEL_ADMIN);
+		registerCommand("w", LEVEL_ADMIN);
+		registerCommand("ban", LEVEL_ADMIN);
+		registerCommand("unban", LEVEL_ADMIN);
+		registerCommand("announce", LEVEL_ADMIN);
+		registerCommand("kick", LEVEL_ADMIN);
+		registerCommand("message", LEVEL_ADMIN);
+		registerCommand("bot", LEVEL_ADMIN);
+		registerCommand("clear", LEVEL_ADMIN);
+		registerCommand("addbannedword", LEVEL_ADMIN);
+		registerCommand("delbannedword", LEVEL_ADMIN);
 		registerCommand("loadplugin", LEVEL_ADMIN);
 		registerCommand("unloadplugin", LEVEL_ADMIN);
 		registerCommand("findip", LEVEL_ADMIN);
 		registerCommand("checkuser", LEVEL_ADMIN);
 		registerCommand("banip", LEVEL_ADMIN);
-        registerCommand("whois", LEVEL_SAFELIST);
-        registerCommand("usage", LEVEL_SAFELIST);
-        registerCommand("alias", LEVEL_SAFELIST);
+		registerCommand("whois", LEVEL_SAFELIST);
+		registerCommand("usage", LEVEL_SAFELIST);
+		registerCommand("alias", LEVEL_SAFELIST);
 		registerCommand("adminstats", LEVEL_SAFELIST);
 		registerCommand("statsdota", LEVEL_SAFELIST);
 
-        int public_level = LEVEL_PUBLIC;
-        if(!publiccommands) {
-            public_level = LEVEL_SAFELIST;
-        }
+		int public_level = LEVEL_PUBLIC;
+		if(!publiccommands) {
+			public_level = LEVEL_SAFELIST;
+		}
 
-        registerCommand("commands", public_level);
-        registerCommand("whoami", public_level);
-        registerCommand("time", public_level);
-        registerCommand("rand", public_level);
+		registerCommand("commands", public_level);
+		registerCommand("whoami", public_level);
+		registerCommand("time", public_level);
+		registerCommand("rand", public_level);
 		registerCommand("uptime", public_level);
 		registerCommand("baninfo", public_level);
 		registerCommand("roomstats", public_level);
 
-        if(owner != null) {
-            registerCommand("owner", public_level);
-        } if(!disable_version) {
-            registerCommand("version", public_level);
-        }
-    }
+		if(owner != null) {
+			registerCommand("owner", public_level);
+		} if(!disable_version) {
+			registerCommand("version", public_level);
+		}
+	}
 
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == announcement_timer && announcement != null) {
-            chatthread.queueChat(announcement, ANNOUNCEMENT);
-        }
-    }
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == announcement_timer && announcement != null) {
+			chatthread.queueChat(announcement, ANNOUNCEMENT);
+		}
+	}
 
-    public String command(MemberInfo member, String command, String payload) {
-        boolean isRoot = false;
-        if(root_admin != null) {
-            isRoot = root_admin.equalsIgnoreCase(member.username);
-        }
-        
-        boolean isAdmin = isRoot || admins.contains(member.username.toLowerCase());
-        boolean isSafelist = safelist.contains(member.username.toLowerCase());
+	public String command(MemberInfo member, String command, String payload) {
+		boolean isRoot = false;
+		if(root_admin != null) {
+			isRoot = root_admin.equalsIgnoreCase(member.username);
+		}
+		
+		boolean isAdmin = isRoot || admins.contains(member.username.toLowerCase());
+		boolean isSafelist = safelist.contains(member.username.toLowerCase());
 		
 		String str_level = getAccessLevel(member.username);
 		Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + str_level + " " + member.username);
@@ -162,34 +162,34 @@ public class GChatBot implements GarenaListener, ActionListener {
 			return pluginResponse;
 		}
 
-        //flood protection if public user
-        if(!isAdmin && !isSafelist) {
-            if(System.currentTimeMillis() - member.lastCommandTime < publicdelay) {
-                return null;
-            } else {
-                member.lastCommandTime = System.currentTimeMillis();
-            }
-        }
+		//flood protection if public user
+		if(!isAdmin && !isSafelist) {
+			if(System.currentTimeMillis() - member.lastCommandTime < publicdelay) {
+				return null;
+			} else {
+				member.lastCommandTime = System.currentTimeMillis();
+			}
+		}
 
-        command = processAlias(command.toLowerCase()); //if it's alias, convert it to original command
+		command = processAlias(command.toLowerCase()); //if it's alias, convert it to original command
 
-        if(command.equals("commands")) {
-            String str = "Commands: ";
+		if(command.equals("commands")) {
+			String str = "Commands: ";
 
-            if(isAdmin) {
-                str += adminCommands.toString(); //includes safelist, public commands
-            } else if(isSafelist) {
-                str += safelistCommands.toString(); //includes public commands
-            } else {
-                str += publicCommands.toString();
-            }
+			if(isAdmin) {
+				str += adminCommands.toString(); //includes safelist, public commands
+			} else if(isSafelist) {
+				str += safelistCommands.toString(); //includes public commands
+			} else {
+				str += publicCommands.toString();
+			}
 
-            return str;
-        }
+			return str;
+		}
 
-        //ADMIN COMMANDS
-        if(isAdmin) {
-            if(command.equalsIgnoreCase("addadmin")) {
+		//ADMIN COMMANDS
+		if(isAdmin) {
+			if(command.equalsIgnoreCase("addadmin")) {
 				payload = trimUsername(payload);
 				boolean isUserRoot = false;
 				if(root_admin != null) {
@@ -225,16 +225,16 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed to add admin <" + payload + ">";
 					}
 				}
-            } else if(command.equalsIgnoreCase("deladmin")) {
+			} else if(command.equalsIgnoreCase("deladmin")) {
 				payload = trimUsername(payload);
-                boolean success = sqlthread.delAdmin(payload.toLowerCase());
-                if(success) {
-                    admins.remove(payload.toLowerCase());
-                    return "Successfully deleted admin " + payload;
-                } else {
-                    return "Failed to delete admin " + payload;
-                }
-            } else if(command.equalsIgnoreCase("addsafelist")) {
+				boolean success = sqlthread.delAdmin(payload.toLowerCase());
+				if(success) {
+					admins.remove(payload.toLowerCase());
+					return "Successfully deleted admin " + payload;
+				} else {
+					return "Failed to delete admin " + payload;
+				}
+			} else if(command.equalsIgnoreCase("addsafelist")) {
 				payload = trimUsername(payload);
 				boolean isUserRoot = false;
 				if(root_admin != null) {
@@ -242,7 +242,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				boolean isUserAdmin = isUserRoot || admins.contains(payload.toLowerCase()); //checks if payload is admin
 				boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
-                if(isUserAdmin) {
+				if(isUserAdmin) {
 					return "Can not add <" + payload + ">, already an admin!";
 				} else if(isUserSafelist) {
 					return "Can not add <" + payload + ">, already safelisted!";
@@ -255,37 +255,37 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed to add safelist " + payload;
 					}
 				}
-            } else if(command.equalsIgnoreCase("delsafelist")) {
+			} else if(command.equalsIgnoreCase("delsafelist")) {
 				payload = trimUsername(payload);
-                boolean success = sqlthread.delSafelist(payload.toLowerCase());
-                if(success) {
-                    safelist.remove(payload.toLowerCase());
-                    return "Successfully deleted safelist " + payload;
-                } else {
-                    return "Failed to delete safelist " + payload;
-                }
-            } else if(command.equalsIgnoreCase("say")) {
-                chatthread.queueChat(payload, MAIN_CHAT);
-                return null;
-            } else if(command.equalsIgnoreCase("exit")) {
-                if(isRoot || root_admin == null) {
-                    exit();
-                }
-                return null;
-            } else if(command.equalsIgnoreCase("w")) {
-                String[] parts = payload.split(" ", 2);
-                String username = parts[0];
+				boolean success = sqlthread.delSafelist(payload.toLowerCase());
+				if(success) {
+					safelist.remove(payload.toLowerCase());
+					return "Successfully deleted safelist " + payload;
+				} else {
+					return "Failed to delete safelist " + payload;
+				}
+			} else if(command.equalsIgnoreCase("say")) {
+				chatthread.queueChat(payload, MAIN_CHAT);
+				return null;
+			} else if(command.equalsIgnoreCase("exit")) {
+				if(isRoot || root_admin == null) {
+					exit();
+				}
+				return null;
+			} else if(command.equalsIgnoreCase("w")) {
+				String[] parts = payload.split(" ", 2);
+				String username = parts[0];
 				username = trimUsername(username);
-                MemberInfo target = garena.memberFromName(username);
-                if(parts.length >= 2) {
-                    String message = parts[1];
-                    chatthread.queueChat(message, target.userID);
-                } else {
+				MemberInfo target = garena.memberFromName(username);
+				if(parts.length >= 2) {
+					String message = parts[1];
+					chatthread.queueChat(message, target.userID);
+				} else {
 					return "Invalid format detected. Correct format is !w <user> <message>";
 				}
 
-                return null;
-            } else if(command.equalsIgnoreCase("ban")) {
+				return null;
+			} else if(command.equalsIgnoreCase("ban")) {
 				String[] parts = payload.split(" ", 3);
 				if(parts.length >= 3 && GarenaEncrypt.isInteger(parts[1])) {
 					String username = parts[0];
@@ -339,7 +339,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Invalid format detected. Correct format is !ban <username> <number_of_hours> <reason>";
 				}
-            } else if(command.equalsIgnoreCase("unban")) {
+			} else if(command.equalsIgnoreCase("unban")) {
 				payload = trimUsername(payload);
 				chatthread.queueChat("Successfully unbanned <" + payload + ">. Unbanned by <" + member.username + ">", ANNOUNCEMENT);
 				boolean success = sqlthread.unban(payload);
@@ -348,83 +348,83 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					chatthread.queueChat("Failed to remove ban information for <" + payload + "> from MySQL database", ANNOUNCEMENT);
 				}
-                garena.unban(payload);
-                return null;
-            } else if(command.equalsIgnoreCase("announce")) {
-                chatthread.queueChat(payload, ANNOUNCEMENT);
-                return null;
-            } else if(command.equalsIgnoreCase("kick")) {
+				garena.unban(payload);
+				return null;
+			} else if(command.equalsIgnoreCase("announce")) {
+				chatthread.queueChat(payload, ANNOUNCEMENT);
+				return null;
+			} else if(command.equalsIgnoreCase("kick")) {
 				String[] parts = payload.split(" ", 2);
 				String user = trimUsername(parts[1]);
 				String reason = "";
 				if(parts[2] != null) {
 					reason = parts[2];
 				}
-                MemberInfo victim = garena.memberFromName(user);
-                if(victim != null) {
-                    garena.kick(victim);
+				MemberInfo victim = garena.memberFromName(user);
+				if(victim != null) {
+					garena.kick(victim);
 					numberKicked++;
 					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
-                    chatthread.queueChat("Kicked for reason: " + reason, ANNOUNCEMENT);
-                    return null;
-                } else {
-                    return "Unable to locate user " + payload + " in room";
-                }
-            } else if(command.equalsIgnoreCase("message")) {
-                if(payload.length() > 0) {
-                    String[] parts = payload.split(" ", 2);
+					chatthread.queueChat("Kicked for reason: " + reason, ANNOUNCEMENT);
+					return null;
+				} else {
+					return "Unable to locate user " + payload + " in room";
+				}
+			} else if(command.equalsIgnoreCase("message")) {
+				if(payload.length() > 0) {
+					String[] parts = payload.split(" ", 2);
 
-                    if(!GarenaEncrypt.isInteger(parts[0]) || parts.length < 2) { //in case of bad input
-                        return "Invalid format detected. Correct format is !message <number> <message>";
-                    }
+					if(!GarenaEncrypt.isInteger(parts[0]) || parts.length < 2) { //in case of bad input
+						return "Invalid format detected. Correct format is !message <number> <message>";
+					}
 
-                    int interval = Integer.parseInt(parts[0]);
-                    announcement = parts[1];
+					int interval = Integer.parseInt(parts[0]);
+					announcement = parts[1];
 
-                    if(announcement_timer != null) {
-                        if(announcement_timer.isRunning()) {
-                            announcement_timer.setDelay(interval*1000);
-                        }
-                    } else {
-                        announcement_timer = new Timer(interval*1000, this);
-                    }
-                    announcement_timer.start();
-                    return "Announcing: " + announcement + " every " + interval + " seconds";
-                } else {
-                    announcement = null;
-                    announcement_timer.stop();
-                    return "Stopping announcement";
-                }
-            } else if(command.equalsIgnoreCase("bot")) {
-                boolean success = sqlthread.command(payload);
+					if(announcement_timer != null) {
+						if(announcement_timer.isRunning()) {
+							announcement_timer.setDelay(interval*1000);
+						}
+					} else {
+						announcement_timer = new Timer(interval*1000, this);
+					}
+					announcement_timer.start();
+					return "Announcing: " + announcement + " every " + interval + " seconds";
+				} else {
+					announcement = null;
+					announcement_timer.stop();
+					return "Stopping announcement";
+				}
+			} else if(command.equalsIgnoreCase("bot")) {
+				boolean success = sqlthread.command(payload);
 
-                if(success) {
-                    return "Successfully executed!";
-                } else {
-                    return "Failed!";
-                }
-            } else if(command.equalsIgnoreCase("clear")) {
-                chatthread.clearQueue();
+				if(success) {
+					return "Successfully executed!";
+				} else {
+					return "Failed!";
+				}
+			} else if(command.equalsIgnoreCase("clear")) {
+				chatthread.clearQueue();
 				return "Cleared chat queue";
-            } else if(command.equalsIgnoreCase("addbannedword")) {
+			} else if(command.equalsIgnoreCase("addbannedword")) {
 				boolean success = sqlthread.addBannedWord(payload.toLowerCase());
 				
-                if(success) {
-                    bannedWords.add(payload.toLowerCase());
-                    return "Successfully added banned word " + payload;
-                } else {
-                    return "Failed to add banned word " + payload;
-                }
-            } else if(command.equalsIgnoreCase("delbannedword")) {
-                boolean success = sqlthread.delBannedWord(payload.toLowerCase());
-                
-                if(success) {
-                    bannedWords.remove(payload.toLowerCase());
-                    return "Successfully deleted banned word " + payload;
-                } else {
-                    return "Failed to delete banned word " + payload;
-                }
-            } else if(command.equalsIgnoreCase("loadplugin")) {
+				if(success) {
+					bannedWords.add(payload.toLowerCase());
+					return "Successfully added banned word " + payload;
+				} else {
+					return "Failed to add banned word " + payload;
+				}
+			} else if(command.equalsIgnoreCase("delbannedword")) {
+				boolean success = sqlthread.delBannedWord(payload.toLowerCase());
+				
+				if(success) {
+					bannedWords.remove(payload.toLowerCase());
+					return "Successfully deleted banned word " + payload;
+				} else {
+					return "Failed to delete banned word " + payload;
+				}
+			} else if(command.equalsIgnoreCase("loadplugin")) {
 				plugins.loadPlugin(payload);
 				return null;
 			} else if(command.equalsIgnoreCase("unloadplugin")) {
@@ -524,48 +524,48 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Invalid format detected. Correct format is !ban <ip_address> <number_of_hours> <reason>";
 				}
 			}
-        }
+		}
 
-        if(isSafelist || isAdmin) {
-            //SAFELIST COMMANDS
-            if(command.equalsIgnoreCase("whois")) {
-                payload = trimUsername(payload);
-                return whois(payload);
-            } else if(command.equalsIgnoreCase("usage")) {
-                payload = processAlias(payload.toLowerCase());
-                if(payload.equalsIgnoreCase("addadmin")) {
+		if(isSafelist || isAdmin) {
+			//SAFELIST COMMANDS
+			if(command.equalsIgnoreCase("whois")) {
+				payload = trimUsername(payload);
+				return whois(payload);
+			} else if(command.equalsIgnoreCase("usage")) {
+				payload = processAlias(payload.toLowerCase());
+				if(payload.equalsIgnoreCase("addadmin")) {
 					return "Format: !addadmin <username>. Example: !addadmin XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("deladmin")) {
+				} else if(payload.equalsIgnoreCase("deladmin")) {
 					return "Format: !deladmin <username>. Example: !deladmin XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("say")) {
+				} else if(payload.equalsIgnoreCase("say")) {
 					return "Format: !say <message>. Example: !say Hello World";
-                } else if(payload.equalsIgnoreCase("w")) {
+				} else if(payload.equalsIgnoreCase("w")) {
 					return "Format: !w <user> <message>. Example: !w XIII.Dragon hello";
-                } else if(payload.equalsIgnoreCase("usage")) {
+				} else if(payload.equalsIgnoreCase("usage")) {
 					return "Format: !usage <command>. Example: !usage ban";
-                } else if(payload.equalsIgnoreCase("whois")) {
+				} else if(payload.equalsIgnoreCase("whois")) {
 					return "Format: !whois <username>. Example: !whois XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("kick")) {
+				} else if(payload.equalsIgnoreCase("kick")) {
 					return "Format: !kick <username> <reason>. Example: !kick XIII.Dragon too pro";
-                } else if(payload.equalsIgnoreCase("ban")) {
+				} else if(payload.equalsIgnoreCase("ban")) {
 					return "Format: !ban <username> <ban_length_in_hours> <reason>. Example: !ban XIII.Dragon 10 too pro";
-                } else if(payload.equalsIgnoreCase("announce")) {
+				} else if(payload.equalsIgnoreCase("announce")) {
 					return "Format: !announce <message>. Example: !announce Hello World";
-                } else if(payload.equalsIgnoreCase("unban")) {
+				} else if(payload.equalsIgnoreCase("unban")) {
 					return "Format: !unban <username>. Example: !unban XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("alias")) {
+				} else if(payload.equalsIgnoreCase("alias")) {
 					return "Format: !alias <command>. Example: !alias addbannedword";
-                } else if(payload.equalsIgnoreCase("message")) {
+				} else if(payload.equalsIgnoreCase("message")) {
 					return "Format: !message <interval_in_seconds> <message>. Example: !message 100 Hello World. If no message is given, will stop messaging";
-                } else if(payload.equalsIgnoreCase("addbannedword")) {
+				} else if(payload.equalsIgnoreCase("addbannedword")) {
 					return "Format: !addbannedword <banned_word_or_phrase>. Example: !addbannedword fuck you. Does not work with all characters";
-                } else if(payload.equalsIgnoreCase("delbannedword")) {
-					return "Format: !delbannedword <banned_word_or_phrase>. Example: !delbannedword fuck you";                               
-                } else if(payload.equalsIgnoreCase("addsafelist")) {
+				} else if(payload.equalsIgnoreCase("delbannedword")) {
+					return "Format: !delbannedword <banned_word_or_phrase>. Example: !delbannedword fuck you";							   
+				} else if(payload.equalsIgnoreCase("addsafelist")) {
 					return "Format: !addsafelist <username>. Example: !addsafelist XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("delsafelist")) {
+				} else if(payload.equalsIgnoreCase("delsafelist")) {
 					return "Format: !delsafelist <username>. Example: !delsafelist XIII.Dragon";
-                } else if(payload.equalsIgnoreCase("baninfo")) {
+				} else if(payload.equalsIgnoreCase("baninfo")) {
 					return "Format: !baninfo <username>. Example: !baninfo XIII.Dragon";
 				} else if(payload.equalsIgnoreCase("findip")) {
 					return "Format: !findip <ip_address>. Example: !findip /111.111.111.111";
@@ -576,16 +576,16 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else if(payload.equalsIgnoreCase("statsdota")) {
 					return "Format: !statsdota <username>. Example: !statsdota XIII.Dragon";
 				} else {
-                    return "Command not found or command has no extra information available!";
-                }
-            } else if(command.equalsIgnoreCase("alias")) {
-                String cmd_check = processAlias(payload);
-                if(commandToAlias.containsKey(cmd_check)) {
-                    return "Aliases: " + arrayToString(commandToAlias.get(cmd_check));
-                } else {
-                    return "Command has no aliases or command not found!";
-                }
-            } else if(command.equalsIgnoreCase("adminstats")) {
+					return "Command not found or command has no extra information available!";
+				}
+			} else if(command.equalsIgnoreCase("alias")) {
+				String cmd_check = processAlias(payload);
+				if(commandToAlias.containsKey(cmd_check)) {
+					return "Aliases: " + arrayToString(commandToAlias.get(cmd_check));
+				} else {
+					return "Command has no aliases or command not found!";
+				}
+			} else if(command.equalsIgnoreCase("adminstats")) {
 				return "Number of users banned/kicked/warned since " + startTime + ": " + numberBanned + "/" + numberKicked + "/" + numberWarned;
 			} else if(command.equalsIgnoreCase("statsdota")) {
 				payload = trimUsername(payload);
@@ -598,42 +598,42 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "<" + payload + "> has not played any games with this bot yet";
 				}
 			}
-        }
-        
-        //PUBLIC COMMANDS
-        if(publiccommands || isSafelist || isAdmin) {
-            if(command.equalsIgnoreCase("version")) {
-                if(!disable_version) {
-                    return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
-                } else {
-                    return null;
-                }
-            } else if(command.equalsIgnoreCase("owner")) {
-                if(owner != null) {
-                    return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner") + ". Created by uakf.b, modified by XIII.Dragon";
-                } else {
-                    return null;
-                }
-            } else if(command.equalsIgnoreCase("whoami")) {
-                return whois(member.username);
-            } else if(command.equalsIgnoreCase("time")) {
-                return time();
-            } else if(command.equalsIgnoreCase("rand")) {
+		}
+		
+		//PUBLIC COMMANDS
+		if(publiccommands || isSafelist || isAdmin) {
+			if(command.equalsIgnoreCase("version")) {
+				if(!disable_version) {
+					return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
+				} else {
+					return null;
+				}
+			} else if(command.equalsIgnoreCase("owner")) {
+				if(owner != null) {
+					return "This chat bot is hosted by " + GCBConfig.configuration.getString("gcb_bot_owner") + ". Created by uakf.b, modified by XIII.Dragon";
+				} else {
+					return null;
+				}
+			} else if(command.equalsIgnoreCase("whoami")) {
+				return whois(member.username);
+			} else if(command.equalsIgnoreCase("time")) {
+				return time();
+			} else if(command.equalsIgnoreCase("rand")) {
 				int scale = 100;
 				if(!payload.equals("")) {
 					scale = Integer.parseInt(payload);
 				}
 				int random = (int)(Math.random()*scale)+1;
-                return "You randomed: " + random;
-            } else if(command.equalsIgnoreCase("uptime")) {
+				return "You randomed: " + random;
+			} else if(command.equalsIgnoreCase("uptime")) {
 				return "Online since: " + startTime;
 			} else if(command.equalsIgnoreCase("baninfo")) {
 				payload = trimUsername(payload);
 				if(sqlthread.doesBanExist(payload.toLowerCase())) {
-                    return "<" + payload + "> " + sqlthread.getBanInfo(payload.toLowerCase());
-                } else {
-                    return "Can not find ban information about <" + payload + ">";
-                }
+					return "<" + payload + "> " + sqlthread.getBanInfo(payload.toLowerCase());
+				} else {
+					return "Can not find ban information about <" + payload + ">";
+				}
 			} else if(command.equalsIgnoreCase("roomstats")) {
 				int countPlaying = 0;
 				int countPeople = 0;
@@ -647,168 +647,168 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				return "There are " + countPlaying + " players with Warcraft 3 open and " + countPeople + " players in the room";
 			}
-        }
+		}
 
-        if(access_message != null) {
-            if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
-                return access_message;
-            } else if (!isAdmin && isSafelist && adminCommands.contains(command.toLowerCase())) {
-                return access_message;
-            }
-        }
+		if(access_message != null) {
+			if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
+				return access_message;
+			} else if (!isAdmin && isSafelist && adminCommands.contains(command.toLowerCase())) {
+				return access_message;
+			}
+		}
 		if(isAdmin || isSafelist) {
 			return "Invalid command recieved, please check your spelling and try again";
 		} else {
 			return null;
 		}
-    }
+	}
 
-    public String whois(String username) {
-        MemberInfo target = garena.memberFromName(username);
+	public String whois(String username) {
+		MemberInfo target = garena.memberFromName(username);
 
-        if(target == null) {
-            return username + " cannot be found!";
-        }
+		if(target == null) {
+			return username + " cannot be found!";
+		}
 
-        String wc3status = "";
-        if(target.playing) {
-            wc3status = "(has WC3 open)";
-        } else {
-            wc3status = "(doesn't have WC3 open)";
-        }
+		String wc3status = "";
+		if(target.playing) {
+			wc3status = "(has WC3 open)";
+		} else {
+			wc3status = "(doesn't have WC3 open)";
+		}
 
-        String accessLevel = getAccessLevel(target.username);
-        return "Username: <" + target.username + "> UID: " + target.userID + " is: " + accessLevel + " " + wc3status + " IP: " + target.externalIP;
-    }
+		String accessLevel = getAccessLevel(target.username);
+		return "Username: <" + target.username + "> UID: " + target.userID + " is: " + accessLevel + " " + wc3status + " IP: " + target.externalIP;
+	}
 
-    public String getAccessLevel(String username) {
-        boolean memberIsRoot = false;
-        if(root_admin != null) {
-            memberIsRoot = root_admin.equalsIgnoreCase(username);
-        }
-        boolean memberIsAdmin = memberIsRoot || admins.contains(username.toLowerCase());
-        boolean memberIsSafelist = safelist.contains(username.toLowerCase());
-        
-        
-        if(memberIsAdmin) {
-            return "admin";
-        } else if(memberIsSafelist){
-            return "safelisted";
-        } else {
-            return "basic";
-        }
-    }
+	public String getAccessLevel(String username) {
+		boolean memberIsRoot = false;
+		if(root_admin != null) {
+			memberIsRoot = root_admin.equalsIgnoreCase(username);
+		}
+		boolean memberIsAdmin = memberIsRoot || admins.contains(username.toLowerCase());
+		boolean memberIsSafelist = safelist.contains(username.toLowerCase());
+		
+		
+		if(memberIsAdmin) {
+			return "admin";
+		} else if(memberIsSafelist){
+			return "safelisted";
+		} else {
+			return "basic";
+		}
+	}
 
-    public void exit() {
-        garena.disconnectRoom();
-        System.exit(0);
-    }
+	public void exit() {
+		garena.disconnectRoom();
+		System.exit(0);
+	}
 
-    public String processAlias(String alias) {
-        if(aliasToCommand.containsKey(alias)) {
-            return aliasToCommand.get(alias);
-        } else {
-            return alias;
-        }
-    }
+	public String processAlias(String alias) {
+		if(aliasToCommand.containsKey(alias)) {
+			return aliasToCommand.get(alias);
+		} else {
+			return alias;
+		}
+	}
 
-    public void registerCommand(String command) {
-        registerCommand(command, LEVEL_PUBLIC);
-    }
+	public void registerCommand(String command) {
+		registerCommand(command, LEVEL_PUBLIC);
+	}
 
-    public void registerCommand(String command, int level) {
-        //get aliases from configuration file
-        String[] aliases = new String[] {command};
+	public void registerCommand(String command, int level) {
+		//get aliases from configuration file
+		String[] aliases = new String[] {command};
 
-        if(GCBConfig.configuration.containsKey("gcb_bot_alias_" + command)) {
-            try {
-                aliases = GCBConfig.configuration.getStringArray("gcb_bot_alias_" + command);
-            } catch(ConversionException e) {
+		if(GCBConfig.configuration.containsKey("gcb_bot_alias_" + command)) {
+			try {
+				aliases = GCBConfig.configuration.getStringArray("gcb_bot_alias_" + command);
+			} catch(ConversionException e) {
 				Main.println("[GChatBat] Warning: unable to parse entry for alias of " + command);
-                aliases = new String[] {command};
-            }
-        }
+				aliases = new String[] {command};
+			}
+		}
 
-        for(String alias : aliases) {
-            aliasToCommand.put(alias, command);
-        }
+		for(String alias : aliases) {
+			aliasToCommand.put(alias, command);
+		}
 
-        if(level <= LEVEL_ADMIN) {
-            adminCommands.add(command);
-        }
+		if(level <= LEVEL_ADMIN) {
+			adminCommands.add(command);
+		}
 
-        if(level <= LEVEL_SAFELIST) {
-            safelistCommands.add(command);
-        }
+		if(level <= LEVEL_SAFELIST) {
+			safelistCommands.add(command);
+		}
 
-        if(level <= LEVEL_PUBLIC) {
-            publicCommands.add(command);
-        }
+		if(level <= LEVEL_PUBLIC) {
+			publicCommands.add(command);
+		}
 
-        commandToAlias.put(command, aliases);
-    }
-    
-    public static String arrayToString(String[] a) {
-        StringBuilder result = new StringBuilder();
-        if (a.length > 0) {
-            result.append(a[0]);
+		commandToAlias.put(command, aliases);
+	}
+	
+	public static String arrayToString(String[] a) {
+		StringBuilder result = new StringBuilder();
+		if (a.length > 0) {
+			result.append(a[0]);
 
-            for (int i = 1; i < a.length; i++) {
-                result.append(", ");
-                result.append(a[i]);
-            }
-        }
-        
-        return result.toString();
-    }
+			for (int i = 1; i < a.length; i++) {
+				result.append(", ");
+				result.append(a[i]);
+			}
+		}
+		
+		return result.toString();
+	}
 
-    public void chatReceived(MemberInfo player, String chat, boolean whisper) {
-        if(player != null && chat.startsWith("?trigger")) {
-            String trigger_msg = "Trigger: " + trigger;
+	public void chatReceived(MemberInfo player, String chat, boolean whisper) {
+		if(player != null && chat.startsWith("?trigger")) {
+			String trigger_msg = "Trigger: " + trigger;
 
-            if(whisper) {
-                chatthread.queueChat(trigger_msg, player.userID);
-            } else {
-                chatthread.queueChat(trigger_msg, MAIN_CHAT);
-            }
-        }
+			if(whisper) {
+				chatthread.queueChat(trigger_msg, player.userID);
+			} else {
+				chatthread.queueChat(trigger_msg, MAIN_CHAT);
+			}
+		}
 
-        //do we have a command?
-        if(player != null && chat.startsWith(trigger)) {
-            //remove trigger from string, and split with space separator
-            String[] array = chat.substring(trigger.length()).split(" ", 2);
-            String command = array[0];
-            String payload = "";
+		//do we have a command?
+		if(player != null && chat.startsWith(trigger)) {
+			//remove trigger from string, and split with space separator
+			String[] array = chat.substring(trigger.length()).split(" ", 2);
+			String command = array[0];
+			String payload = "";
 
-            if(array.length >= 2) {
-                payload = array[1];
-            }
+			if(array.length >= 2) {
+				payload = array[1];
+			}
 
-            String response = command(player, command, payload);
-            
-            if(response != null) {
-                if(whisper) {
-                    chatthread.queueChat(response, player.userID);
-                } else {
-                    chatthread.queueChat(response, MAIN_CHAT);
-                }
-            }
-        }
-        
-        if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) { //only checks if true
-            boolean isAdmin = admins.contains(player.username.toLowerCase());
-            boolean isSafelist = safelist.contains(player.username.toLowerCase());
-            if(!isAdmin && !isSafelist) { //only checks non-admin, non-safelist players
-                for(int i = 0; i < bannedWords.size(); i++) {
-                    if(chat.toLowerCase().indexOf(bannedWords.get(i)) > -1) { //checks chat against bannedWords vector
-                        String detectAnnouncement = GCBConfig.configuration.getString("gcb_bot_detect_announcement"); //takes string from config file
-                        if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("kick")) { //checks config file if kick
-                            garena.kick(player);
+			String response = command(player, command, payload);
+			
+			if(response != null) {
+				if(whisper) {
+					chatthread.queueChat(response, player.userID);
+				} else {
+					chatthread.queueChat(response, MAIN_CHAT);
+				}
+			}
+		}
+		
+		if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) { //only checks if true
+			boolean isAdmin = admins.contains(player.username.toLowerCase());
+			boolean isSafelist = safelist.contains(player.username.toLowerCase());
+			if(!isAdmin && !isSafelist) { //only checks non-admin, non-safelist players
+				for(int i = 0; i < bannedWords.size(); i++) {
+					if(chat.toLowerCase().indexOf(bannedWords.get(i)) > -1) { //checks chat against bannedWords vector
+						String detectAnnouncement = GCBConfig.configuration.getString("gcb_bot_detect_announcement"); //takes string from config file
+						if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("kick")) { //checks config file if kick
+							garena.kick(player);
 							numberKicked++;
 							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
-                            chatthread.queueChat("Kicked for reason: " + detectAnnouncement, ANNOUNCEMENT);
-                        } else if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("ban")) { //checks config file if ban
-                            int time = GCBConfig.configuration.getInt("gcb_bot_detect_ban_time", 24); //default 24 hours
+							chatthread.queueChat("Kicked for reason: " + detectAnnouncement, ANNOUNCEMENT);
+						} else if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("ban")) { //checks config file if ban
+							int time = GCBConfig.configuration.getInt("gcb_bot_detect_ban_time", 24); //default 24 hours
 							String currentDate = time();
 							String expireDate = time(time);
 							String ipAddress = player.externalIP.toString();
@@ -820,15 +820,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 							} else {
 								chatthread.queueChat("Failed to add ban information for <" + player.username + "> to MySQL database", ANNOUNCEMENT);
 							}
-                            garena.ban(player.username, time);
+							garena.ban(player.username, time);
 							numberBanned++;
 							chatthread.queueChat("Banned for reason: " + detectAnnouncement, ANNOUNCEMENT);
-                        } else {
-                            chatthread.queueChat(detectAnnouncement, ANNOUNCEMENT); //if nothing is set in config file, just announces detection
-                        }
-                        break;
-                    }
-                }
+						} else {
+							chatthread.queueChat(detectAnnouncement, ANNOUNCEMENT); //if nothing is set in config file, just announces detection
+						}
+						break;
+					}
+				}
 				for(int i = player.lastMessages.length-3; i < player.lastMessages.length-1; i++) {
 					if(player.lastMessages[i] != null) {
 						if(chat.equals(player.lastMessages[i])) {
@@ -907,9 +907,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 	
 	public String trimUsername(String username) {
 		username = username.trim();
@@ -935,7 +935,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		return sdf.format(cal.getTime());
 	}
 
-    public void playerJoined(MemberInfo player) {
+	public void playerJoined(MemberInfo player) {
 		if(GCBConfig.configuration.getBoolean("gcb_bot_warn_same_ip", false)) {
 			for(int i = 0; i < bannedIpAddress.size(); i++) {
 				if(player.externalIP.toString().substring(1).equals(bannedIpAddress.get(i))) {
@@ -964,25 +964,25 @@ public class GChatBot implements GarenaListener, ActionListener {
 				chatthread.queueChat("Safelisted user <" + player.username + "> has entered the room", MAIN_CHAT);
 			}
 		}
-    }
+	}
 
-    public void playerLeft(MemberInfo player) {
+	public void playerLeft(MemberInfo player) {
 		for(int i = 0; i < player.lastMessages.length-1; i++) {
 			player.lastMessages[i] = "";
 		}
 		player.inRoom = false;
-    }
+	}
 
-    public void playerStopped(MemberInfo player) {
+	public void playerStopped(MemberInfo player) {
 
-    }
+	}
 
-    public void playerStarted(MemberInfo player) {
+	public void playerStarted(MemberInfo player) {
 
-    }
+	}
 
-    public void disconnected(int x) {
-        //try to reconnect
+	public void disconnected(int x) {
+		//try to reconnect
 
-    }
+	}
 }
