@@ -358,7 +358,10 @@ public class GChatBot implements GarenaListener, ActionListener {
             } else if(command.equalsIgnoreCase("kick")) {
 				String[] parts = payload.split(" ", 2);
 				String user = trimUsername(parts[1]);
-				String reason = parts[2];
+				String reason = "";
+				if(parts[2] != null) {
+					reason = parts[2];
+				}
                 MemberInfo victim = garena.memberFromName(user);
                 if(victim != null) {
                     garena.kick(victim);
