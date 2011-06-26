@@ -22,7 +22,9 @@ public class MemberInfo {
     int externalPort;
     int internalPort;
     int virtualSuffix;
-    long lastCommandTime;
+	long lastCommandTime;
+	boolean inRoom;
+	String[] lastMessages = new String[6];
 
     //these will be set after HELLO is received
     int correctPort = -1;
