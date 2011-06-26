@@ -64,7 +64,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 	
 	public Vector<String> bannedWords;
 	public Vector<String> bannedIpAddress;
-	public Vector<String> bannedUsers;
 
     public GChatBot() {
         admins = new Vector<String>();
@@ -76,7 +75,6 @@ public class GChatBot implements GarenaListener, ActionListener {
         publicCommands = new Vector<String>();
         bannedWords = new Vector<String>();
 		bannedIpAddress = new Vector<String>();
-		bannedUsers = new Vector<String>();
 		startTime = time();
     }
 
@@ -407,9 +405,10 @@ public class GChatBot implements GarenaListener, ActionListener {
                 }
             } else if(command.equalsIgnoreCase("clear")) {
                 chatthread.clearQueue();
+				return "Cleared chat queue";
             } else if(command.equalsIgnoreCase("addbannedword")) {
-                boolean success = sqlthread.addBannedWord(payload.toLowerCase());
-                
+				boolean success = sqlthread.addBannedWord(payload.toLowerCase());
+				
                 if(success) {
                     bannedWords.add(payload.toLowerCase());
                     return "Successfully added banned word " + payload;
@@ -830,7 +829,7 @@ public class GChatBot implements GarenaListener, ActionListener {
                         break;
                     }
                 }
-				for(int i = player.lastMessages.length-4; i < player.lastMessages.length-2; i++) {
+				for(int i = player.lastMessages.length-3; i < player.lastMessages.length-1; i++) {
 					if(player.lastMessages[i] != null) {
 						if(chat.equals(player.lastMessages[i])) {
 							String currentDate = time();
@@ -850,41 +849,59 @@ public class GChatBot implements GarenaListener, ActionListener {
 						}
 					}
 				}
-				for(int i = 0; i < player.lastMessages.length-2; i++) { //moves each value in the array up by 1
+				for(int i = 0; i < player.lastMessages.length-1; i++) { //moves each value in the array up by 1
 					if(player.lastMessages[i+1] != null) { //stops null pointer exception
 						player.lastMessages[i] = player.lastMessages[i+1];
 					} else {
 						player.lastMessages[i] = "";
 					}
 				}
-				player.lastMessages[player.lastMessages.length-2] = chat; //adds current chat into the array at 2nd to last position
-				int numberOfEqualitySigns = 0; //'<' and '>'
-				int numberOfNewLines = 0; //the enter key
-				for(int i = 0; i < player.lastMessages.length-1; i++) {
-					if(player.lastMessages[i] != null) {
-						for(int j = 0; j < player.lastMessages[i].length()-1; j++) {
-							if(player.lastMessages[i].charAt(j) == '<' || player.lastMessages[i].charAt(j) == '>') {
-								numberOfEqualitySigns++;
-							}
-							if(player.lastMessages[i].charAt(j) == '\n') {
-								numberOfNewLines++;
-							}
-						}
+				player.lastMessages[player.lastMessages.length-1] = chat; //adds current chat into the array
+				int numEqualitySigns = 0; //'<' and '>'
+				int numNewLines = 0; //the enter key
+				for(int i = 0; i < chat.length()-1; i++) {
+					if(chat.charAt(i) == '<' || chat.charAt(i) == '>') {
+						numEqualitySigns++;
+					} else if(chat.charAt(i) =='\n') {
+						numNewLines++;
 					}
 				}
-				if((chat.indexOf('<') > -1 || chat.indexOf('>') > -1) && numberOfEqualitySigns > 24 && numberOfEqualitySigns < 50) {
-					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less '>' and '<' symbols)", ANNOUNCEMENT);
+				if(numNewLines > 20) {
+					garena.kick(player);
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
+					numberKicked++;
+				}
+				if(numEqualitySigns > 8) {
+					player.numWarnings++;
+				}
+				if(numNewLines > 3) {
+					player.numWarnings++;
+				}
+				if(player.numWarnings == 3 && numEqualitySigns > 8) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less '>' and '<' symbols). First warning!", ANNOUNCEMENT);
 					numberWarned++;
-				} else if((chat.indexOf('<') > -1 || chat.indexOf('>') > -1) && numberOfEqualitySigns > 49) {
+				} else if(player.numWarnings == 4 && numEqualitySigns > 8) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less '>' and '<' symbols). Second warning!", ANNOUNCEMENT);
+					numberWarned++;
+				} else if(player.numWarnings == 5 && numEqualitySigns > 8) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less '>' and '<' symbols). FINAL WARNING!", ANNOUNCEMENT);
+					numberWarned++;
+				} else if(player.numWarnings > 5 && numEqualitySigns > 8) {
 					garena.kick(player);
 					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: Autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
-				}
-				if(chat.indexOf('\n') > -1 && numberOfNewLines > 7 && numberOfNewLines < 20) {
-					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less enter symbols)", ANNOUNCEMENT);
+				} else if(player.numWarnings == 3 && numNewLines > 3) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less enter symbols). First warning!", ANNOUNCEMENT);
 					numberWarned++;
-				} else if(chat.indexOf('\n') > -1 && numberOfNewLines > 19) {
+				} else if(player.numWarnings == 4 && numNewLines > 3) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less enter symbols). Second warning!", ANNOUNCEMENT);
+					numberWarned++;
+				} else if(player.numWarnings == 5 && numNewLines > 3) {
+					chatthread.queueChat("<" + player.username + "> please stop spamming or you will be kicked (use less enter symbols). FINAL WARNING", ANNOUNCEMENT);
+					numberWarned++;
+				} else if(player.numWarnings > 5 && numNewLines > 3) {
 					garena.kick(player);
 					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
