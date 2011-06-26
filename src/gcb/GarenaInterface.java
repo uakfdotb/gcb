@@ -1044,7 +1044,7 @@ public class GarenaInterface {
 
         for(int i = 0; i < members.size(); i++) {
             if(members.get(i).userID == user_id) {
-                member = members.remove(i);
+                member = members.get(i);
             }
         }
 
