@@ -14,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.util.Vector;
+import java.math.*;
 
 /**
  *
@@ -31,9 +33,11 @@ public class SQLThread extends Thread {
     String password;
 
     String realm;
+	int botId;
     int dbtype;
     GChatBot bot;
     boolean initial;
+	int defaultAdminAccess;
 
     public SQLThread(GChatBot bot) {
         this.bot = bot;
@@ -44,6 +48,8 @@ public class SQLThread extends Thread {
         username = GCBConfig.configuration.getString("gcb_bot_db_username");
         password = GCBConfig.configuration.getString("gcb_bot_db_password");
         realm = GCBConfig.configuration.getString("gcb_bot_realm", "gcb");
+		botId = GCBConfig.configuration.getInt("gcb_bot_id", 0);
+		defaultAdminAccess = GCBConfig.configuration.getInt("gcb_bot_default_admin_access", 4095);
 
         String dbtype_str = GCBConfig.configuration.getString("gcb_bot_db_type", "gcb");
 
@@ -66,10 +72,9 @@ public class SQLThread extends Thread {
         try {
             connection = DriverManager.getConnection(host, username, password);
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-            
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
         }
     }
@@ -79,22 +84,21 @@ public class SQLThread extends Thread {
             PreparedStatement statement = null;
 
             if(dbtype == TYPE_GHOSTONE) {
-                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES"
-                        + "(0, ?, '" + realm + "', 4095)");
+                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES" + "(0, ?, ?, ?)");
             } else if(dbtype == TYPE_GHOSTPP || dbtype == TYPE_GHOSTPP_EXTENDED) {
                 statement = connection.prepareStatement("INSERT INTO admins (botid, name, server) VALUES (0, ?, 'gcb')");
             } else if(dbtype == TYPE_GCB) {
                 statement = connection.prepareStatement("INSERT INTO admins (name) VALUES (?)");
-            }
-            statement.setString(1, username);
-
-            statement.execute();
+			}
+			statement.setString(1, username);
+			statement.setString(2, realm);
+			statement.setInt(3, defaultAdminAccess);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-            
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
         }
 
@@ -103,15 +107,14 @@ public class SQLThread extends Thread {
 
     public boolean delAdmin(String username) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name = ?");
-            statement.setString(1, username);
-            statement.execute();
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name=?");
+			statement.setString(1, username);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
         }
 
@@ -122,27 +125,23 @@ public class SQLThread extends Thread {
         if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
             return false;
         }
-
+		PreparedStatement statement = null;
         try {
-            PreparedStatement statement = null;
-
             if(dbtype == TYPE_GHOSTONE) {
-                statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES"
-                        + " ('" + realm + "', ?, ?)");
-                statement.setString(1, username);
-                statement.setString(2, voucher);
+                statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES (?, ?, ?)");
+				statement.setString(1, realm);
+				statement.setString(2, username);
+				statement.setString(3, voucher);
             } else if(dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
                 statement = connection.prepareStatement("INSERT INTO safelist (name) VALUES (?)");
-                statement.setString(1, username);
+				statement.setString(1, username);
             }
-
-            statement.execute();
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
         }
 
@@ -155,15 +154,14 @@ public class SQLThread extends Thread {
         }
         
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name = ?");
-            statement.setString(1, username);
-            statement.execute();
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name =?");
+			statement.setString(1, username);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
         }
 
@@ -172,16 +170,14 @@ public class SQLThread extends Thread {
 
     public boolean addBannedWord(String bannedWord) {
         try {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase)"
-                    + " VALUES (NULL, 'bannedword', ?)");
-            statement.setString(1, bannedWord);
-            statement.execute();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', ?)");
+			statement.setString(1, bannedWord);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
         }
 
@@ -190,21 +186,256 @@ public class SQLThread extends Thread {
 
     public boolean delBannedWord(String bannedWord) {
         try {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases"
-                    + " WHERE phrase=' ? and type='bannedword'");
-            statement.setString(1, bannedWord);
-            statement.execute();
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=? and type ='bannedword'");
+			statement.setString(1, bannedWord);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
         }
 
         return false;
     }
+	
+	public boolean addBan(String bannedUser, String ipAddress, String currentDate, String admin, String reason, String expireDate) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (id, botid, server, name, ip, date, gamename, admin, reason, gamecount, expiredate, warn) VALUES (NULL, ?, ?, ?, ?, ?, 'Room Ban', ?, ?, 0, ?, 0)");
+			statement.setInt(1, botId);
+			statement.setString(2, realm);
+			statement.setString(3, bannedUser);
+			statement.setString(4, ipAddress);
+			statement.setString(5, currentDate);
+			statement.setString(6, admin);
+			statement.setString(7, reason);
+			statement.setString(8, expireDate);
+			statement.execute();
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to add ban to MySQL database: " + e.getLocalizedMessage());
+		}
+		
+		return false;
+	}
+	
+	public boolean unban(String user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE name=?");
+			statement.setString(1, user);
+			statement.execute();
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to remove ban from MySQL database: " + e.getLocalizedMessage());
+		}
+		
+		return false;
+	}
+	
+	public String getBanInfo(String user) {
+		String date = "";
+		String admin = "";
+		String reason = "";
+		String expireDate = "";
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT date, admin, reason, expiredate FROM bans WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				date = result.getString(1);
+				admin = result.getString(2);
+				reason = result.getString(3);
+				expireDate = result.getString(4);
+				date = date.substring(0, date.length()-2); //removes the millisecond value from the time
+			}
+			return "banned on " + date + " by <" + admin + "> for: " + reason + ". Ban expires on " + expireDate;
+
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to get ban information on user: " + e.getLocalizedMessage());
+		}
+		
+		return "";
+	}
+	
+	public boolean doesBanExist(String user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			String name = "";
+			while (result.next()) {
+				name = result.getString(1);
+			}
+			if(name.equals("")) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] User can not be found in bans list: " + e.getLocalizedMessage());
+		}
+		
+		return false;
+	}
+	
+	public String getBannedUserFromIp(String ip) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE ip=?");
+			statement.setString(1, ip);
+			ResultSet result = statement.executeQuery();
+			String name = "";
+			while (result.next()) {
+				name = name + " " + result.getString(1);
+			}
+			return name;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] User can not be found in bans list: " + e.getLocalizedMessage());
+		}
+		
+		return "";
+	}
+	
+	public boolean doesUserHaveStats(String user) {
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT name FROM gameplayers WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			String name = "";
+			while (result.next()) {
+				name = result.getString(1);
+			}
+			if(name.equals("")) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] User can not be found in gameplayers list: " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public String getDotaStats(String user) {
+		int winner = 0;
+		int totalGames = 0;
+		int totalWins = 0;
+		int totalLoss = 0;
+		int totalKills = 0;
+		int totalDeaths = 0;
+		int totalCreepKills = 0;
+		int totalCreepDenies = 0;
+		int totalAssists = 0;
+		int totalNeutralKills = 0;
+		int totalTowerKills = 0;
+		int totalRaxKills = 0;
+		int totalCourierKills = 0;
+		double avgKills = 0;
+		double avgDeaths = 0;
+		double avgCreepKills = 0;
+		double avgCreepDenies = 0;
+		double avgAssists = 0;
+		double avgNeutralKills = 0;
+		double avgTowerKills = 0;
+		double avgRaxKills = 0;
+		double avgCourierKills = 0;
+		double winRate = 0;
+		
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT gameid, team, colour FROM gameplayers WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				int gameId = result.getInt(1);
+				int team = result.getInt(2);
+				int colour = result.getInt(3);
+				PreparedStatement statement2 = connection.prepareStatement("SELECT winner FROM dotagames WHERE gameid=?");
+				statement2.setInt(1, gameId);
+				ResultSet result2 = statement2.executeQuery();
+				while (result2.next()) {
+					winner = result2.getInt(1);
+					if(winner == 1 && team == 0) {
+						totalWins++;
+					} else if(winner == 1 && team == 1) {
+						totalLoss++;
+					} else if(winner == 2 && team == 0) {
+						totalLoss++;
+					} else if(winner == 2 && team == 1) {
+						totalWins++;
+					}
+				}
+				PreparedStatement statement3 = connection.prepareStatement("SELECT kills, deaths, creepkills, creepdenies, assists, neutralkills, towerkills, raxkills, courierkills FROM dotaplayers WHERE gameid=? and colour=?");
+				statement3.setInt(1, gameId);
+				statement3.setInt(2, colour);
+				ResultSet result3 = statement3.executeQuery();
+				while (result3.next()) {
+					totalKills += result3.getInt(1);
+					totalDeaths += result3.getInt(2);
+					totalCreepKills += result3.getInt(3);
+					totalCreepDenies += result3.getInt(4);
+					totalAssists += result3.getInt(5);
+					totalNeutralKills += result3.getInt(6);
+					totalTowerKills += result3.getInt(7);
+					totalRaxKills += result3.getInt(8);
+					totalCourierKills += result3.getInt(9);
+				}
+			}
+			totalGames = totalWins + totalLoss;
+			int decimalPlace = 2;
+			BigDecimal bdAvgKills = new BigDecimal((double)totalKills/(double)totalGames);
+			bdAvgKills = bdAvgKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgKills = bdAvgKills.doubleValue();
+			BigDecimal bdAvgDeaths = new BigDecimal((double)totalDeaths/(double)totalGames);
+			bdAvgDeaths = bdAvgDeaths.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgDeaths = bdAvgDeaths.doubleValue();
+			BigDecimal bdAvgCreepKills = new BigDecimal((double)totalCreepKills/(double)totalGames);
+			bdAvgCreepKills = bdAvgCreepKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgCreepKills = bdAvgCreepKills.doubleValue();
+			BigDecimal bdAvgCreepDenies = new BigDecimal((double)totalCreepDenies/(double)totalGames);
+			bdAvgCreepDenies = bdAvgCreepDenies.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgCreepDenies = bdAvgCreepDenies.doubleValue();
+			BigDecimal bdAvgAssists = new BigDecimal((double)totalAssists/(double)totalGames);
+			bdAvgAssists = bdAvgAssists.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgAssists = bdAvgAssists.doubleValue();
+			BigDecimal bdNeutralKills = new BigDecimal((double)totalNeutralKills/(double)totalGames);
+			bdNeutralKills = bdNeutralKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgNeutralKills = bdNeutralKills.doubleValue();
+			BigDecimal bdAvgTowerKills = new BigDecimal((double)totalTowerKills/(double)totalGames);
+			bdAvgTowerKills = bdAvgTowerKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgTowerKills = bdAvgTowerKills.doubleValue();
+			BigDecimal bdAvgRaxKills = new BigDecimal((double)totalRaxKills/(double)totalGames);
+			bdAvgRaxKills = bdAvgRaxKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgRaxKills = bdAvgRaxKills.doubleValue();
+			BigDecimal bdAvgCourierKills = new BigDecimal((double)totalCourierKills/(double)totalGames);	
+			bdAvgCourierKills = bdAvgCourierKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
+			avgCourierKills = bdAvgCourierKills.doubleValue();	
+			return "has played " + totalGames + " DotA games on this hostbot (W/L: " + totalWins + "/" + totalLoss + ") Hero K/D/A: " + avgKills + "/" + avgDeaths + "/" + avgAssists + " Creep K/D/N: " + avgCreepKills + "/" + avgCreepDenies + "/" + avgNeutralKills + " T/R/C: " + avgTowerKills + "/" + avgRaxKills + "/" + avgCourierKills;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+            Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
+		}
+		return "";
+	}
 
     public boolean command(String command) {
         if(dbtype != TYPE_GHOSTPP_EXTENDED) {
@@ -212,18 +443,15 @@ public class SQLThread extends Thread {
         }
 
         try {
-            int target_botid = GCBConfig.configuration.getInteger("gcb_bot_id", 1);
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command)"
-                    + " VALUES (?, ?)");
-            statement.setString(1, target_botid + "");
-            statement.setString(2, command);
-            statement.execute();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
+			statement.setInt(1, botId);
+			statement.setString(2, command);
+			statement.execute();
             return true;
         } catch(SQLException e) {
-            if(Main.DEBUG) {
-                e.printStackTrace();
-            }
-
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
             Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
         }
 
@@ -232,10 +460,9 @@ public class SQLThread extends Thread {
 
     public void run() {
         while(true) {
-            if(Main.DEBUG) {
-                Main.println("[SQLThread] Refreshing internal lists with database...");
-            }
-
+			if(Main.DEBUG) {
+				Main.println("[SQLThread] Refreshing internal lists with database...");
+			}
             try {
                 //refresh admin list
                 Statement statement = connection.createStatement();
@@ -250,7 +477,6 @@ public class SQLThread extends Thread {
                 }
                 
                 if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
-                    statement = connection.createStatement();
                     result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
                     bot.bannedWords.clear();
                     while(result.next()) {
@@ -260,12 +486,20 @@ public class SQLThread extends Thread {
                     if(initial) {
                         Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " banned words");
                     }
+					result = statement.executeQuery("SELECT ip FROM bans");
+					bot.bannedIpAddress.clear();
+					while(result.next()) {
+						bot.bannedIpAddress.add(result.getString("ip"));
+					}
+					
+					if(initial) {
+						Main.println("[SQLThread] Initial refresh: found " + bot.bannedIpAddress.size() + " banned IP addresses");
+					}
                 }
             } catch(SQLException e) {
-                if(Main.DEBUG) {
-                    e.printStackTrace();
-                }
-
+				if(Main.DEBUG) {
+				e.printStackTrace();
+			}
                 Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
             }
 
@@ -283,10 +517,9 @@ public class SQLThread extends Thread {
                         Main.println("[SQLThread] Initial refresh: found " + bot.safelist.size() + " safelist");
                     }
                 } catch(SQLException e) {
-                    if(Main.DEBUG) {
-                        e.printStackTrace();
-                    }
-                    
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
                     Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
                 }
             }
