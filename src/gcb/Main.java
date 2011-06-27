@@ -172,7 +172,7 @@ public class Main {
 
 	public void initBot() {
 		if(loadBot) {
-			bot = new GChatBot();
+			bot = new GChatBot(this);
 			bot.init();
 			bot.garena = garena;
 			bot.plugins = plugins;
@@ -243,11 +243,12 @@ public class Main {
 	}
 
 	public static void println(String str) {
-		System.out.println(str);
+		Date date = new Date();
+		String print = "[" + DateFormat.getDateTimeInstance().format(date) + "] " + str;
+		System.out.println(print);
 
 		if(log_out != null) {
-			Date date = new Date();
-			log_out.println("[" + DateFormat.getDateTimeInstance().format(date) + "] " + str);
+			log_out.println(print);
 		}
 	}
 

@@ -177,6 +177,9 @@ public class GarenaInterface {
 	public boolean initRoom() {
 		Main.println("[GInterface] Connecting to room...");
 
+		//update room_id in case this is called from !room command
+		room_id = GCBConfig.configuration.getInt("gcb_roomid", 590633);
+
 		InetAddress address = null;
 		//hostname lookup
 		try {
@@ -245,6 +248,9 @@ public class GarenaInterface {
 		} catch(IOException ioe) {
 			//ignore
 		}
+
+		//cleanup room objects
+		members.clear();
 	}
 
 	public boolean sendGSPSessionInit() {
@@ -811,7 +817,7 @@ public class GarenaInterface {
 				} else if(type == 34) {
 					//JOIN message
 					MemberInfo added = readMemberInfo(size - 1, lbuf);
-					Main.println("[" + time() + "] New member joined: " + added.username + " with id " + added.userID);
+					Main.println("[GarenaInterface] New member joined: " + added.username + " with id " + added.userID);
 
 					for(GarenaListener listener : listeners) {
 						listener.playerJoined(added);
@@ -1049,9 +1055,9 @@ public class GarenaInterface {
 		}
 
 		if(member != null) {
-			Main.println("[" + time() + "] " + member.username + " with ID " + member.userID + " has left the room");
+			Main.println("[GarenaInterface] " + member.username + " with ID " + member.userID + " has left the room");
 		} else {
-			Main.println("[" + time() + "] Unlisted member " + user_id + " has left the room");
+			Main.println("[GarenaInterface] Unlisted member " + user_id + " has left the room");
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1071,9 +1077,9 @@ public class GarenaInterface {
 
 		if(member != null) {
 			member.playing = true;
-			Main.println("[" + time() + "] " + member.username + " with ID " + member.userID + " has started playing");
+			Main.println("[GarenaInterface] " + member.username + " with ID " + member.userID + " has started playing");
 		} else {
-			Main.println("[" + time() + "] Unlisted member " + user_id + " has started playing");
+			Main.println("[GarenaInterface] Unlisted member " + user_id + " has started playing");
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1093,9 +1099,9 @@ public class GarenaInterface {
 
 		if(member != null) {
 			member.playing = false;
-			Main.println("[" + time() + "] " + member.username + " with ID " + member.userID + " has stopped playing");
+			Main.println("[GarenaInterface] " + member.username + " with ID " + member.userID + " has stopped playing");
 		} else {
-			Main.println("[" + time() + "] Unlisted member " + user_id + " has stopped playing");
+			Main.println("[GarenaInterface] Unlisted member " + user_id + " has stopped playing");
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1119,9 +1125,9 @@ public class GarenaInterface {
 		String chat_string = crypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
-			Main.println("[" + time() + "] " + member.username + " with ID " + member.userID + " whispers: " + chat_string);
+			Main.println("[GarenaInterface] " + member.username + " with ID " + member.userID + " whispers: " + chat_string);
 		} else {
-			Main.println("[" + time() + "] Unlisted member " + user_id + " whispers: " + chat_string);
+			Main.println("[GarenaInterface] Unlisted member " + user_id + " whispers: " + chat_string);
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1151,9 +1157,9 @@ public class GarenaInterface {
 		String chat_string = crypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
-			Main.println("[" + time() + "] " + member.username + " with ID " + member.userID + ": " + chat_string);
+			Main.println("[GarenaInterface] " + member.username + " with ID " + member.userID + ": " + chat_string);
 		} else {
-			Main.println("[" + time() + "] Unlisted member " + user_id + ": " + chat_string);
+			Main.println("[GarenaInterface] Unlisted member " + user_id + ": " + chat_string);
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1162,7 +1168,7 @@ public class GarenaInterface {
 	}
 
 	public boolean chat(String text) {
-		Main.println("[" + time() + "] Sending message: " + text);
+		Main.println("[GarenaInterface] Sending message: " + text);
 
 		byte[] chat_bytes = null;
 
@@ -1194,7 +1200,7 @@ public class GarenaInterface {
 	}
 
 	public boolean announce(String text) {
-		Main.println("[" + time() + "] Sending announce: " + text);
+		Main.println("[GarenaInterface] Sending announce: " + text);
 
 		byte[] chat_bytes = null;
 
@@ -1225,7 +1231,7 @@ public class GarenaInterface {
 
 	public boolean ban(String username, int hours) {
 		int seconds = hours * 3600;
-		Main.println("[" + time() + "] Banning " + username + " for " + seconds + " seconds");
+		Main.println("[GarenaInterface] Banning " + username + " for " + seconds + " seconds");
 
 		byte[] username_bytes = null;
 
@@ -1260,7 +1266,7 @@ public class GarenaInterface {
 	}
 
 	public boolean kick(MemberInfo member) {
-		Main.println("[" + time() + "] Kicking " + member.username + " with user ID " + member.userID);
+		Main.println("[GarenaInterface] Kicking " + member.username + " with user ID " + member.userID);
 
 		buf.clear();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -1316,7 +1322,7 @@ public class GarenaInterface {
 	}
 
 	public boolean whisper(int target_user, String text) {
-		Main.println("[" + time() + "] Sending whisper to " + target_user + ": " + text);
+		Main.println("[GarenaInterface] Sending whisper to " + target_user + ": " + text);
 
 		byte[] chat_bytes = null;
 
@@ -1564,11 +1570,11 @@ public class GarenaInterface {
 			} else {
 				sendHello(target.userID, target.correctIP, target.correctPort);
 			}
-			
-			//also send reverse SEARCH if needed
-			if(reverseEnabled) {
-				reverseHost.sendSearch();
-			}
+		}
+
+		//also send reverse SEARCH if needed
+		if(reverseEnabled) {
+			reverseHost.sendSearch();
 		}
 	}
 
@@ -1630,7 +1636,9 @@ public class GarenaInterface {
 	}
 	
 	public void broadcastUDPEncap(int source, int destination, byte[] data, int offset, int length) {
-		for(MemberInfo target : members) {
+		for(int i = 0; i < members.size(); i++) {
+			MemberInfo target = members.get(i);
+
 			if(target.userID == this.user_id) continue;
 			if(!target.playing) continue; //don't broadcast if they don't have WC3 open
 		

@@ -69,7 +69,12 @@ public class GChatBot implements GarenaListener, ActionListener {
 	public Vector<String> bannedWords;
 	public Vector<String> bannedIpAddress;
 
-	public GChatBot() {
+	//for re-initializing parts of GarenaInterface
+	Main main;
+
+	public GChatBot(Main main) {
+		this.main = main;
+
 		roomAdmins = new Vector<String>();
 		botAdmins = new Vector<String>();
 		safelist = new Vector<String>();
@@ -120,6 +125,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("clear", LEVEL_BOT_ADMIN);
 		registerCommand("findip", LEVEL_BOT_ADMIN);
 		registerCommand("checkuser", LEVEL_BOT_ADMIN);
+		registerCommand("room", LEVEL_BOT_ADMIN);
 		
 		registerCommand("whois", LEVEL_SAFELIST);
 		registerCommand("usage", LEVEL_SAFELIST);
@@ -517,7 +523,25 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Invalid format detected. Correct format is !banip <ip_address> <number_of_hours> <reason>";
 				}
-			}
+			} else if (command.equalsIgnoreCase("room")) {
+				String[] parts = payload.split(" ", 2);
+
+				if(!parts[0].trim().equals("")) {
+					try {
+						GCBConfig.configuration.setProperty("gcb_roomid", Integer.parseInt(parts[0]));
+					} catch(NumberFormatException e) {
+						Main.println("[GChatBot] Warning: ignoring invalid number " + parts[0]);
+					}
+				}
+
+				if(parts.length > 1 && !parts[1].trim().equals("")) {
+					GCBConfig.configuration.setProperty("gcb_roomhost", parts[1]);
+				}
+
+				garena.disconnectRoom();
+				main.initRoom();
+				return null;
+			} 
 		}
 		
 		if(isRoomAdmin || isBotAdmin) {
