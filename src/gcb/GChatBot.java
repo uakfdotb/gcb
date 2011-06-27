@@ -23,9 +23,10 @@ import org.apache.commons.configuration.ConversionException;
  */
 public class GChatBot implements GarenaListener, ActionListener {
 	public static String VERSION = "gcb_bot 0e";
-	public static int LEVEL_PUBLIC = 0;
-	public static int LEVEL_SAFELIST = 1;
-	public static int LEVEL_ADMIN = 2;
+	public static final int LEVEL_PUBLIC = 0;
+	public static final int LEVEL_SAFELIST = 1;
+	public static final int LEVEL_BOT_ADMIN = 2;
+	public static final int LEVEL_ROOM_ADMIN = 3;
 	public static final int MAIN_CHAT = -1;
 	public static final int ANNOUNCEMENT = -2;
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -44,6 +45,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	SQLThread sqlthread;
 	ChatThread chatthread;
 	String root_admin; //root admin for this bot; null if root is disabled
+	int defaultAdminAccess;
 
 	//config
 	int publicdelay;
@@ -53,12 +55,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 	boolean disable_version;
 
 	//thread safe objects
-	public Vector<String> admins; //admin usernames
+	public Vector<String> roomAdmins; //admin usernames
+	public Vector<String> botAdmins;
 	public Vector<String> safelist;
 
 	HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
 	HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
-	Vector<String> adminCommands; //includes all commands accessible by admins, including safelist/public commands
+	Vector<String> roomAdminCommands; //includes all commands accessible by admins, including safelist/public commands
+	Vector<String> botAdminCommands; 
 	Vector<String> safelistCommands;
 	Vector<String> publicCommands;
 	
@@ -66,11 +70,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 	public Vector<String> bannedIpAddress;
 
 	public GChatBot() {
-		admins = new Vector<String>();
+		roomAdmins = new Vector<String>();
+		botAdmins = new Vector<String>();
 		safelist = new Vector<String>();
 		aliasToCommand = new HashMap<String, String>();
 		commandToAlias = new HashMap<String, String[]>();
-		adminCommands = new Vector<String>();
+		roomAdminCommands = new Vector<String>();
+		botAdminCommands = new Vector<String>();
 		safelistCommands = new Vector<String>();
 		publicCommands = new Vector<String>();
 		bannedWords = new Vector<String>();
@@ -90,28 +96,31 @@ public class GChatBot implements GarenaListener, ActionListener {
 		access_message = GCBConfig.getString("gcb_bot_access_message");
 		owner = GCBConfig.getString("gcb_bot_owner");
 		disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
+		defaultAdminAccess = GCBConfig.configuration.getInt("gcb_bot_default_admin_access", 4095);
 		
-		registerCommand("addadmin", LEVEL_ADMIN);
-		registerCommand("deladmin", LEVEL_ADMIN);
-		registerCommand("addsafelist", LEVEL_ADMIN);
-		registerCommand("delsafelist", LEVEL_ADMIN);
-		registerCommand("say", LEVEL_ADMIN);
-		registerCommand("exit", LEVEL_ADMIN);
-		registerCommand("w", LEVEL_ADMIN);
-		registerCommand("ban", LEVEL_ADMIN);
-		registerCommand("unban", LEVEL_ADMIN);
-		registerCommand("announce", LEVEL_ADMIN);
-		registerCommand("kick", LEVEL_ADMIN);
-		registerCommand("message", LEVEL_ADMIN);
-		registerCommand("bot", LEVEL_ADMIN);
-		registerCommand("clear", LEVEL_ADMIN);
-		registerCommand("addbannedword", LEVEL_ADMIN);
-		registerCommand("delbannedword", LEVEL_ADMIN);
-		registerCommand("loadplugin", LEVEL_ADMIN);
-		registerCommand("unloadplugin", LEVEL_ADMIN);
-		registerCommand("findip", LEVEL_ADMIN);
-		registerCommand("checkuser", LEVEL_ADMIN);
-		registerCommand("banip", LEVEL_ADMIN);
+		registerCommand("addadmin", LEVEL_ROOM_ADMIN);
+		registerCommand("deladmin", LEVEL_ROOM_ADMIN);
+		registerCommand("say", LEVEL_ROOM_ADMIN);
+		registerCommand("exit", LEVEL_ROOM_ADMIN);
+		registerCommand("w", LEVEL_ROOM_ADMIN);
+		registerCommand("ban", LEVEL_ROOM_ADMIN);
+		registerCommand("unban", LEVEL_ROOM_ADMIN);
+		registerCommand("announce", LEVEL_ROOM_ADMIN);
+		registerCommand("kick", LEVEL_ROOM_ADMIN);
+		registerCommand("message", LEVEL_ROOM_ADMIN);
+		registerCommand("addbannedword", LEVEL_ROOM_ADMIN);
+		registerCommand("delbannedword", LEVEL_ROOM_ADMIN);
+		registerCommand("loadplugin", LEVEL_ROOM_ADMIN);
+		registerCommand("unloadplugin", LEVEL_ROOM_ADMIN);
+		registerCommand("banip", LEVEL_ROOM_ADMIN);
+		
+		registerCommand("addsafelist", LEVEL_BOT_ADMIN);
+		registerCommand("delsafelist", LEVEL_BOT_ADMIN);
+		registerCommand("bot", LEVEL_BOT_ADMIN);
+		registerCommand("clear", LEVEL_BOT_ADMIN);
+		registerCommand("findip", LEVEL_BOT_ADMIN);
+		registerCommand("checkuser", LEVEL_BOT_ADMIN);
+		
 		registerCommand("whois", LEVEL_SAFELIST);
 		registerCommand("usage", LEVEL_SAFELIST);
 		registerCommand("alias", LEVEL_SAFELIST);
@@ -150,20 +159,21 @@ public class GChatBot implements GarenaListener, ActionListener {
 			isRoot = root_admin.equalsIgnoreCase(member.username);
 		}
 		
-		boolean isAdmin = isRoot || admins.contains(member.username.toLowerCase());
+		boolean isRoomAdmin = isRoot || roomAdmins.contains(member.username.toLowerCase());
+		boolean isBotAdmin = botAdmins.contains(member.username.toLowerCase());
 		boolean isSafelist = safelist.contains(member.username.toLowerCase());
 		
 		String str_level = getAccessLevel(member.username);
 		Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + str_level + " " + member.username);
 		
 		//notify plugins
-		String pluginResponse = plugins.onCommand(member, command, payload, isAdmin, isSafelist);
+		String pluginResponse = plugins.onCommand(member, command, payload, isRoomAdmin, isBotAdmin, isSafelist);
 		if(pluginResponse != null) {
 			return pluginResponse;
 		}
 
 		//flood protection if public user
-		if(!isAdmin && !isSafelist) {
+		if(!isRoomAdmin && !isBotAdmin && !isSafelist) {
 			if(System.currentTimeMillis() - member.lastCommandTime < publicdelay) {
 				return null;
 			} else {
@@ -176,8 +186,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 		if(command.equals("commands")) {
 			String str = "Commands: ";
 
-			if(isAdmin) {
-				str += adminCommands.toString(); //includes safelist, public commands
+			if(isRoomAdmin) {
+				str += roomAdminCommands.toString(); //includes bot admin, safelist, public commands
+			} else if(isBotAdmin) {
+				str += botAdminCommands.toString(); //includes safelist, public commands
 			} else if(isSafelist) {
 				str += safelistCommands.toString(); //includes public commands
 			} else {
@@ -187,82 +199,91 @@ public class GChatBot implements GarenaListener, ActionListener {
 			return str;
 		}
 
-		//ADMIN COMMANDS
-		if(isAdmin) {
+		//ROOM ADMIN COMMANDS
+		if(isRoomAdmin) {
 			if(command.equalsIgnoreCase("addadmin")) {
-				payload = trimUsername(payload);
+				String[] parts = payload.split(" ", 2);
+				String user = "";
+				int access = defaultAdminAccess;
+				if(parts.length >= 1) {
+					user = trimUsername(parts[0]);
+					if(user.equals("")) {
+						return "Invalid format detected. Correct format is !addadmin <username> <access>";
+					}
+				} else {
+					return "Invalid format detected. Correct format is !addadmin <username> <access>";
+				}
+				if(parts.length == 2) {
+					if(GarenaEncrypt.isInteger(parts[1])) {
+						access = Integer.parseInt(parts[1]);
+					}
+				}
 				boolean isUserRoot = false;
 				if(root_admin != null) {
-				isRoot = root_admin.equalsIgnoreCase(payload.toLowerCase());
+					isRoot = root_admin.equalsIgnoreCase(user.toLowerCase());
 				}
-				boolean isUserAdmin = isUserRoot || admins.contains(payload.toLowerCase()); //checks if payload is admin
-				boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
+				boolean isUserAdmin = isUserRoot || roomAdmins.contains(user.toLowerCase()) || botAdmins.contains(payload.toLowerCase()); //checks if payload is admin
+				boolean isUserSafelist = safelist.contains(user.toLowerCase()); //checks if user is safelist
 				if(!isUserAdmin && isUserSafelist) { //if not an admin, but safelist
-					boolean successAddAdmin = sqlthread.addAdmin(payload.toLowerCase());
-					boolean successDelSafelist = sqlthread.delSafelist(payload.toLowerCase());
+					boolean successAddAdmin = sqlthread.addAdmin(user.toLowerCase(), access);
+					boolean successDelSafelist = sqlthread.delSafelist(user.toLowerCase());
 					if(successAddAdmin && successDelSafelist) { //if added admin and removed safelist
-						admins.add(payload.toLowerCase());
-						safelist.remove(payload.toLowerCase());
-						return "Successfully added admin <" + payload + ">";
+						safelist.remove(user.toLowerCase());
+						if(access < 8191) {
+							botAdmins.add(user.toLowerCase());
+							return "Successfully added hostbot administrator <" + user + ">";
+						} else {
+							roomAdmins.add(user.toLowerCase());
+							return "Successfully added room administrator <" + user + ">";
+						}
 					} else if(successAddAdmin && !successDelSafelist) { //if added admin but failed to remove safelist
-						admins.add(payload.toLowerCase());
-						return "Successfully added admin <" + payload + ">, but failed to remove from safelist. Please manually remove from safelist";
+						if(access < 8191) {
+							botAdmins.add(user.toLowerCase());
+							return "Successfully added hostbot administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
+						} else {
+							roomAdmins.add(user.toLowerCase());
+							return "Successfully added room administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
+						}
 					} else if(!successAddAdmin && successDelSafelist) { //if failed to add admin, but succeeded in remove from safelist
-						safelist.remove(payload.toLowerCase());
-						return "Failed to add admin <" + payload + ">, but succeeded to remove from safelist";
+						safelist.remove(user.toLowerCase());
+						if(access < 8191) {
+							return "Failed to add hostbot administrator <" + user + ">, but succeeded to remove from safelist";
+						} else {
+							return "Failed to add room administrator <" + user + ">, but succeeded to remove from safelist";
+						}
 					}else if(!successAddAdmin && !successDelSafelist) { //if failed to add admin and failed to remove safelist
-						return "Failed to add admin <" + payload + "> and remove from safelist";
+						if(access < 8191) {
+							return "Failed to add hostbot administrator <" + user + "> and remove from safelist";
+						} else {
+							return "Failed to add room administrator <" + user + "> and remove from safelist";
+						}
 					}
 				} else if(isUserAdmin) {
-					return "Can not add <" + payload + ">, already an admin!";
+					return "Can not add <" + user + ">, already an administrator!";
 				} else if(!isUserAdmin && !isUserSafelist) {
-					boolean successAddAdmin = sqlthread.addAdmin(payload.toLowerCase());
+					boolean successAddAdmin = sqlthread.addAdmin(user.toLowerCase(), access);
 					
 					if(successAddAdmin) {
-						admins.remove(payload.toLowerCase());
-						return "Successfully added admin <" + payload + ">";
+						if(access < 8191) {
+							botAdmins.add(user.toLowerCase());
+							return "Successfully added hostbot administrator <" + user + ">";
+						} else {
+							roomAdmins.add(user.toLowerCase());
+							return "Successfully added room administrator <" + user + ">";
+						}
 					} else {
-						return "Failed to add admin <" + payload + ">";
+						return "Failed to add administrator <" + user + ">";
 					}
 				}
 			} else if(command.equalsIgnoreCase("deladmin")) {
 				payload = trimUsername(payload);
 				boolean success = sqlthread.delAdmin(payload.toLowerCase());
 				if(success) {
-					admins.remove(payload.toLowerCase());
-					return "Successfully deleted admin " + payload;
+					botAdmins.remove(payload.toLowerCase());
+					roomAdmins.remove(payload.toLowerCase());
+					return "Successfully deleted administrator " + payload;
 				} else {
-					return "Failed to delete admin " + payload;
-				}
-			} else if(command.equalsIgnoreCase("addsafelist")) {
-				payload = trimUsername(payload);
-				boolean isUserRoot = false;
-				if(root_admin != null) {
-					isRoot = root_admin.equalsIgnoreCase(payload.toLowerCase());
-				}
-				boolean isUserAdmin = isUserRoot || admins.contains(payload.toLowerCase()); //checks if payload is admin
-				boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
-				if(isUserAdmin) {
-					return "Can not add <" + payload + ">, already an admin!";
-				} else if(isUserSafelist) {
-					return "Can not add <" + payload + ">, already safelisted!";
-				} else {
-					boolean success = sqlthread.addSafelist(payload.toLowerCase(), member.username);
-					if(success) {
-						safelist.add(payload.toLowerCase());
-						return "Successfully added safelist " + payload;
-					} else {
-						return "Failed to add safelist " + payload;
-					}
-				}
-			} else if(command.equalsIgnoreCase("delsafelist")) {
-				payload = trimUsername(payload);
-				boolean success = sqlthread.delSafelist(payload.toLowerCase());
-				if(success) {
-					safelist.remove(payload.toLowerCase());
-					return "Successfully deleted safelist " + payload;
-				} else {
-					return "Failed to delete safelist " + payload;
+					return "Failed to delete administrator " + payload;
 				}
 			} else if(command.equalsIgnoreCase("say")) {
 				chatthread.queueChat(payload, MAIN_CHAT);
@@ -292,13 +313,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 					username = trimUsername(username);
 					boolean isUserRoot = false;
 					if(root_admin != null) {
-						isRoot = root_admin.equalsIgnoreCase(username.toLowerCase());
+						isUserRoot = root_admin.equalsIgnoreCase(username.toLowerCase());
 					}
-					boolean isUserAdmin = isUserRoot || admins.contains(username.toLowerCase()); //checks if payload is admin
+					boolean isUserAdmin = isUserRoot || roomAdmins.contains(username.toLowerCase()) || botAdmins.contains(username.toLowerCase()); //checks if payload is admin
 					boolean isUserSafelist = safelist.contains(username.toLowerCase()); //checks if payload is safelist
 					if(!isRoot) {
 						if(isUserAdmin) {
-							return "Failed to ban <" + payload + ">, user is an admin!";
+							return "Failed to ban <" + payload + ">, user is an administrator!";
 						} else if(isUserSafelist) {
 							return "Failed to ban <" + payload + ">, user is safelisted!";
 						}
@@ -365,6 +386,19 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(parts.length >= 2) {
 					reason = parts[1];
 				}
+				boolean isUserRoot = false;
+				if(root_admin != null) {
+					isUserRoot = root_admin.equalsIgnoreCase(user.toLowerCase());
+				}
+				boolean isUserAdmin = isUserRoot || roomAdmins.contains(user.toLowerCase()) || botAdmins.contains(user.toLowerCase()); //checks if payload is admin
+				boolean isUserSafelist = safelist.contains(user.toLowerCase()); //checks if payload is safelist
+				if(!isRoot) {
+					if(isUserAdmin) {
+						return "Failed to kick <" + payload + ">, user is an administrator!";
+					} else if(isUserSafelist) {
+						return "Failed to kick <" + payload + ">, user is safelisted!";
+					}
+				}
 				MemberInfo victim = garena.memberFromName(user);
 				if(victim != null) {
 					garena.kick(victim);
@@ -400,17 +434,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 					announcement_timer.stop();
 					return "Stopping announcement";
 				}
-			} else if(command.equalsIgnoreCase("bot")) {
-				boolean success = sqlthread.command(payload);
-
-				if(success) {
-					return "Successfully executed!";
-				} else {
-					return "Failed!";
-				}
-			} else if(command.equalsIgnoreCase("clear")) {
-				chatthread.clearQueue();
-				return "Cleared chat queue";
 			} else if(command.equalsIgnoreCase("addbannedword")) {
 				boolean success = sqlthread.addBannedWord(payload.toLowerCase());
 				
@@ -435,6 +458,111 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equalsIgnoreCase("unloadplugin")) {
 				plugins.unloadPlugin(payload);
 				return null;
+			} else if(command.equalsIgnoreCase("banip")) {
+				String[] parts = payload.split(" ", 3);
+				int count = 0;
+				Vector<String> listOfUsers = new Vector<String>();
+				if(parts.length >= 3 || GarenaEncrypt.isInteger(parts[1])) {
+					String ipAddress = parts[0];
+					if(ipAddress.charAt(0) != '/') { //adds a '/' to start of IP address if it doesnt exist
+						ipAddress = "/" + ipAddress;
+					}
+					for(int i = 0; i < garena.members.size(); i++) {
+						if(garena.members.get(i).externalIP.toString().equals(ipAddress) && garena.members.get(i).inRoom) {
+							if(!listOfUsers.contains(garena.members.get(i).username )) {
+								listOfUsers.add(garena.members.get(i).username);
+								count++;
+							}
+						}
+					}
+					if(count > 0) {
+						for(int i = 0; i < listOfUsers.size(); i++) {
+							int time = 24; //default 24 hours
+							try {
+								time = Integer.parseInt(parts[1]);
+							} catch(NumberFormatException e) {
+								Main.println("[GChatBot] Warning: ignoring invalid number " + parts[1]);
+							}
+							String reason = parts[2] + " (banned via IP address)";
+							String currentDate = time();
+							String expireDate = time(time);
+							String username = listOfUsers.get(i).toLowerCase();
+							boolean isUserRoot = false;
+							if(root_admin != null) {
+								isRoot = root_admin.equalsIgnoreCase(username);
+							}
+							boolean isUserAdmin = isUserRoot || roomAdmins.contains(username) || botAdmins.contains(username); //checks if the user is an admin
+							boolean isUserSafelist = safelist.contains(username); //checks if the user is safelist
+							if(!isUserAdmin && !isUserSafelist) {
+								ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
+								boolean success = sqlthread.addBan(username, ipAddress, currentDate, member.username, reason , expireDate);
+								chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+								if(success) {
+									chatthread.queueChat("Successfully added ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
+								} else {
+									chatthread.queueChat("Failed to add ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
+								}
+								garena.ban(username, time);
+								numberBanned++;
+								chatthread.queueChat("Successfully banned <" + username + "> for " + time + " hours. Banned by: <" + member.username + ">", ANNOUNCEMENT);
+								return null;
+							} else {
+								chatthread.queueChat("Can not ban admin or safelisted user <" + listOfUsers.get(i) + ">", MAIN_CHAT);
+								return null;
+							}
+						}
+					} else {
+						return "Can not find any users with IP address: " + ipAddress;
+					}
+				} else {
+					return "Invalid format detected. Correct format is !banip <ip_address> <number_of_hours> <reason>";
+				}
+			}
+		}
+		
+		if(isRoomAdmin || isBotAdmin) {
+			//BOT ADMIN COMMANDS
+			if(command.equalsIgnoreCase("addsafelist")) {
+				payload = trimUsername(payload);
+				boolean isUserRoot = false;
+				if(root_admin != null) {
+					isRoot = root_admin.equalsIgnoreCase(payload.toLowerCase());
+				}
+				boolean isUserAdmin = isUserRoot || roomAdmins.contains(payload.toLowerCase()) || botAdmins.contains(payload.toLowerCase()); //checks if payload is admin
+				boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
+				if(isUserAdmin) {
+					return "Can not add <" + payload + ">, already an administrator!";
+				} else if(isUserSafelist) {
+					return "Can not add <" + payload + ">, already safelisted!";
+				} else {
+					boolean success = sqlthread.addSafelist(payload.toLowerCase(), member.username);
+					if(success) {
+						safelist.add(payload.toLowerCase());
+						return "Successfully added safelist " + payload;
+					} else {
+						return "Failed to add safelist " + payload;
+					}
+				}
+			} else if(command.equalsIgnoreCase("delsafelist")) {
+				payload = trimUsername(payload);
+				boolean success = sqlthread.delSafelist(payload.toLowerCase());
+				if(success) {
+					safelist.remove(payload.toLowerCase());
+					return "Successfully deleted safelist " + payload;
+				} else {
+					return "Failed to delete safelist " + payload;
+				}
+			} else if(command.equalsIgnoreCase("bot")) {
+				boolean success = sqlthread.command(payload);
+
+				if(success) {
+					return "Successfully executed!";
+				} else {
+					return "Failed!";
+				}
+			} else if(command.equalsIgnoreCase("clear")) {
+				chatthread.clearQueue();
+				return "Cleared chat queue";
 			} else if(command.equalsIgnoreCase("findip")) {
 				if(payload.charAt(0) != '/') {
 					payload = "/" + payload;
@@ -471,76 +599,19 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Can not find any other users who share an IP address with " + payload;
 				}
-			} else if(command.equalsIgnoreCase("banip")) {
-				String[] parts = payload.split(" ", 3);
-				int count = 0;
-				Vector<String> listOfUsers = new Vector<String>();
-				if(parts.length >= 3 || GarenaEncrypt.isInteger(parts[1])) {
-					String ipAddress = parts[0];
-					if(ipAddress.charAt(0) != '/') { //adds a '/' to start of IP address if it doesnt exist
-						ipAddress = "/" + ipAddress;
-					}
-					for(int i = 0; i < garena.members.size(); i++) {
-						if(garena.members.get(i).externalIP.toString().equals(ipAddress) && garena.members.get(i).inRoom) {
-							if(!listOfUsers.contains(garena.members.get(i).username )) {
-								listOfUsers.add(garena.members.get(i).username);
-								count++;
-							}
-						}
-					}
-					if(count > 0) {
-						for(int i = 0; i < listOfUsers.size(); i++) {
-							int time = 24; //default 24 hours
-							try {
-								time = Integer.parseInt(parts[1]);
-							} catch(NumberFormatException e) {
-								Main.println("[GChatBot] Warning: ignoring invalid number " + parts[1]);
-							}
-							String reason = parts[2] + " (banned via IP address)";
-							String currentDate = time();
-							String expireDate = time(time);
-							String username = listOfUsers.get(i).toLowerCase();
-							boolean isUserRoot = false;
-							if(root_admin != null) {
-								isRoot = root_admin.equalsIgnoreCase(username);
-							}
-							boolean isUserAdmin = isUserRoot || admins.contains(username); //checks if the user is an admin
-							boolean isUserSafelist = safelist.contains(username); //checks if the user is safelist
-							if(!isUserAdmin && !isUserSafelist) {
-								ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
-								boolean success = sqlthread.addBan(username, ipAddress, currentDate, member.username, reason , expireDate);
-								chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
-								if(success) {
-									chatthread.queueChat("Successfully added ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
-								} else {
-									chatthread.queueChat("Failed to add ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
-								}
-								garena.ban(username, time);
-								numberBanned++;
-								chatthread.queueChat("Successfully banned <" + username + "> for " + time + " hours. Banned by: <" + member.username + ">", ANNOUNCEMENT);
-							} else {
-								chatthread.queueChat("Can not ban admin or safelisted user <" + listOfUsers.get(i) + ">", MAIN_CHAT);
-							}
-						}
-					} else {
-						return "Can not find any users with IP address: " + ipAddress;
-					}
-				} else {
-					return "Invalid format detected. Correct format is !ban <ip_address> <number_of_hours> <reason>";
-				}
 			}
 		}
-
-		if(isSafelist || isAdmin) {
+		
+		if(isRoomAdmin || isBotAdmin || isSafelist) {
 			//SAFELIST COMMANDS
 			if(command.equalsIgnoreCase("whois")) {
 				payload = trimUsername(payload);
 				return whois(payload);
 			} else if(command.equalsIgnoreCase("usage")) {
 				payload = processAlias(payload.toLowerCase());
-				if(payload.equalsIgnoreCase("addadmin")) {
-					return "Format: !addadmin <username>. Example: !addadmin XIII.Dragon";
-				} else if(payload.equalsIgnoreCase("deladmin")) {
+				if(payload.equalsIgnoreCase("addroomadmin")) {
+					return "Format: !addadmin <username> <access>. Example: !addadmin XIII.Dragon 8191";
+				} else if(payload.equalsIgnoreCase("delroomadmin")) {
 					return "Format: !deladmin <username>. Example: !deladmin XIII.Dragon";
 				} else if(payload.equalsIgnoreCase("say")) {
 					return "Format: !say <message>. Example: !say Hello World";
@@ -577,7 +648,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else if(payload.equalsIgnoreCase("checkuser")) {
 					return "Format: !checkuser <username>. Example: !checkuser XIII.Dragon";
 				} else if(payload.equalsIgnoreCase("banip")) {
-					return "Format: !banip <ip_address> <ban_length_in_hours> <reason>. Example: !ban 111.111.111.111 10 maphackers";
+					return "Format: !banip <ip_address> <ban_length_in_hours> <reason>. Example: !banip 111.111.111.111 10 maphackers";
 				} else if(payload.equalsIgnoreCase("statsdota")) {
 					return "Format: !statsdota <username>. Example: !statsdota XIII.Dragon";
 				} else {
@@ -593,10 +664,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equalsIgnoreCase("adminstats")) {
 				return "Number of users banned/kicked/warned since " + startTime + ": " + numberBanned + "/" + numberKicked + "/" + numberWarned;
 			} else if(command.equalsIgnoreCase("statsdota")) {
-				payload = trimUsername(payload);
-				if(payload == null) {
+				if(payload.equals("")) {
 					payload = member.username;
 				}
+				payload = trimUsername(payload);
 				if(sqlthread.doesUserHaveStats(payload)) {
 					return "<" + payload + "> " + sqlthread.getDotaStats(payload);
 				} else {
@@ -606,7 +677,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 		
 		//PUBLIC COMMANDS
-		if(publiccommands || isSafelist || isAdmin) {
+		if(isRoomAdmin || isBotAdmin || isSafelist || publiccommands) {
 			if(command.equalsIgnoreCase("version")) {
 				if(!disable_version) {
 					return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
@@ -655,13 +726,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 
 		if(access_message != null) {
-			if(!isAdmin && !isSafelist && (adminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
+			if(!isRoomAdmin && !isBotAdmin && !isSafelist && (roomAdminCommands.contains(command.toLowerCase()) || botAdminCommands.contains(command.toLowerCase()) || safelistCommands.contains(command.toLowerCase()))) {
 				return access_message;
-			} else if (!isAdmin && isSafelist && adminCommands.contains(command.toLowerCase())) {
+			} else if(!isRoomAdmin && !isBotAdmin && isSafelist && (roomAdminCommands.contains(command.toLowerCase()) || botAdminCommands.contains(command.toLowerCase()))) {
+				return access_message;
+			} else if(!isRoomAdmin && isBotAdmin && roomAdminCommands.contains(command.toLowerCase())) {
 				return access_message;
 			}
 		}
-		if(isAdmin || isSafelist) {
+		if(isRoomAdmin || isBotAdmin || isSafelist) {
 			return "Invalid command recieved, please check your spelling and try again";
 		} else {
 			return null;
@@ -691,16 +764,21 @@ public class GChatBot implements GarenaListener, ActionListener {
 		if(root_admin != null) {
 			memberIsRoot = root_admin.equalsIgnoreCase(username);
 		}
-		boolean memberIsAdmin = memberIsRoot || admins.contains(username.toLowerCase());
+		boolean memberIsRoomAdmin = roomAdmins.contains(username.toLowerCase());
+		boolean memberIsBotAdmin = botAdmins.contains(username.toLowerCase());
 		boolean memberIsSafelist = safelist.contains(username.toLowerCase());
 		
 		
-		if(memberIsAdmin) {
-			return "admin";
+		if(memberIsRoot) {
+			return "Root Administrator";
+		} else if(memberIsRoomAdmin) {
+			return "Room Admin";
+		} else if(memberIsBotAdmin) {
+			return "Bot Admin";
 		} else if(memberIsSafelist){
-			return "safelisted";
+			return "Safelisted";
 		} else {
-			return "basic";
+			return "Basic";
 		}
 	}
 
@@ -738,8 +816,12 @@ public class GChatBot implements GarenaListener, ActionListener {
 			aliasToCommand.put(alias, command);
 		}
 
-		if(level <= LEVEL_ADMIN) {
-			adminCommands.add(command);
+		if(level <= LEVEL_ROOM_ADMIN) {
+			roomAdminCommands.add(command);
+		}
+		
+		if(level <= LEVEL_BOT_ADMIN) {
+			botAdminCommands.add(command);
 		}
 
 		if(level <= LEVEL_SAFELIST) {
@@ -801,9 +883,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 		
 		if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) { //only checks if true
-			boolean isAdmin = admins.contains(player.username.toLowerCase());
+			boolean isRoot = false;
+			if(root_admin != null) {
+				isRoot = root_admin.equalsIgnoreCase(player.username);
+			}
+			boolean isRoomAdmin = isRoot || roomAdmins.contains(player.username.toLowerCase());
+			boolean isBotAdmin = botAdmins.contains(player.username.toLowerCase());
 			boolean isSafelist = safelist.contains(player.username.toLowerCase());
-			if(!isAdmin && !isSafelist) { //only checks non-admin, non-safelist players
+			if(!isRoomAdmin && !isBotAdmin && !isSafelist) { //only checks non-admin, non-safelist players
 				for(int i = 0; i < bannedWords.size(); i++) {
 					if(chat.toLowerCase().indexOf(bannedWords.get(i)) > -1) { //checks chat against bannedWords vector
 						String detectAnnouncement = GCBConfig.configuration.getString("gcb_bot_detect_announcement"); //takes string from config file
@@ -947,7 +1034,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					String bannedUsers = sqlthread.getBannedUserFromIp(player.externalIP.toString().substring(1));
 					String[] parts = bannedUsers.split(" ");
 					String plural = "player";
-					if(parts.length > 1) {
+					if(parts.length > 2) {
 						plural = "players";
 					}
 					chatthread.queueChat("Warning: <" + player.username + "> shares IP address " + player.externalIP.toString().substring(1) + " with banned " + plural + bannedUsers, -1);
@@ -959,12 +1046,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 			if(root_admin != null) {
 				isUserRoot = root_admin.equalsIgnoreCase(player.username.toLowerCase());
 			}
-			boolean isUserAdmin = admins.contains(player.username.toLowerCase()); //checks if player is admin
+			boolean isUserRoomAdmin = roomAdmins.contains(player.username.toLowerCase()); //checks if player is a room admin
+			boolean isUserBotAdmin = botAdmins.contains(player.username.toLowerCase()); //checks if player is a bot admin
 			boolean isUserSafelist = safelist.contains(player.username.toLowerCase()); //checks if player is safelist
 			if(isUserRoot) {
 				chatthread.queueChat("Root Administator <" + player.username + "> has entered the room", ANNOUNCEMENT);
-			} else if(isUserAdmin) {
-				chatthread.queueChat("Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
+			} else if(isUserRoomAdmin) {
+				chatthread.queueChat("Room Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
+			} else if(isUserBotAdmin) {
+				chatthread.queueChat("Hostbot Administator <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(isUserSafelist) {
 				chatthread.queueChat("Safelisted user <" + player.username + "> has entered the room", MAIN_CHAT);
 			}

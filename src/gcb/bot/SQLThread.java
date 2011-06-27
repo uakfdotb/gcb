@@ -22,183 +22,183 @@ import java.math.*;
  * @author wizardus
  */
 public class SQLThread extends Thread {
-	public static int TYPE_GCB = 0;
-	public static int TYPE_GHOSTPP = 1;
-	public static int TYPE_GHOSTONE = 2;
-	public static int TYPE_GHOSTPP_EXTENDED = 3;
+    public static int TYPE_GCB = 0;
+    public static int TYPE_GHOSTPP = 1;
+    public static int TYPE_GHOSTONE = 2;
+    public static int TYPE_GHOSTPP_EXTENDED = 3;
 
-	Connection connection;
-	String host;
-	String username;
-	String password;
+    Connection connection;
+    String host;
+    String username;
+    String password;
 
-	String realm;
+    String realm;
 	int botId;
-	int dbtype;
-	GChatBot bot;
-	boolean initial;
-	int defaultAdminAccess;
+    int dbtype;
+    GChatBot bot;
+    boolean initial;
 
-	public SQLThread(GChatBot bot) {
-		this.bot = bot;
-		initial = true;
+    public SQLThread(GChatBot bot) {
+        this.bot = bot;
+        initial = true;
 
-		//configuration
-		host = GCBConfig.configuration.getString("gcb_bot_db_host");
-		username = GCBConfig.configuration.getString("gcb_bot_db_username");
-		password = GCBConfig.configuration.getString("gcb_bot_db_password");
-		realm = GCBConfig.configuration.getString("gcb_bot_realm", "gcb");
+        //configuration
+        host = GCBConfig.configuration.getString("gcb_bot_db_host");
+        username = GCBConfig.configuration.getString("gcb_bot_db_username");
+        password = GCBConfig.configuration.getString("gcb_bot_db_password");
+        realm = GCBConfig.configuration.getString("gcb_bot_realm", "gcb");
 		botId = GCBConfig.configuration.getInt("gcb_bot_id", 0);
-		defaultAdminAccess = GCBConfig.configuration.getInt("gcb_bot_default_admin_access", 4095);
 
-		String dbtype_str = GCBConfig.configuration.getString("gcb_bot_db_type", "gcb");
+        String dbtype_str = GCBConfig.configuration.getString("gcb_bot_db_type", "gcb");
 
-		if(dbtype_str.equalsIgnoreCase("gcb")) {
-			dbtype = TYPE_GCB;
-		} else if(dbtype_str.equalsIgnoreCase("ghost++") || dbtype_str.equalsIgnoreCase("ghostpp")) {
-			dbtype = TYPE_GHOSTPP;
-		} else if(dbtype_str.equalsIgnoreCase("ghostone")) {
-			dbtype = TYPE_GHOSTONE;
-		} else if(dbtype_str.equalsIgnoreCase("ghost_extended")) {
-			dbtype = TYPE_GHOSTPP_EXTENDED;
-		} else {
-			Main.println("[SQLThread] Warning: unknown database type " + dbtype_str + "; assuming gcb-like");
-			dbtype = TYPE_GCB;
-		}
-	}
+        if(dbtype_str.equalsIgnoreCase("gcb")) {
+            dbtype = TYPE_GCB;
+        } else if(dbtype_str.equalsIgnoreCase("ghost++") || dbtype_str.equalsIgnoreCase("ghostpp")) {
+            dbtype = TYPE_GHOSTPP;
+        } else if(dbtype_str.equalsIgnoreCase("ghostone")) {
+            dbtype = TYPE_GHOSTONE;
+        } else if(dbtype_str.equalsIgnoreCase("ghost_extended")) {
+            dbtype = TYPE_GHOSTPP_EXTENDED;
+        } else {
+            Main.println("[SQLThread] Warning: unknown database type " + dbtype_str + "; assuming gcb-like");
+            dbtype = TYPE_GCB;
+        }
+    }
 
-	public void init() {
-		//connect
-		try {
-			connection = DriverManager.getConnection(host, username, password);
-		} catch(SQLException e) {
+    public void init() {
+        //connect
+        try {
+            connection = DriverManager.getConnection(host, username, password);
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
-		}
-	}
+            Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
+        }
+    }
 
-	public boolean addAdmin(String username) {
-		try {
-			PreparedStatement statement = null;
+    public boolean addAdmin(String username, int access) {
+        try {
+            PreparedStatement statement = null;
 
-			if(dbtype == TYPE_GHOSTONE) {
-				statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES" + "(0, ?, ?, ?)");
-			} else if(dbtype == TYPE_GHOSTPP || dbtype == TYPE_GHOSTPP_EXTENDED) {
-				statement = connection.prepareStatement("INSERT INTO admins (botid, name, server) VALUES (0, ?, 'gcb')");
-			} else if(dbtype == TYPE_GCB) {
-				statement = connection.prepareStatement("INSERT INTO admins (name) VALUES (?)");
-			}
-			statement.setString(1, username);
-			statement.setString(2, realm);
-			statement.setInt(3, defaultAdminAccess);
-			statement.execute();
-			return true;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
-		}
-
-		return false;
-	}
-
-	public boolean delAdmin(String username) {
-		try {
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name=?");
-			statement.setString(1, username);
-			statement.execute();
-			return true;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
-		}
-
-		return false;
-	}
-
-	public boolean addSafelist(String username, String voucher) {
-		if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
-			return false;
-		}
-		PreparedStatement statement = null;
-		try {
-			if(dbtype == TYPE_GHOSTONE) {
-				statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES (?, ?, ?)");
-				statement.setString(1, realm);
-				statement.setString(2, username);
-				statement.setString(3, voucher);
-			} else if(dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
-				statement = connection.prepareStatement("INSERT INTO safelist (name) VALUES (?)");
+            if(dbtype == TYPE_GHOSTONE) {
+                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES" + "(0, ?, ?, ?)");
+				statement.setString(1, username);
+				statement.setString(2, realm);
+				statement.setInt(3, access);
+            } else if(dbtype == TYPE_GHOSTPP || dbtype == TYPE_GHOSTPP_EXTENDED) {
+                statement = connection.prepareStatement("INSERT INTO admins (botid, name, server) VALUES (0, ?, 'gcb')");
+				statement.setString(1, username);
+            } else if(dbtype == TYPE_GCB) {
+                statement = connection.prepareStatement("INSERT INTO admins (name) VALUES (?)");
 				statement.setString(1, username);
 			}
 			statement.execute();
-			return true;
-		} catch(SQLException e) {
+            return true;
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
-		}
+            Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean delSafelist(String username) {
-		if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
-			return false;
-		}
-		
-		try {
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name =?");
+    public boolean delAdmin(String username) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name=?");
 			statement.setString(1, username);
 			statement.execute();
-			return true;
-		} catch(SQLException e) {
+            return true;
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
-		}
+            Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean addBannedWord(String bannedWord) {
-		try {
-			PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', ?)");
+    public boolean addSafelist(String username, String voucher) {
+        if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
+            return false;
+        }
+		PreparedStatement statement = null;
+        try {
+            if(dbtype == TYPE_GHOSTONE) {
+                statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES (?, ?, ?)");
+				statement.setString(1, realm);
+				statement.setString(2, username);
+				statement.setString(3, voucher);
+            } else if(dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
+                statement = connection.prepareStatement("INSERT INTO safelist (name) VALUES (?)");
+				statement.setString(1, username);
+            }
+			statement.execute();
+            return true;
+        } catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+            Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
+        }
+
+        return false;
+    }
+
+    public boolean delSafelist(String username) {
+        if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
+            return false;
+        }
+        
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name =?");
+			statement.setString(1, username);
+			statement.execute();
+            return true;
+        } catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+            Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
+        }
+
+        return false;
+    }
+
+    public boolean addBannedWord(String bannedWord) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', ?)");
 			statement.setString(1, bannedWord);
 			statement.execute();
-			return true;
-		} catch(SQLException e) {
+            return true;
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
-		}
+            Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean delBannedWord(String bannedWord) {
-		try {
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=? and type ='bannedword'");
+    public boolean delBannedWord(String bannedWord) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=? and type ='bannedword'");
 			statement.setString(1, bannedWord);
 			statement.execute();
-			return true;
-		} catch(SQLException e) {
+            return true;
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
-		}
+            Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 	
 	public boolean addBan(String bannedUser, String ipAddress, String currentDate, String admin, String reason, String expireDate) {
 		try {
@@ -432,60 +432,66 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
+            Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
 		}
 		return "";
 	}
 
-	public boolean command(String command) {
-		if(dbtype != TYPE_GHOSTPP_EXTENDED) {
-			return false;
-		}
+    public boolean command(String command) {
+        if(dbtype != TYPE_GHOSTPP_EXTENDED) {
+            return false;
+        }
 
-		try {
-			PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
+        try {
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
 			statement.setInt(1, botId);
 			statement.setString(2, command);
 			statement.execute();
-			return true;
-		} catch(SQLException e) {
+            return true;
+        } catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
-		}
+            Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public void run() {
-		while(true) {
+    public void run() {
+        while(true) {
 			if(Main.DEBUG) {
 				Main.println("[SQLThread] Refreshing internal lists with database...");
 			}
-			try {
-				//refresh admin list
-				Statement statement = connection.createStatement();
-				ResultSet result = statement.executeQuery("SELECT name FROM admins");
-				bot.admins.clear();
-				while(result.next()) {
-					bot.admins.add(result.getString("name").toLowerCase());
-				}
-
-				if(initial) {
-					Main.println("[SQLThread] Initial refresh: found " + bot.admins.size() + " admins");
-				}
-				
-				if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
-					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
-					bot.bannedWords.clear();
-					while(result.next()) {
-						bot.bannedWords.add(result.getString("phrase").toLowerCase());
+            try {
+                //refresh admin list
+                PreparedStatement statement = connection.prepareStatement("SELECT name, access FROM admins");
+                ResultSet result = statement.executeQuery();
+				bot.roomAdmins.clear();
+				bot.botAdmins.clear();
+                while(result.next()) {
+					if(result.getInt(2) < 8191) {
+						bot.botAdmins.add(result.getString(1).toLowerCase());
+					} else {
+						bot.roomAdmins.add(result.getString(1).toLowerCase());
 					}
+                }
 
-					if(initial) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " banned words");
-					}
+                if(initial) {
+                    Main.println("[SQLThread] Initial refresh: found " + bot.roomAdmins.size() + " room admins");
+					Main.println("[SQLThread] Initial refresh: found " + bot.botAdmins.size() + " bot admins");
+                }
+                
+                if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
+                    result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
+                    bot.bannedWords.clear();
+                    while(result.next()) {
+                        bot.bannedWords.add(result.getString("phrase").toLowerCase());
+                    }
+
+                    if(initial) {
+                        Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " banned words");
+                    }
 					result = statement.executeQuery("SELECT ip FROM bans");
 					bot.bannedIpAddress.clear();
 					while(result.next()) {
@@ -495,42 +501,42 @@ public class SQLThread extends Thread {
 					if(initial) {
 						Main.println("[SQLThread] Initial refresh: found " + bot.bannedIpAddress.size() + " banned IP addresses");
 					}
-				}
-			} catch(SQLException e) {
+                }
+            } catch(SQLException e) {
 				if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-				Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
-			}
+                Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
+            }
 
-			if(dbtype == TYPE_GHOSTONE || dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
-				try {
-					//refresh safelist list
-					Statement statement = connection.createStatement();
-					ResultSet result = statement.executeQuery("SELECT name FROM safelist");
-					bot.safelist.clear();
-					while(result.next()) {
-						bot.safelist.add(result.getString("name").toLowerCase());
-					}
+            if(dbtype == TYPE_GHOSTONE || dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
+                try {
+                    //refresh safelist list
+                    Statement statement = connection.createStatement();
+                    ResultSet result = statement.executeQuery("SELECT name FROM safelist");
+                    bot.safelist.clear();
+                    while(result.next()) {
+                        bot.safelist.add(result.getString("name").toLowerCase());
+                    }
 
-					if(initial) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.safelist.size() + " safelist");
-					}
-				} catch(SQLException e) {
+                    if(initial) {
+                        Main.println("[SQLThread] Initial refresh: found " + bot.safelist.size() + " safelist");
+                    }
+                } catch(SQLException e) {
 					if(Main.DEBUG) {
 						e.printStackTrace();
 					}
-					Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
-				}
-			}
+                    Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
+                }
+            }
 
-			if(initial) {
-				initial = false;
-			}
-			
-			try {
-				Thread.sleep(60000);
-			} catch(InterruptedException e) {}
-		}
-	}
+            if(initial) {
+                initial = false;
+            }
+            
+            try {
+                Thread.sleep(60000);
+            } catch(InterruptedException e) {}
+        }
+    }
 }
