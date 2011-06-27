@@ -355,10 +355,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 				return null;
 			} else if(command.equalsIgnoreCase("kick")) {
 				String[] parts = payload.split(" ", 2);
-				String user = trimUsername(parts[1]);
+				String user = "";
 				String reason = "";
-				if(parts[2] != null) {
-					reason = parts[2];
+				if(parts.length >= 1) {
+					user = trimUsername(parts[0]);
+				} else {
+					return "Invalid format detected. Correct format is !kick <username> <reason>";
+				}
+				if(parts.length >= 2) {
+					reason = parts[1];
 				}
 				MemberInfo victim = garena.memberFromName(user);
 				if(victim != null) {
@@ -560,7 +565,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else if(payload.equalsIgnoreCase("addbannedword")) {
 					return "Format: !addbannedword <banned_word_or_phrase>. Example: !addbannedword fuck you. Does not work with all characters";
 				} else if(payload.equalsIgnoreCase("delbannedword")) {
-					return "Format: !delbannedword <banned_word_or_phrase>. Example: !delbannedword fuck you";							   
+					return "Format: !delbannedword <banned_word_or_phrase>. Example: !delbannedword fuck you";
 				} else if(payload.equalsIgnoreCase("addsafelist")) {
 					return "Format: !addsafelist <username>. Example: !addsafelist XIII.Dragon";
 				} else if(payload.equalsIgnoreCase("delsafelist")) {
@@ -971,6 +976,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			player.lastMessages[i] = "";
 		}
 		player.inRoom = false;
+		player.numWarnings = 0;
 	}
 
 	public void playerStopped(MemberInfo player) {
