@@ -46,6 +46,8 @@ The keys that you need to set are: gcb_username, your Garena username; gcb_passw
 
 To set "gcb_roomid" and "gcb_roomhost", open rooms.txt and search for the room name you are looking for (for example: USA DotA Room 01). Then, write the id on that line for "gcb_roomid" and the server for "gcb_roomhost". See the ID from RoomEN.dat section later for details on how to generate rooms.txt or retrieve the ID/IP address manually in case the included rooms.txt goes out of date (Garena frequently updates its rooms).
 
+Alternatively, you can set "gcb_roomname" (case insensitive), which well then try to find a match in gcbrooms.txt. However, be aware that there are rooms with the same name.
+
 Running
 -------
 
