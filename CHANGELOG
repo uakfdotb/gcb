@@ -5,6 +5,8 @@
 - Admins can now clear the output queue to prevent bot from being flooded
 - No access message and public commands can be disabled
 - Support for plugins that implement gcb.plugin.Plugin
+- gcb_list: supports nonhuman format meant to be read easily by computers
+- Lots of other changes to bot
 - fix: SQL queries should now be safe from injections
 - fix: TCP FIN is sent four times to emulate Garena client
 - fix: UDP broadcasts only sent to playing members

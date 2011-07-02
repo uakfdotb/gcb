@@ -6,8 +6,11 @@
 package gcb;
 
 import gcb.plugin.PluginManager;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -178,12 +181,69 @@ public class GarenaInterface {
 		Main.println("[GInterface] Connecting to room...");
 
 		//update room_id in case this is called from !room command
-		room_id = GCBConfig.configuration.getInt("gcb_roomid", 590633);
+		room_id = GCBConfig.configuration.getInt("gcb_roomid", -1);
+		String room_hostname = GCBConfig.configuration.getString("gcb_roomhost", null); //default server 9
+
+		//see if we should check by name instead
+		if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
+			Main.println("[GInterface] Automatically searching for roomid and roomhost...");
+
+			String roomName = GCBConfig.configuration.getString("gcb_roomname", null);
+
+			if(roomName == null) {
+				Main.println("[GInterface] Error: no room name set; shutting down!");
+				disconnected(GARENA_ROOM);
+				return false;
+			}
+
+			File roomFile = new File("gcbrooms.txt");
+
+			if(!roomFile.exists()) {
+				Main.println("[GInterface] Error: " + roomFile.getAbsolutePath() + " does not exist!");
+				disconnected(GARENA_ROOM);
+				return false;
+			}
+
+			//read file and hope there's name in it; don't be case sensitive, but some rooms repeat!
+			try {
+				BufferedReader in = new BufferedReader(new FileReader(roomFile));
+				String line;
+
+				while((line = in.readLine()) != null) {
+					String[] parts = line.split("\\*\\*");
+
+					if(parts[0].trim().equalsIgnoreCase(roomName)) {
+						room_id = Integer.parseInt(parts[1]);
+						room_hostname = parts[3];
+
+						Main.println("[GInterface] Autoset found match; name is [" + parts[0] + "],"
+								+ " id is [" + room_id + "]" + ", host is [" + room_hostname + "],"
+								+ " and game is [" + parts[5] + "]");
+						
+						break;
+					}
+				}
+
+				if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
+					Main.println("[GInterface] Error: no matches found; exiting...");
+					disconnected(GARENA_ROOM);
+					return false;
+				}
+			} catch(IOException ioe) {
+				if(Main.DEBUG) {
+					ioe.printStackTrace();
+				}
+				
+				Main.println("[GInterface] Error during autosearch: " + ioe.getLocalizedMessage());
+				disconnected(GARENA_ROOM);
+				return false;
+			}
+		}
 
 		InetAddress address = null;
 		//hostname lookup
+		Main.println("[GInterface] Conducting hostname lookup...");
 		try {
-			String room_hostname = GCBConfig.configuration.getString("gcb_roomhost", "174.36.26.84"); //default server 9
 			address = InetAddress.getByName(room_hostname);
 		} catch(UnknownHostException uhe) {
 			if(Main.DEBUG) {
@@ -1684,11 +1744,13 @@ public class GarenaInterface {
 		int conn_id = crypt.random.nextInt(); //generate random connection ID
 		tbuf.putInt(conn_id);
 
-		//put 127.0.0.1 in big-endian
-		tbuf.put((byte) 127);
-		tbuf.put((byte) 0);
-		tbuf.put((byte) 0);
-		tbuf.put((byte) 1);
+		//put loopback address in big endian (for NAT compatibility?)
+		try {
+			byte[] loopbackBytes = InetAddress.getLocalHost().getAddress();
+			tbuf.put(loopbackBytes);
+		} catch(UnknownHostException uhe) {
+			uhe.printStackTrace();
+		}
 
 		tbuf.putShort((short) targetPort); //destination TCP port in LITTLE ENDIAN
 		tbuf.putShort((short) 0);

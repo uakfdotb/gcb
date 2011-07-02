@@ -15,6 +15,16 @@ import java.util.HashMap;
 public class Main {
     
     public static void main(String[] args) throws Exception {
+    	boolean human = true;
+    	
+    	if(args.length >= 1) {
+    		if(args[0].equalsIgnoreCase("human")) {
+    			human = true;
+    		} else {
+    			human = false;
+    		}
+    	}
+    	
         //gameid table
         HashMap<Integer, String> games = new HashMap<Integer, String>();
         games.put(1000, "WC3/TFT");
@@ -64,9 +74,13 @@ public class Main {
             String game_name = games.get(game_id);
             if(game_name == null) game_name = "unknown";
 
-            System.out.printf("name:%-42s id:%-7d sid:%-3d server:%-15s gid:%-5d game:%-13s ml:%-3d",
-                    name, id, server, server_ip, game_id, game_name, level);
-            System.out.println();
+			if(human) {
+		        System.out.printf("name:%-42s id:%-7d sid:%-3d server:%-15s gid:%-5d game:%-13s ml:%-3d",
+		                name, id, server, server_ip, game_id, game_name, level);
+		        System.out.println();
+            } else {
+            	System.out.println(name + "**" + id + "**" + server + "**" + server_ip + "**" + game_id + "**" + game_name + "**" + level);
+            }
         }
         
         rs.close();
