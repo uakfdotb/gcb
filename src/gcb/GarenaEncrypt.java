@@ -86,7 +86,7 @@ public class GarenaEncrypt {
 		BouncyCastleProvider bcp = new BouncyCastleProvider();
 		Security.addProvider(bcp);
 
-		Main.println("[GEncrypt] Reader private key in PEM format...");
+		Main.println("[GEncrypt] Reading private key in PEM format...");
 		try {
 			PEMReader pemreader = new PEMReader(new FileReader("gkey.pem"));
 			rsaKey = (KeyPair) pemreader.readObject();
