@@ -237,31 +237,31 @@ public class GChatBot implements GarenaListener, ActionListener {
 						safelist.remove(user.toLowerCase());
 						if(access < 8191) {
 							botAdmins.add(user.toLowerCase());
-							return "Successfully added hostbot administrator <" + user + ">";
+							return "Successfully added Hostbot administrator <" + user + ">";
 						} else {
 							roomAdmins.add(user.toLowerCase());
-							return "Successfully added room administrator <" + user + ">";
+							return "Successfully added Room Administrator <" + user + ">";
 						}
 					} else if(successAddAdmin && !successDelSafelist) { //if added admin but failed to remove safelist
 						if(access < 8191) {
 							botAdmins.add(user.toLowerCase());
-							return "Successfully added hostbot administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
+							return "Successfully added Hostbot Administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
 						} else {
 							roomAdmins.add(user.toLowerCase());
-							return "Successfully added room administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
+							return "Successfully added Room Administrator <" + user + ">, but failed to remove from safelist. Please manually remove from safelist";
 						}
 					} else if(!successAddAdmin && successDelSafelist) { //if failed to add admin, but succeeded in remove from safelist
 						safelist.remove(user.toLowerCase());
 						if(access < 8191) {
-							return "Failed to add hostbot administrator <" + user + ">, but succeeded to remove from safelist";
+							return "Failed to add Hostbot Administrator <" + user + ">, but succeeded to remove from safelist";
 						} else {
-							return "Failed to add room administrator <" + user + ">, but succeeded to remove from safelist";
+							return "Failed to add Room Administrator <" + user + ">, but succeeded to remove from safelist";
 						}
 					}else if(!successAddAdmin && !successDelSafelist) { //if failed to add admin and failed to remove safelist
 						if(access < 8191) {
-							return "Failed to add hostbot administrator <" + user + "> and remove from safelist";
+							return "Failed to add Hostbot Administrator <" + user + "> and remove from safelist";
 						} else {
-							return "Failed to add room administrator <" + user + "> and remove from safelist";
+							return "Failed to add Room Administrator <" + user + "> and remove from safelist";
 						}
 					}
 				} else if(isUserAdmin) {
@@ -272,10 +272,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 					if(successAddAdmin) {
 						if(access < 8191) {
 							botAdmins.add(user.toLowerCase());
-							return "Successfully added hostbot administrator <" + user + ">";
+							return "Successfully added Hostbot Administrator <" + user + ">";
 						} else {
 							roomAdmins.add(user.toLowerCase());
-							return "Successfully added room administrator <" + user + ">";
+							return "Successfully added Room Administrator <" + user + ">";
 						}
 					} else {
 						return "Failed to add administrator <" + user + ">";
@@ -356,7 +356,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						victimUsername = username;
 					}
 					boolean success = sqlthread.addBan(username.toLowerCase(), ipAddress, currentDate, member.username, reason, expireDate);
-					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 					if(success) {
 						chatthread.queueChat("Successfully added ban information for <" + victimUsername + "> to MySQL database", ANNOUNCEMENT);
 					} else {
@@ -416,7 +416,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(victim != null) {
 					garena.kick(victim);
 					numberKicked++;
-					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("Kicked for reason: " + reason, ANNOUNCEMENT);
 					return null;
 				} else {
@@ -517,7 +517,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							if(!isUserAdmin && !isUserSafelist) {
 								ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 								boolean success = sqlthread.addBan(username, ipAddress, currentDate, member.username, reason , expireDate);
-								chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+								chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 								if(success) {
 									chatthread.queueChat("Successfully added ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
 								} else {
@@ -538,7 +538,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Invalid format detected. Correct format is !banip <ip_address> <number_of_hours> <reason>";
 				}
-			} else if (command.equalsIgnoreCase("room")) {
+			} else if(command.equalsIgnoreCase("room")) {
 				String[] parts = payload.split(" ", 2);
 				if(!parts[0].trim().equals("")) {
 					try {
@@ -816,7 +816,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 
 		String accessLevel = getAccessLevel(target.username);
-		return "Username: <" + target.username + "> UID: " + target.userID + " is: " + accessLevel + " " + wc3status + " IP: " + target.externalIP;
+		String externalIp = "";
+		if(GCBConfig.configuration.getBoolean("gcb_bot_showip", false)) {
+			externalIp = " IP: " + target.externalIP.toString();
+		}
+		return "Username: <" + target.username + "> UID: " + target.userID + " is: " + accessLevel + " " + wc3status + externalIp;
 	}
 
 	public String getAccessLevel(String username) {
@@ -957,7 +961,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("kick")) { //checks config file if kick
 							garena.kick(player);
 							numberKicked++;
-							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+							chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 							chatthread.queueChat("Kicked for reason: " + detectAnnouncement, ANNOUNCEMENT);
 						} else if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("ban")) { //checks config file if ban
 							int time = GCBConfig.configuration.getInt("gcb_bot_detect_ban_time", 24); //default 24 hours
@@ -966,7 +970,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							String ipAddress = player.externalIP.toString();
 							ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 							boolean success = sqlthread.addBan(player.username, ipAddress, currentDate, "Autodetect", detectAnnouncement, expireDate);
-							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+							chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 							if(success) {
 								chatthread.queueChat("Successfully added ban information for <" + player.username + "> to MySQL database", ANNOUNCEMENT);
 							} else {
@@ -989,7 +993,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							String ipAddress = player.externalIP.toString();
 							ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 							boolean success = sqlthread.addBan(player.username, ipAddress, currentDate, "Autodetect", "Using flood-enabling program", expireDate);
-							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+							chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 							if(success) {
 								chatthread.queueChat("Successfully added ban information for <" + player.username + "> to MySQL database", ANNOUNCEMENT);
 							} else {
@@ -1020,7 +1024,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				if(numNewLines > 20) {
 					garena.kick(player);
-					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				}
@@ -1041,7 +1045,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					numberWarned++;
 				} else if(player.numWarnings > 5 && numEqualitySigns > 8) {
 					garena.kick(player);
-					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: Autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				} else if(player.numWarnings == 3 && numNewLines > 3) {
@@ -1055,7 +1059,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					numberWarned++;
 				} else if(player.numWarnings > 5 && numNewLines > 3) {
 					garena.kick(player);
-					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.sleep(2000); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				}
