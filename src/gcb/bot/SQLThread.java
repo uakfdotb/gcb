@@ -267,6 +267,44 @@ public class SQLThread extends Thread {
 		return "";
 	}
 	
+	public String getBanReason(String user) {
+		String reason = "";
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT reason FROM bans WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				reason = result.getString(1);
+			}
+			return reason;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to get ban reason on user: " + e.getLocalizedMessage());
+		}
+		return "";
+	}
+	
+	public String getBanExpiryDate(String user) {
+		String expiryDate = "";
+		try {
+			PreparedStatement statement = connection.prepareStatement("SELECT expiredate FROM bans WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				expiryDate = result.getString(1);
+			}
+			return expiryDate;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to get ban reason on user: " + e.getLocalizedMessage());
+		}
+		return "";
+	}
+	
 	public boolean doesBanExist(String user) {
 		try {
 			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE name=?");
@@ -500,6 +538,15 @@ public class SQLThread extends Thread {
 					
 					if(initial) {
 						Main.println("[SQLThread] Initial refresh: found " + bot.bannedIpAddress.size() + " banned IP addresses");
+					}
+					result = statement.executeQuery("SELECT name FROM bans");
+					bot.bannedPlayers.clear();
+					while(result.next()) {
+						bot.bannedPlayers.add(result.getString("name"));
+					}
+					
+					if(initial) {
+						Main.println("[SQLThread] Intitial refresh: found " + bot.bannedPlayers.size() + " banned players");
 					}
                 }
             } catch(SQLException e) {
