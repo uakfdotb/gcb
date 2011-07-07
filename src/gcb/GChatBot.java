@@ -74,7 +74,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 
 	public GChatBot(Main main) {
 		this.main = main;
-
 		roomAdmins = new Vector<String>();
 		botAdmins = new Vector<String>();
 		safelist = new Vector<String>();
@@ -118,6 +117,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("loadplugin", LEVEL_ROOM_ADMIN);
 		registerCommand("unloadplugin", LEVEL_ROOM_ADMIN);
 		registerCommand("banip", LEVEL_ROOM_ADMIN);
+		registerCommand("room", LEVEL_ROOM_ADMIN);
 		
 		registerCommand("addsafelist", LEVEL_BOT_ADMIN);
 		registerCommand("delsafelist", LEVEL_BOT_ADMIN);
@@ -125,7 +125,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("clear", LEVEL_BOT_ADMIN);
 		registerCommand("findip", LEVEL_BOT_ADMIN);
 		registerCommand("checkuser", LEVEL_BOT_ADMIN);
-		registerCommand("room", LEVEL_BOT_ADMIN);
 		
 		registerCommand("whois", LEVEL_SAFELIST);
 		registerCommand("usage", LEVEL_SAFELIST);
@@ -145,6 +144,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("uptime", public_level);
 		registerCommand("baninfo", public_level);
 		registerCommand("roomstats", public_level);
+		registerCommand("currentversion", public_level);
 
 		if(owner != null) {
 			registerCommand("owner", public_level);
@@ -282,14 +282,18 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 				}
 			} else if(command.equalsIgnoreCase("deladmin")) {
-				payload = trimUsername(payload);
-				boolean success = sqlthread.delAdmin(payload.toLowerCase());
-				if(success) {
-					botAdmins.remove(payload.toLowerCase());
-					roomAdmins.remove(payload.toLowerCase());
-					return "Successfully deleted administrator " + payload;
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					boolean success = sqlthread.delAdmin(payload.toLowerCase());
+					if(success) {
+						botAdmins.remove(payload.toLowerCase());
+						roomAdmins.remove(payload.toLowerCase());
+						return "Successfully deleted administrator " + payload;
+					} else {
+						return "Failed to delete administrator " + payload;
+					}
 				} else {
-					return "Failed to delete administrator " + payload;
+					return "Invalid format detected. Correct format is !deladmin <username>";
 				}
 			} else if(command.equalsIgnoreCase("say")) {
 				chatthread.queueChat(payload, MAIN_CHAT);
@@ -310,7 +314,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Invalid format detected. Correct format is !w <user> <message>";
 				}
-
 				return null;
 			} else if(command.equalsIgnoreCase("ban")) {
 				String[] parts = payload.split(" ", 3);
@@ -367,16 +370,20 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Invalid format detected. Correct format is !ban <username> <number_of_hours> <reason>";
 				}
 			} else if(command.equalsIgnoreCase("unban")) {
-				payload = trimUsername(payload);
-				chatthread.queueChat("Successfully unbanned <" + payload + ">. Unbanned by <" + member.username + ">", ANNOUNCEMENT);
-				boolean success = sqlthread.unban(payload);
-				if(success) {
-					chatthread.queueChat("Successfully removed ban information for <" + payload + "> from MySQL database", ANNOUNCEMENT);
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					chatthread.queueChat("Successfully unbanned <" + payload + ">. Unbanned by <" + member.username + ">", ANNOUNCEMENT);
+					boolean success = sqlthread.unban(payload);
+					if(success) {
+						chatthread.queueChat("Successfully removed ban information for <" + payload + "> from MySQL database", ANNOUNCEMENT);
+					} else {
+						chatthread.queueChat("Failed to remove ban information for <" + payload + "> from MySQL database", ANNOUNCEMENT);
+					}
+					garena.unban(payload);
+					return null;
 				} else {
-					chatthread.queueChat("Failed to remove ban information for <" + payload + "> from MySQL database", ANNOUNCEMENT);
+					return "Invalid format detected. Correct format is !unban <username>";
 				}
-				garena.unban(payload);
-				return null;
 			} else if(command.equalsIgnoreCase("announce")) {
 				chatthread.queueChat(payload, ANNOUNCEMENT);
 				return null;
@@ -441,22 +448,30 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Stopping announcement";
 				}
 			} else if(command.equalsIgnoreCase("addbannedword")) {
-				boolean success = sqlthread.addBannedWord(payload.toLowerCase());
-				
-				if(success) {
-					bannedWords.add(payload.toLowerCase());
-					return "Successfully added banned word " + payload;
+				if(!payload.equals("")) {
+					boolean success = sqlthread.addBannedWord(payload.toLowerCase());
+					
+					if(success) {
+						bannedWords.add(payload.toLowerCase());
+						return "Successfully added banned word " + payload;
+					} else {
+						return "Failed to add banned word " + payload;
+					}
 				} else {
-					return "Failed to add banned word " + payload;
+					return "Invalid format detected. Correct format is !addbannedword <word>";
 				}
 			} else if(command.equalsIgnoreCase("delbannedword")) {
-				boolean success = sqlthread.delBannedWord(payload.toLowerCase());
-				
-				if(success) {
-					bannedWords.remove(payload.toLowerCase());
-					return "Successfully deleted banned word " + payload;
+				if(!payload.equals("")) {
+					boolean success = sqlthread.delBannedWord(payload.toLowerCase());
+					
+					if(success) {
+						bannedWords.remove(payload.toLowerCase());
+						return "Successfully deleted banned word " + payload;
+					} else {
+						return "Failed to delete banned word " + payload;
+					}
 				} else {
-					return "Failed to delete banned word " + payload;
+					return "Invalid format detected. Correct format is !delbannedword <word>";
 				}
 			} else if(command.equalsIgnoreCase("loadplugin")) {
 				plugins.loadPlugin(payload);
@@ -525,7 +540,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 			} else if (command.equalsIgnoreCase("room")) {
 				String[] parts = payload.split(" ", 2);
-
 				if(!parts[0].trim().equals("")) {
 					try {
 						GCBConfig.configuration.setProperty("gcb_roomid", Integer.parseInt(parts[0]));
@@ -533,48 +547,54 @@ public class GChatBot implements GarenaListener, ActionListener {
 						Main.println("[GChatBot] Warning: ignoring invalid number " + parts[0]);
 					}
 				}
-
 				if(parts.length > 1 && !parts[1].trim().equals("")) {
 					GCBConfig.configuration.setProperty("gcb_roomhost", parts[1]);
 				}
-
 				garena.disconnectRoom();
 				main.initRoom();
 				return null;
-			} 
+			}
 		}
 		
 		if(isRoomAdmin || isBotAdmin) {
 			//BOT ADMIN COMMANDS
 			if(command.equalsIgnoreCase("addsafelist")) {
-				payload = trimUsername(payload);
-				boolean isUserRoot = false;
-				if(root_admin != null) {
-					isRoot = root_admin.equalsIgnoreCase(payload.toLowerCase());
-				}
-				boolean isUserAdmin = isUserRoot || roomAdmins.contains(payload.toLowerCase()) || botAdmins.contains(payload.toLowerCase()); //checks if payload is admin
-				boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
-				if(isUserAdmin) {
-					return "Can not add <" + payload + ">, already an administrator!";
-				} else if(isUserSafelist) {
-					return "Can not add <" + payload + ">, already safelisted!";
-				} else {
-					boolean success = sqlthread.addSafelist(payload.toLowerCase(), member.username);
-					if(success) {
-						safelist.add(payload.toLowerCase());
-						return "Successfully added safelist " + payload;
-					} else {
-						return "Failed to add safelist " + payload;
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					boolean isUserRoot = false;
+					if(root_admin != null) {
+						isRoot = root_admin.equalsIgnoreCase(payload.toLowerCase());
 					}
+					boolean isUserAdmin = isUserRoot || roomAdmins.contains(payload.toLowerCase()) || botAdmins.contains(payload.toLowerCase()); //checks if payload is admin
+					boolean isUserSafelist = safelist.contains(payload.toLowerCase()); //checks if payload is safelist
+					if(isUserAdmin) {
+						return "Can not add <" + payload + ">, already an administrator!";
+					} else if(isUserSafelist) {
+						return "Can not add <" + payload + ">, already safelisted!";
+					} else {
+						boolean success = sqlthread.addSafelist(payload.toLowerCase(), member.username);
+						if(success) {
+							safelist.add(payload.toLowerCase());
+							return "Successfully added safelist " + payload;
+						} else {
+							return "Failed to add safelist " + payload;
+						}
+					}
+				} else {
+					return "Invalid format detected. Correct format is !addsafelist <username>";
 				}
 			} else if(command.equalsIgnoreCase("delsafelist")) {
-				payload = trimUsername(payload);
-				boolean success = sqlthread.delSafelist(payload.toLowerCase());
-				if(success) {
-					safelist.remove(payload.toLowerCase());
-					return "Successfully deleted safelist " + payload;
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					boolean success = sqlthread.delSafelist(payload.toLowerCase());
+					if(success) {
+						safelist.remove(payload.toLowerCase());
+						return "Successfully deleted safelist " + payload;
+					} else {
+						return "Failed to delete safelist " + payload;
+					}
 				} else {
-					return "Failed to delete safelist " + payload;
+					return "Invalid format detected. Correct format is !delsafelist <username>";
 				}
 			} else if(command.equalsIgnoreCase("bot")) {
 				boolean success = sqlthread.command(payload);
@@ -588,40 +608,48 @@ public class GChatBot implements GarenaListener, ActionListener {
 				chatthread.clearQueue();
 				return "Cleared chat queue";
 			} else if(command.equalsIgnoreCase("findip")) {
-				if(payload.charAt(0) != '/') {
-					payload = "/" + payload;
-				}
-				int count = 0;
-				Vector<String> listOfUsers = new Vector<String>();
-				for(int i = 0; i < garena.members.size(); i++) {
-					if(garena.members.get(i).externalIP.toString().equals(payload) && garena.members.get(i).inRoom) {
-						if(!listOfUsers.contains("<" + garena.members.get(i).username + ">")) {
-							listOfUsers.add("<" + garena.members.get(i).username + ">");
-							count++;
+				if(!payload.equals("")) {
+					if(payload.charAt(0) != '/') {
+						payload = "/" + payload;
+					}
+					int count = 0;
+					Vector<String> listOfUsers = new Vector<String>();
+					for(int i = 0; i < garena.members.size(); i++) {
+						if(garena.members.get(i).externalIP.toString().equals(payload) && garena.members.get(i).inRoom) {
+							if(!listOfUsers.contains("<" + garena.members.get(i).username + ">")) {
+								listOfUsers.add("<" + garena.members.get(i).username + ">");
+								count++;
+							}
 						}
 					}
-				}
-				if(count > 1) {
-					return listOfUsers.toString() + " all share IP address " + payload;
+					if(count > 1) {
+						return listOfUsers.toString() + " all share IP address " + payload;
+					} else {
+						return "Can not find any users in the room with IP address " + payload;
+					}
 				} else {
-					return "Can not find any users in the room with IP address " + payload;
+					return "Invalid format detected. Correct format is !findip <ip>";
 				}
 			} else if(command.equalsIgnoreCase("checkuser")) {
-				payload = trimUsername(payload);
-				int count = 0;
-				Vector<String> listOfUsers = new Vector<String>();
-				for(int i = 0; i < garena.members.size(); i++) {
-					if(garena.members.get(i).externalIP.toString().equalsIgnoreCase(garena.memberFromName(payload).externalIP.toString()) && garena.members.get(i).inRoom) {
-						if(!listOfUsers.contains("<" + garena.members.get(i).username + ">")) {
-							listOfUsers.add("<" + garena.members.get(i).username + ">");
-							count++;
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					int count = 0;
+					Vector<String> listOfUsers = new Vector<String>();
+					for(int i = 0; i < garena.members.size(); i++) {
+						if(garena.members.get(i).externalIP.toString().equalsIgnoreCase(garena.memberFromName(payload).externalIP.toString()) && garena.members.get(i).inRoom) {
+							if(!listOfUsers.contains("<" + garena.members.get(i).username + ">")) {
+								listOfUsers.add("<" + garena.members.get(i).username + ">");
+								count++;
+							}
 						}
 					}
-				}
-				if(count > 1) {
-					return listOfUsers.toString() + " all share IP address " + garena.memberFromName(payload).externalIP.toString();
+					if(count > 1) {
+						return listOfUsers.toString() + " all share IP address " + garena.memberFromName(payload).externalIP.toString();
+					} else {
+						return "Can not find any other users who share an IP address with " + payload;
+					}
 				} else {
-					return "Can not find any other users who share an IP address with " + payload;
+					return "Invalid format detected. Correct format is !checkuser <username>";
 				}
 			}
 		}
@@ -728,12 +756,16 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equalsIgnoreCase("uptime")) {
 				return "Online since: " + startTime;
 			} else if(command.equalsIgnoreCase("baninfo")) {
-				payload = trimUsername(payload);
-				if(sqlthread.doesBanExist(payload.toLowerCase())) {
-					return "<" + payload + "> " + sqlthread.getBanInfo(payload.toLowerCase());
+				if(!payload.equals("")) {
+					payload = trimUsername(payload);
+					if(sqlthread.doesBanExist(payload.toLowerCase())) {
+						return "<" + payload + "> " + sqlthread.getBanInfo(payload.toLowerCase());
+					} else {
+						return "Can not find ban information about <" + payload + ">";
+					}
 				} else {
-					return "Can not find ban information about <" + payload + ">";
-				}
+					return "Invalid format detected. Correct format is !baninfo <username>";
+				}			
 			} else if(command.equalsIgnoreCase("roomstats")) {
 				int countPlaying = 0;
 				int countPeople = 0;
@@ -746,6 +778,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 				}
 				return "There are " + countPlaying + " players with Warcraft 3 open and " + countPeople + " players in the room";
+			} else if(command.equalsIgnoreCase("currentversion")) {
+				String dotaVersion = GCBConfig.configuration.getString("dota_version", "6.72c");
+				String warcraftVersion = GCBConfig.configuration.getString("warcraft_version", "1.24e / 1.24.4.6387");
+				return "Current DotA version is " + dotaVersion + ", current Warcraft 3 version is " + warcraftVersion;
 			}
 		}
 
@@ -945,7 +981,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						break;
 					}
 				}
-				for(int i = player.lastMessages.length-3; i < player.lastMessages.length-1; i++) {
+				for(int i = player.lastMessages.length-3; i < player.lastMessages.length; i++) {
 					if(player.lastMessages[i] != null) {
 						if(chat.equals(player.lastMessages[i])) {
 							String currentDate = time();
@@ -1090,6 +1126,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			player.lastMessages[i] = "";
 		}
 		player.inRoom = false;
+		player.playing = false;
 		player.numWarnings = 0;
 	}
 
