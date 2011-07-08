@@ -7,8 +7,11 @@ package gcb.plugin;
 
 import gcb.GCBConfig;
 import gcb.GarenaInterface;
+import gcb.GarenaThread;
 import gcb.Main;
 import gcb.MemberInfo;
+import gcb.WC3Interface;
+import gcb.bot.ChatThread;
 import gcb.bot.SQLThread;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -31,7 +34,13 @@ public class PluginManager {
 	Hashtable<String, Plugin> plugins; //class name to plugin
 
 	GarenaInterface garena;
-	SQLThread sql;
+	WC3Interface wc3i;
+	GarenaThread gsp_thread;
+	GarenaThread gcrp_thread;
+	GarenaThread pl_thread;
+	GarenaThread wc3_thread;
+	SQLThread sqlthread;
+	ChatThread chatthread;
 
 	public PluginManager() {
 		pluginList = new ArrayList<Plugin>();
@@ -41,9 +50,17 @@ public class PluginManager {
 		pluginPath = GCBConfig.configuration.getString("gcb_plugin_path", "plugin/");
 	}
 
-	public void setGarena(GarenaInterface garena, SQLThread sql) {
+	public void setGarena(GarenaInterface garena, WC3Interface wc3i, GarenaThread gsp_thread,
+			GarenaThread gcrp_thread, GarenaThread pl_thread, GarenaThread wc3_thread,
+			SQLThread sqlthread, ChatThread chatthread) {
 		this.garena = garena;
-		this.sql = sql;
+		this.wc3i = wc3i;
+		this.gsp_thread = gsp_thread;
+		this.gcrp_thread = gcrp_thread;
+		this.pl_thread = pl_thread;
+		this.wc3_thread = wc3_thread;
+		this.sqlthread = sqlthread;
+		this.chatthread = chatthread;
 	}
 
 	//copied from http://faheemsohail.com/2011/01/writing-a-small-plugin-framework-for-your-apps/
@@ -116,6 +133,14 @@ public class PluginManager {
 		}
 	}
 
+	public void say(String s) {
+		if(chatthread != null) {
+			chatthread.queueChat(s, chatthread.MAIN_CHAT);
+		} else {
+			garena.chat(s);
+		}
+	}
+
 	public void register(Plugin p, String s) {
 		ArrayList<Plugin> registerList = register.get(s);
 		if(registerList == null) {
@@ -185,7 +210,7 @@ public class PluginManager {
 
 	public String onCommand(MemberInfo player, String command, String payload, boolean isRoomAdmin, boolean isBotAdmin, boolean isSafelist) {
 		ArrayList<Plugin> registerList = register.get("onCommand");
-
+		
 		if(registerList != null) {
 			for(Plugin p : registerList) {
 				String response = p.onCommand(player, command, payload, isRoomAdmin, isBotAdmin, isSafelist);
@@ -222,12 +247,36 @@ public class PluginManager {
 		Main.println(message);
 	}
 
-	public GarenaInterface getGarenaInterface() {
+	public ChatThread getChatThread() {
+		return chatthread;
+	}
+
+	public GarenaInterface getGarena() {
 		return garena;
 	}
 
+	public GarenaThread getGCRPThread() {
+		return gcrp_thread;
+	}
+
+	public GarenaThread getGSPThread() {
+		return gsp_thread;
+	}
+
+	public GarenaThread getPLThread() {
+		return pl_thread;
+	}
+
 	public SQLThread getSQLThread() {
-		return sql;
+		return sqlthread;
+	}
+
+	public GarenaThread getWC3Thread() {
+		return wc3_thread;
+	}
+
+	public WC3Interface getWC3i() {
+		return wc3i;
 	}
 }
 

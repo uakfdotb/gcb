@@ -11,25 +11,24 @@ import java.net.InetAddress;
  * @author wizardus
  */
 public class MemberInfo {
-
-	int userID;
-	String username;
-	String country;
-	int experience;
-	boolean playing;
-	InetAddress externalIP;
-	InetAddress internalIP;
-	int externalPort;
-	int internalPort;
-	int virtualSuffix;
+	public int userID;
+	public String username;
+	public String country;
+	public int experience;
+	public boolean playing;
+	public InetAddress externalIP;
+	public InetAddress internalIP;
+	public int externalPort;
+	public int internalPort;
+	public int virtualSuffix;
 	long lastCommandTime;
 
-	boolean inRoom;
+	public boolean inRoom;
 
 	int numWarnings;
 	String[] lastMessages = new String[6];
 	
 	//these will be set after HELLO is received
-	int correctPort = -1;
-	InetAddress correctIP = null;
+	public int correctPort = -1;
+	public InetAddress correctIP = null;
 }

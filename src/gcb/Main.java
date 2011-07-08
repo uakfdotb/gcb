@@ -78,6 +78,12 @@ public class Main {
 	public void initPlugins() {
 		if(loadPlugins) {
 			plugins = new PluginManager();
+		}
+	}
+
+	public void loadPlugins() {
+		if(loadPlugins) {
+			plugins.setGarena(garena, wc3i, gsp_thread, gcrp_thread, pl_thread, wc3_thread, sqlthread, chatthread);
 			plugins.initPlugins();
 			plugins.loadPlugins();
 		}
@@ -239,6 +245,7 @@ public class Main {
 		if(!main.initGarena()) return;
 		if(!main.initRoom()) return;
 		main.initBot();
+		main.loadPlugins();
 		main.helloLoop();
 	}
 
