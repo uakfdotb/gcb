@@ -104,7 +104,7 @@ public class plugindb extends Plugin {
 	
 	public int dbAdd(String key, String value) {
 		try {
-			PreparedStatement statement = connection.prepareStatement("INSERT INTO plugindb (plugin,k,val) VALUES (?, ?, ?)");
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO plugindb (plugin,k,val) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, pluginName);
 			statement.setString(2, key);
 			statement.setString(3, value);
