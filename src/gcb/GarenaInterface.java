@@ -870,8 +870,7 @@ public class GarenaInterface {
 				int type = rin.read();
 
 				if(type == 48) {
-					Main.println("[GInterface] Successfully joined room!");
-					processWelcome(size - 1, lbuf);
+					processAnnounce(size - 1, lbuf);
 				} else if(type == 44) {
 					processMemberList(size - 1, lbuf);
 				} else if(type == 34) {
@@ -951,14 +950,13 @@ public class GarenaInterface {
 		}
 	}
 
-	public void processWelcome(int packet_size, ByteBuffer lbuf) throws IOException {
+	public void processAnnounce(int packet_size, ByteBuffer lbuf) throws IOException {
 		lbuf.clear();
 		lbuf.put((byte) rin.read());
 		lbuf.put((byte) rin.read());
 		lbuf.put((byte) rin.read());
 		lbuf.put((byte) rin.read());
-		int room_id = lbuf.getInt(0);
-		Main.println("[GInterface] Server says room ID is " + room_id);
+		int serverRoomId = lbuf.getInt(0);
 
 		byte[] str_bytes = new byte[packet_size - 4];
 		rin.readFully(str_bytes);
