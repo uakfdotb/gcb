@@ -360,7 +360,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						victimUsername = username;
 					}
 					garena.ban(username, time);
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("Successfully banned <" + username + "> for " + time + " hours. Banned by: <" + member.username + ">", ANNOUNCEMENT);
 					boolean success = sqlthread.addBan(username.toLowerCase(), ipAddress, currentDate, member.username, reason, expireDate);
 					if(success) {
@@ -377,7 +377,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(!payload.equals("")) {
 					payload = trimUsername(payload);
 					garena.unban(payload);
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("Successfully unbanned <" + payload + ">. Unbanned by <" + member.username + ">", ANNOUNCEMENT);
 					boolean success = sqlthread.unban(payload);
 					if(success) {
@@ -421,7 +421,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(victim != null) {
 					garena.kick(victim);
 					numberKicked++;
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("Kicked for reason: " + reason, ANNOUNCEMENT);
 					return null;
 				} else {
@@ -522,7 +522,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							if(!isUserAdmin && !isUserSafelist) {
 								ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 								boolean success = sqlthread.addBan(username, ipAddress, currentDate, member.username, reason , expireDate);
-								chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+								chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 								if(success) {
 									chatthread.queueChat("Successfully added ban information for <" + username + "> to MySQL database", ANNOUNCEMENT);
 								} else {
@@ -981,7 +981,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("kick")) { //checks config file if kick
 							garena.kick(player);
 							numberKicked++;
-							chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 							chatthread.queueChat("Kicked for reason: " + detectAnnouncement, ANNOUNCEMENT);
 						} else if(GCBConfig.configuration.getString("gcb_bot_detect_banned_word").equalsIgnoreCase("ban")) { //checks config file if ban
 							int time = GCBConfig.configuration.getInt("gcb_bot_detect_ban_time", 24); //default 24 hours
@@ -990,7 +990,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							String ipAddress = player.externalIP.toString();
 							ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 							boolean success = sqlthread.addBan(player.username, ipAddress, currentDate, "Autodetect", detectAnnouncement, expireDate);
-							chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 							if(success) {
 								chatthread.queueChat("Successfully added ban information for <" + player.username + "> to MySQL database", ANNOUNCEMENT);
 							} else {
@@ -1013,7 +1013,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							String ipAddress = player.externalIP.toString();
 							ipAddress = ipAddress.substring(1); //removes the "/" character from the start of the IP
 							boolean success = sqlthread.addBan(player.username, ipAddress, currentDate, "Autodetect", "Using flood-enabling program", expireDate);
-							chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+							chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 							if(success) {
 								chatthread.queueChat("Successfully added ban information for <" + player.username + "> to MySQL database", ANNOUNCEMENT);
 							} else {
@@ -1032,7 +1032,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 						player.lastMessages[i] = "";
 					}
 				}
-				player.lastMessages[player.lastMessages.length-1] = chat; //adds current chat into the array
+				if(!whisper) {
+					player.lastMessages[player.lastMessages.length-1] = chat; //adds current chat into the array
+				}
 				int numEqualitySigns = 0; //'<' and '>'
 				int numNewLines = 0; //the enter key
 				for(int i = 0; i < chat.length()-1; i++) {
@@ -1044,7 +1046,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				if(numNewLines > 20) {
 					garena.kick(player);
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				}
@@ -1065,7 +1067,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					numberWarned++;
 				} else if(player.numWarnings > 5 && numEqualitySigns > 8) {
 					garena.kick(player);
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: Autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				} else if(player.numWarnings == 3 && numNewLines > 3) {
@@ -1079,7 +1081,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					numberWarned++;
 				} else if(player.numWarnings > 5 && numNewLines > 3) {
 					garena.kick(player);
-					chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
 					chatthread.queueChat("<" + player.username + "> kicked for reason: autodetection of spam", ANNOUNCEMENT);
 					numberKicked++;
 				}
@@ -1120,25 +1122,44 @@ public class GChatBot implements GarenaListener, ActionListener {
 		String expiryDate = sqlthread.getBanExpiryDate(username);
 		String[] parts2 = expiryDate.split("-", 3);
 		calendar2.set(Integer.parseInt(parts2[0]), Integer.parseInt(parts2[1]), Integer.parseInt(parts2[2]));
-		long diff = calendar1.getTimeInMillis() - calendar2.getTimeInMillis();
+		long diff = calendar2.getTimeInMillis() - calendar1.getTimeInMillis();
 		long diffHours = diff / (60 * 60 * 1000);
 		garena.ban(username, (int)diffHours);
 		numberBanned++;
 		String reason = sqlthread.getBanReason(username);
-		chatthread.queueChat("", SLEEP); //stops the chat bot sending too many announcements quickly
-		chatthread.queueChat("<" + username + "> banned for reason: " + reason, ANNOUNCEMENT);
+		chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+		chatthread.queueChat("<" + username + "> banned for reason: " + reason + " for " + diffHours + " hours", ANNOUNCEMENT);
 	}
 
 	public void playerJoined(MemberInfo player) {
-		if(GCBConfig.configuration.getBoolean("gcb_bot_global_ban", false)) {
-			for(int i = 0; i < bannedPlayers.size(); i++) {
-				if(player.username.equalsIgnoreCase(bannedPlayers.get(i))) {
-					updateBans(player.username);
+		boolean keepGoing = true;
+		if(GCBConfig.configuration.getBoolean("gcb_bot_kick_low_level", false)) {
+			int minLevel = GCBConfig.configuration.getInt("gcb_bot_kick_min_level", 99);
+			boolean isRoot = false;
+			if(root_admin != null) {
+				isRoot = root_admin.equalsIgnoreCase(player.username);
+			}
+			boolean isRoomAdmin = isRoot || roomAdmins.contains(player.username.toLowerCase());
+			boolean isBotAdmin = botAdmins.contains(player.username.toLowerCase());
+			boolean isSafelist = safelist.contains(player.username.toLowerCase());
+			
+			if(!isSafelist && !isBotAdmin && !isRoomAdmin) {
+				if(player.experience < minLevel) {
+					garena.kick(player);
+					chatthread.queueChat("", ANNOUNCEMENT); //stops the chat bot sending too many announcements quickly
+					chatthread.queueChat("<" + player.username + "> kicked for reason: too low level", MAIN_CHAT);
+					numberKicked++;
+					keepGoing = false;
 				}
-				break;
 			}
 		}
-		if(GCBConfig.configuration.getBoolean("gcb_bot_warn_same_ip", false)) {
+		if(GCBConfig.configuration.getBoolean("gcb_bot_global_ban", false) && keepGoing) {
+			if(bannedPlayers.contains(player.username)) {
+				updateBans(player.username);
+				keepGoing = false;
+			}
+		}
+		if(GCBConfig.configuration.getBoolean("gcb_bot_warn_same_ip", false) && keepGoing) {
 			for(int i = 0; i < bannedIpAddress.size(); i++) {
 				if(player.externalIP.toString().substring(1).equals(bannedIpAddress.get(i))) {
 					String bannedUsers = sqlthread.getBannedUserFromIp(player.externalIP.toString().substring(1));
@@ -1147,11 +1168,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 					if(parts.length > 2) {
 						plural = "players";
 					}
-					chatthread.queueChat("Warning: <" + player.username + "> shares IP address " + player.externalIP.toString().substring(1) + " with banned " + plural + bannedUsers, -1);
+					chatthread.queueChat("Warning: <" + player.username + "> shares IP address " + player.externalIP.toString().substring(1) + " with banned " + plural + bannedUsers, MAIN_CHAT);
+					keepGoing = false;
 				}
+				break;
 			}
 		}
-		if(GCBConfig.configuration.getBoolean("gcb_bot_user_join_announcement", false)) {
+		if(GCBConfig.configuration.getBoolean("gcb_bot_user_join_announcement", false) && keepGoing) {
 			boolean isUserRoot = false;
 			if(root_admin != null) {
 				isUserRoot = root_admin.equalsIgnoreCase(player.username.toLowerCase());
@@ -1172,9 +1195,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	}
 
 	public void playerLeft(MemberInfo player) {
-		for(int i = 0; i < player.lastMessages.length-1; i++) {
-			player.lastMessages[i] = "";
-		}
+		java.util.Arrays.fill(player.lastMessages,"");
 		player.inRoom = false;
 		player.playing = false;
 		player.numWarnings = 0;
