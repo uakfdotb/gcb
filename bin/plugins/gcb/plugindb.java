@@ -247,8 +247,8 @@ class ScoreEntry implements Comparable {
 	
 	public int compareTo(Object o) {
 		ScoreEntry entry = (ScoreEntry) o;
-		if(entry.score > score) return -1;
-		else if(entry.score < score) return 1;
+		if(entry.score > score) return 1;
+		else if(entry.score < score) return -1;
 		else return 0;
 	}
 }
