@@ -19,7 +19,7 @@ import java.util.Date;
  * @author wizardus
  */
 public class Main {
-	public static String VERSION = "gcb 0e";
+	public static String VERSION = "gcb 0f";
 	public static boolean DEBUG = false;
 
 	static PrintWriter log_out;

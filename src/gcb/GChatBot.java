@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Scanner;
 import javax.swing.Timer;
 import java.util.Vector;
 import org.apache.commons.configuration.ConversionException;
@@ -22,7 +23,6 @@ import org.apache.commons.configuration.ConversionException;
  * @author wizardus
  */
 public class GChatBot implements GarenaListener, ActionListener {
-	public static String VERSION = "gcb_bot 0e";
 	public static final int LEVEL_PUBLIC = 0;
 	public static final int LEVEL_SAFELIST = 1;
 	public static final int LEVEL_BOT_ADMIN = 2;
@@ -54,6 +54,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	String access_message;
 	String owner;
 	boolean disable_version;
+	boolean commandline; //enable commandline input?
 
 	//thread safe objects
 	public Vector<String> roomAdmins; //admin usernames
@@ -92,8 +93,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 	}
 
 	public void init() {
-		Main.println(VERSION);
-
 		//configuration
 		trigger = GCBConfig.configuration.getString("gcb_bot_trigger", "!");
 		root_admin = GCBConfig.getString("gcb_bot_root");
@@ -103,7 +102,8 @@ public class GChatBot implements GarenaListener, ActionListener {
 		access_message = GCBConfig.getString("gcb_bot_access_message");
 		owner = GCBConfig.getString("gcb_bot_owner");
 		disable_version = GCBConfig.configuration.getBoolean("gcb_bot_noversion", false);
-		defaultAdminAccess = GCBConfig.configuration.getInt("gcb_bot_default_admin_access", 4095);
+		defaultAdminAccess = GCBConfig.configuration.getInt("gcb_bot_default_admin_access", 8191);
+		commandline = GCBConfig.configuration.getBoolean("gcb_bot_commandline", false);
 		
 		registerCommand("addadmin", LEVEL_ROOM_ADMIN);
 		registerCommand("deladmin", LEVEL_ROOM_ADMIN);
@@ -155,6 +155,12 @@ public class GChatBot implements GarenaListener, ActionListener {
 		} if(!disable_version) {
 			registerCommand("version", public_level);
 		}
+		
+		//start input threah
+		if(commandline) {
+			CommandInputThread commandThread = new CommandInputThread(this);
+			commandThread.start();
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -167,6 +173,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 		boolean isRoot = false;
 		if(root_admin != null) {
 			isRoot = root_admin.equalsIgnoreCase(member.username);
+		}
+		
+		//check if we're dealing with command line user, and make sure it's actually commandline
+		if(commandline && member.username.equals("commandline") && member.userID == -1 && member.externalIP == null && member.commandline) {
+			isRoot = true;
 		}
 		
 		boolean isRoomAdmin = isRoot || roomAdmins.contains(member.username.toLowerCase());
@@ -666,9 +677,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 				return whois(payload);
 			} else if(command.equalsIgnoreCase("usage")) {
 				payload = processAlias(payload.toLowerCase());
-				if(payload.equalsIgnoreCase("addroomadmin")) {
+				if(payload.equalsIgnoreCase("addadmin")) {
 					return "Format: !addadmin <username> <access>. Example: !addadmin XIII.Dragon 8191";
-				} else if(payload.equalsIgnoreCase("delroomadmin")) {
+				} else if(payload.equalsIgnoreCase("deladmin")) {
 					return "Format: !deladmin <username>. Example: !deladmin XIII.Dragon";
 				} else if(payload.equalsIgnoreCase("say")) {
 					return "Format: !say <message>. Example: !say Hello World";
@@ -752,7 +763,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		if(isRoomAdmin || isBotAdmin || isSafelist || publiccommands) {
 			if(command.equalsIgnoreCase("version")) {
 				if(!disable_version) {
-					return "Current version: " + VERSION + " (http://code.google.com/p/gcb/)";
+					return "Current version: " + Main.VERSION + " (http://code.google.com/p/gcb/)";
 				} else {
 					return null;
 				}
@@ -1212,5 +1223,41 @@ public class GChatBot implements GarenaListener, ActionListener {
 	public void disconnected(int x) {
 		//try to reconnect
 
+	}
+}
+
+class CommandInputThread extends Thread {
+	MemberInfo commandlineUser;
+	GChatBot bot;
+	
+	public CommandInputThread(GChatBot bot) {
+		this.bot = bot;
+		
+		commandlineUser = new MemberInfo();
+		commandlineUser.username = "commandline";
+		commandlineUser.commandline = true;
+		commandlineUser.userID = -1;
+	}
+	
+	public void run() {
+		Scanner scanner = new Scanner(System.in);
+		
+		while(scanner.hasNext()) {
+			String chat = scanner.nextLine();
+			//remove trigger from string, and split with space separator
+			String[] array = chat.substring(bot.trigger.length()).split(" ", 2);
+			String command = array[0];
+			String payload = "";
+
+			if(array.length >= 2) {
+				payload = array[1];
+			}
+
+			String response = bot.command(commandlineUser, command, payload);
+			
+			if(response != null) {
+				System.out.println("[RESPONSE] " + response);
+			}
+		}
 	}
 }

@@ -31,4 +31,6 @@ public class MemberInfo {
 	//these will be set after HELLO is received
 	public int correctPort = -1;
 	public InetAddress correctIP = null;
+	
+	boolean commandline = false;
 }

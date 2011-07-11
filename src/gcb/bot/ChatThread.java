@@ -7,6 +7,7 @@ package gcb.bot;
 
 import gcb.GCBConfig;
 import gcb.GarenaInterface;
+import gcb.Main;
 import java.util.LinkedList;
 
 /**
@@ -45,6 +46,8 @@ public class ChatThread extends Thread {
 
 			chat_queue.notifyAll(); //in case run() is waiting for us
 		}
+		
+		Main.println("[QUEUED:" + target_user + "] " + message);
 	}
 
 	//in case we're flooding or something

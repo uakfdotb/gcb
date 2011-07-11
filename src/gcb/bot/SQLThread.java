@@ -14,8 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.util.Vector;
 import java.math.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -27,7 +27,7 @@ public class SQLThread extends Thread {
 	public static int TYPE_GHOSTONE = 2;
 	public static int TYPE_GHOSTPP_EXTENDED = 3;
 
-	Connection connection;
+	ArrayList<Connection> connections;
 	String host;
 	String username;
 	String password;
@@ -66,20 +66,58 @@ public class SQLThread extends Thread {
 	}
 
 	public void init() {
-		//connect
+		connections = new ArrayList<Connection>();
+		
 		try {
-			connection = DriverManager.getConnection(host, username, password);
-		} catch(SQLException e) {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch(ClassNotFoundException cnfe) {
+			Main.println("[SQLThread] MySQL driver cannot be found: " + cnfe.getLocalizedMessage());
+			
 			if(Main.DEBUG) {
-				e.printStackTrace();
+				cnfe.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
+		}
+	}
+	
+	//gets a connection
+	public Connection connection() {
+		synchronized(connections) {
+			if(connections.isEmpty()) {
+				try {
+					Main.println("[SQLThread] Creating new connection...");
+					connections.add(DriverManager.getConnection(host, username, password));
+				}
+				catch(SQLException e) {
+					Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
+					
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
+				}
+			}
+					
+			if(Main.DEBUG) {
+				Main.println("[SQLThread] Currently have " + connections.size() + " connections");
+			}
+
+			return connections.remove(0);
+		}
+	}
+	
+	public void connectionReady(Connection connection) {
+		synchronized(connections) {
+			connections.add(connection);
+			
+			if(Main.DEBUG) {
+				Main.println("[SQLThread] Recovering connection; now at " + connections.size() + " connections");
+			}
 		}
 	}
 
 	public boolean addAdmin(String username, int access) {
 		try {
 			PreparedStatement statement = null;
+			Connection connection = connection();
 
 			if(dbtype == TYPE_GHOSTONE) {
 				statement = connection.prepareStatement("INSERT INTO admins (botid, name, server, access) VALUES" + "(0, ?, ?, ?)");
@@ -94,6 +132,7 @@ public class SQLThread extends Thread {
 				statement.setString(1, username);
 			}
 			statement.execute();
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -107,9 +146,11 @@ public class SQLThread extends Thread {
 
 	public boolean delAdmin(String username) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name=?");
 			statement.setString(1, username);
 			statement.execute();
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -127,6 +168,8 @@ public class SQLThread extends Thread {
 		}
 		PreparedStatement statement = null;
 		try {
+			Connection connection = connection();
+			
 			if(dbtype == TYPE_GHOSTONE) {
 				statement = connection.prepareStatement("INSERT INTO safelist (server, name, voucher) VALUES (?, ?, ?)");
 				statement.setString(1, realm);
@@ -137,6 +180,7 @@ public class SQLThread extends Thread {
 				statement.setString(1, username);
 			}
 			statement.execute();
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -154,9 +198,12 @@ public class SQLThread extends Thread {
 		}
 
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM safelist WHERE name =?");
 			statement.setString(1, username);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -170,9 +217,12 @@ public class SQLThread extends Thread {
 
 	public boolean addBannedWord(String bannedWord) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', ?)");
 			statement.setString(1, bannedWord);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -186,9 +236,12 @@ public class SQLThread extends Thread {
 
 	public boolean delBannedWord(String bannedWord) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=? and type ='bannedword'");
 			statement.setString(1, bannedWord);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -202,6 +255,7 @@ public class SQLThread extends Thread {
 	
 	public boolean addBan(String bannedUser, String ipAddress, String currentDate, String admin, String reason, String expireDate) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (id, botid, server, name, ip, date, gamename, admin, reason, gamecount, expiredate, warn) VALUES (NULL, ?, ?, ?, ?, ?, 'Room Ban', ?, ?, 0, ?, 0)");
 			statement.setInt(1, botId);
 			statement.setString(2, realm);
@@ -212,6 +266,8 @@ public class SQLThread extends Thread {
 			statement.setString(7, reason);
 			statement.setString(8, expireDate);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -225,9 +281,12 @@ public class SQLThread extends Thread {
 	
 	public boolean unban(String user) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE name=?");
 			statement.setString(1, user);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -245,6 +304,7 @@ public class SQLThread extends Thread {
 		String reason = "";
 		String expireDate = "";
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT date, admin, reason, expiredate FROM bans WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
@@ -255,8 +315,9 @@ public class SQLThread extends Thread {
 				expireDate = result.getString(4);
 				date = date.substring(0, date.length()-2); //removes the millisecond value from the time
 			}
+			
+			connectionReady(connection);
 			return "banned on " + date + " by <" + admin + "> for: " + reason + ". Ban expires on " + expireDate;
-
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
@@ -270,12 +331,15 @@ public class SQLThread extends Thread {
 	public String getBanReason(String user) {
 		String reason = "";
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT reason FROM bans WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
 			while (result.next()) {
 				reason = result.getString(1);
 			}
+			
+			connectionReady(connection);
 			return reason;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -289,12 +353,15 @@ public class SQLThread extends Thread {
 	public String getBanExpiryDate(String user) {
 		String expiryDate = "";
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT expiredate FROM bans WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
 			while (result.next()) {
 				expiryDate = result.getString(1);
 			}
+			
+			connectionReady(connection);
 			return expiryDate;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -307,6 +374,7 @@ public class SQLThread extends Thread {
 	
 	public boolean doesBanExist(String user) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
@@ -314,6 +382,8 @@ public class SQLThread extends Thread {
 			while (result.next()) {
 				name = result.getString(1);
 			}
+			
+			connectionReady(connection);
 			if(name.equals("")) {
 				return false;
 			} else {
@@ -331,6 +401,7 @@ public class SQLThread extends Thread {
 	
 	public String getBannedUserFromIp(String ip) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE ip=?");
 			statement.setString(1, ip);
 			ResultSet result = statement.executeQuery();
@@ -338,6 +409,8 @@ public class SQLThread extends Thread {
 			while (result.next()) {
 				name = name + " " + result.getString(1);
 			}
+			
+			connectionReady(connection);
 			return name;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -351,6 +424,7 @@ public class SQLThread extends Thread {
 	
 	public boolean doesUserHaveStats(String user) {
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT name FROM gameplayers WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
@@ -358,6 +432,8 @@ public class SQLThread extends Thread {
 			while (result.next()) {
 				name = result.getString(1);
 			}
+			
+			connectionReady(connection);
 			if(name.equals("")) {
 				return false;
 			} else {
@@ -398,6 +474,7 @@ public class SQLThread extends Thread {
 		double winRate = 0;
 		
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("SELECT gameid, team, colour FROM gameplayers WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
@@ -464,7 +541,9 @@ public class SQLThread extends Thread {
 			avgRaxKills = bdAvgRaxKills.doubleValue();
 			BigDecimal bdAvgCourierKills = new BigDecimal((double)totalCourierKills/(double)totalGames);	
 			bdAvgCourierKills = bdAvgCourierKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
-			avgCourierKills = bdAvgCourierKills.doubleValue();	
+			avgCourierKills = bdAvgCourierKills.doubleValue();
+			
+			connectionReady(connection);
 			return "has played " + totalGames + " DotA games on this hostbot (W/L: " + totalWins + "/" + totalLoss + ") Hero K/D/A: " + avgKills + "/" + avgDeaths + "/" + avgAssists + " Creep K/D/N: " + avgCreepKills + "/" + avgCreepDenies + "/" + avgNeutralKills + " T/R/C: " + avgTowerKills + "/" + avgRaxKills + "/" + avgCourierKills;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -481,10 +560,13 @@ public class SQLThread extends Thread {
 		}
 
 		try {
+			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
 			statement.setInt(1, botId);
 			statement.setString(2, command);
 			statement.execute();
+			
+			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
@@ -501,16 +583,30 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				Main.println("[SQLThread] Refreshing internal lists with database...");
 			}
+			
+			Connection connection = connection();
+			
 			try {
 				//refresh admin list
-				PreparedStatement statement = connection.prepareStatement("SELECT name, access FROM admins");
-				ResultSet result = statement.executeQuery();
-				bot.roomAdmins.clear();
-				bot.botAdmins.clear();
-				while(result.next()) {
-					if(result.getInt(2) < 8191) {
-						bot.botAdmins.add(result.getString(1).toLowerCase());
-					} else {
+				//if ghostone, then get access; access >= 8191 -> roomadmin
+				//if not ghostone, they are automatically a room admin
+				if(dbtype == TYPE_GHOSTONE) {
+					PreparedStatement statement = connection.prepareStatement("SELECT name, access FROM admins");
+					ResultSet result = statement.executeQuery();
+					bot.roomAdmins.clear();
+					bot.botAdmins.clear();
+					while(result.next()) {
+						if(result.getInt(2) < 8191) {
+							bot.botAdmins.add(result.getString(1).toLowerCase());
+						} else {
+							bot.roomAdmins.add(result.getString(1).toLowerCase());
+						}
+					}
+				} else {
+					PreparedStatement statement = connection.prepareStatement("SELECT name FROM admins");
+					ResultSet result = statement.executeQuery();
+					bot.roomAdmins.clear();
+					while(result.next()) {
 						bot.roomAdmins.add(result.getString(1).toLowerCase());
 					}
 				}
@@ -521,7 +617,8 @@ public class SQLThread extends Thread {
 				}
 
 				if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
-					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
+					Statement statement = connection.createStatement();
+					ResultSet result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
 					bot.bannedWords.clear();
 					while(result.next()) {
 						bot.bannedWords.add(result.getString("phrase").toLowerCase());
@@ -580,6 +677,8 @@ public class SQLThread extends Thread {
 			if(initial) {
 				initial = false;
 			}
+			
+			connectionReady(connection);
 
 			try {
 				Thread.sleep(60000);
