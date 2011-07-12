@@ -1344,6 +1344,39 @@ public class GarenaInterface {
 			return false;
 		}
 	}
+
+	public boolean kick(MemberInfo member, String reason) {
+		Main.println("[GarenaInterface] Kicking " + member.username + " with user ID " + member.userID + "; reason: " + reason);
+
+		byte[] reason_bytes = null;
+
+		try {
+			reason_bytes = reason.getBytes("UTF-8");
+		} catch(UnsupportedEncodingException e) {
+			Main.println("[GInterface] Error in kick: " + e.getLocalizedMessage());
+			return false;
+		}
+		
+		buf.clear();
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+		buf.putInt(14 + reason_bytes.length); //message size
+		buf.put((byte) 0x28); //kick message identifier
+		buf.putInt(user_id);
+		buf.putInt(member.userID);
+		//reason
+		buf.putInt(reason_bytes.length); //reason size, excluding null terminator
+		buf.put(reason_bytes);
+		buf.put((byte) 0); //null terminator for reason
+
+		try {
+			rout.write(buf.array(), buf.arrayOffset(), buf.position());
+			return true;
+		} catch(IOException ioe) {
+			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			disconnected(GARENA_ROOM);
+			return false;
+		}
+	}
 	
 	public void startPlaying() {
 		Main.println("[GInterface] Sending GCRP START...");
