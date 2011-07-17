@@ -11,8 +11,8 @@ import gcb.plugin.PluginManager;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.util.Date;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -21,9 +21,10 @@ import java.util.Date;
 public class Main {
 	public static String VERSION = "gcb 0f";
 	public static boolean DEBUG = false;
+	public static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	static PrintWriter log_out;
-
+	
 	GChatBot bot;
 
 	PluginManager plugins;
@@ -43,7 +44,7 @@ public class Main {
 	boolean loadPL;
 	boolean loadSQL;
 	boolean loadChat;
-	
+
 	public void init(String[] args) {
 		System.out.println(VERSION);
 		GCBConfig.load(args);
@@ -182,6 +183,7 @@ public class Main {
 			bot.init();
 			bot.garena = garena;
 			bot.plugins = plugins;
+			bot.sqlthread = sqlthread;
 			bot.chatthread = chatthread;
 
 			garena.registerListener(bot);
@@ -192,11 +194,12 @@ public class Main {
 			sqlthread = new SQLThread(bot);
 			sqlthread.init();
 			sqlthread.start();
-
-			if(loadBot) {
-				bot.sqlthread = sqlthread;
-			}
 		}
+		
+		if(loadBot) {
+			bot.sqlthread = sqlthread;
+		}
+
 	}
 
 	public void helloLoop() {
@@ -233,12 +236,19 @@ public class Main {
 		main.init(args);
 
 		//init log
-		String log_file = GCBConfig.getString("gcb_log");
-
-		if(log_file != null) {
-			log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+		if(GCBConfig.configuration.getBoolean("gcb_log")) {
+			if(GCBConfig.configuration.getBoolean("gcb_log_new_file", false)) {
+				if(date() + "gcb.log" != null) {
+					log_out = new PrintWriter(new FileWriter("log/" + date() + ".log", true), true);
+				}
+			} else {
+				if("gcb.log" != null) {
+					log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+					DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
+				}
+			}
 		}
-
+		
 		DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
 
 		main.initPlugins();
@@ -250,13 +260,17 @@ public class Main {
 	}
 
 	public static void println(String str) {
-		Date date = new Date();
-		String print = "[" + DateFormat.getDateTimeInstance().format(date) + "] " + str;
-		System.out.println(print);
+		System.out.println(str);
 
 		if(log_out != null) {
-			log_out.println(print);
+			log_out.println("[" + date() + "] " + str);
 		}
+	}
+	
+	public static String date() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		return sdf.format(cal.getTime());
 	}
 
 	//hexadecimal string to byte array
@@ -268,7 +282,7 @@ public class Main {
 			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
 								 + Character.digit(s.charAt(i+1), 16));
 		}
-
+		
 		return data;
 	}
 
