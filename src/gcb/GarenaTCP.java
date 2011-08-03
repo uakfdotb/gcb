@@ -30,6 +30,7 @@ public class GarenaTCP extends Thread {
 	int[] local_ports; //port on local server we are connected to
 
 	int remote_id; //remote user ID
+	String remote_username;
 	InetAddress remote_address;
 	int remote_port;
 
@@ -83,14 +84,15 @@ public class GarenaTCP extends Thread {
 		return false;
 	}
 
-	public boolean init(InetAddress remote_address, int remote_port, int remote_id, int conn_id, int destination_port) {
+	public boolean init(InetAddress remote_address, int remote_port, int remote_id, int conn_id, int destination_port, String username) {
 		this.remote_address = remote_address;
 		this.remote_port = remote_port;
 		this.remote_id = remote_id;
 		this.conn_id = conn_id;
+		this.remote_username = username;
 
 		Main.println("[GarenaTCP] Starting new virtual TCP connection " + conn_id +
-				" with user " + remote_id + " at " + remote_address + " to " + destination_port);
+				" with user " + remote_username + " at " + remote_address + " to " + destination_port);
 
 		if(!isValidPort(destination_port)) {
 			Main.println("[GarenaTCP] User " + remote_id + " tried to connect on port " + destination_port + "; terminating");
@@ -298,7 +300,7 @@ public class GarenaTCP extends Thread {
 	}
 
 	public void end() {
-		Main.println("[GarenaTCP] Terminating connection " + conn_id + " with " + remote_address);
+		Main.println("[GarenaTCP] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
 
 		if(socket != null) {
