@@ -204,7 +204,13 @@ public class Main {
 
 	public void helloLoop() {
 		if(loadPL) {
-			int counter = 0;
+			int playCounter = 0;
+			int reconnectCounter = 0;
+
+			//see how often to reconnect
+			int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", 24 * 60);
+			//divide by six to get interval measured for 10 second delays
+			int reconnectInterval = reconnectMinuteInterval / 6;
 
 			while(true) {
 				try {
@@ -215,10 +221,17 @@ public class Main {
 
 				garena.sendHello();
 
-				counter++;
-				if(counter > 3) {
-					counter = 0;
+				playCounter++;
+				if(playCounter > 3) {
+					playCounter = 0;
 					garena.startPlaying(); //make sure we're actually playing
+				}
+
+				if(reconnectCounter >= reconnectInterval) {
+					reconnectCounter = 0;
+					//reconnect to Garena room
+					garena.disconnectRoom();
+					garena.initRoom();
 				}
 
 				try {

@@ -314,6 +314,9 @@ public class GarenaTCP extends Thread {
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
+
+		//remove connection from GarenaInterface map
+		garena.tcp_connections.remove(conn_id);
 	}
 }
 

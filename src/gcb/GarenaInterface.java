@@ -1569,7 +1569,8 @@ public class GarenaInterface {
 						tcp_connection.connAck(seq, ack);
 					} else if(buf_array[1] == 0x01) {
 						Main.println("[GInterface] User requested termination on connection " + conn_id);
-						tcp_connections.remove(conn_id);
+						// tcp_connections will be updated by GarenaTCP
+						// tcp_connections.remove(conn_id);
 						tcp_connection.end();
 					} else {
 						Main.println("[GInterface] PeerLoop: unknown CONN type received: " + buf_array[1]);
