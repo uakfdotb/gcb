@@ -301,6 +301,9 @@ public class GarenaInterface {
 			return false;
 		}
 
+		//notify main server that we joined the room
+		sendGSPJoinedRoom(user_id, room_id);
+
 		return true;
 	}
 
@@ -329,6 +332,9 @@ public class GarenaInterface {
 
 		//cleanup room objects
 		members.clear();
+
+		//notify the main server
+		sendGSPJoinedRoom(user_id, 0);
 	}
 
 	public boolean sendGSPSessionInit() {
@@ -697,7 +703,7 @@ public class GarenaInterface {
 		Main.println("[GInterface] Query response: user ID is " + id);
 	}
 
-	public boolean queryUserByName(String username) {
+	public boolean sendGSPQueryUser(String username) {
 		Main.println("[GInterface] Querying by name: " + username);
 		buf.clear();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -737,7 +743,7 @@ public class GarenaInterface {
 
 	//username is requester username, sent with friend request
 	//message is the one sent with friend request that requested user will read
-	public boolean requestFriend(int id, String username, String message) {
+	public boolean sendGSPRequestFriend(int id, String username, String message) {
 		Main.println("[GInterface] Friend requesting: " + id);
 		buf.clear();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -775,6 +781,42 @@ public class GarenaInterface {
 
 		try {
 			out.write(buf.array(), buf.arrayOffset(), buf.position());
+			return true;
+		} catch(IOException ioe) {
+			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			disconnected(GARENA_MAIN);
+			return false;
+		}
+	}
+
+	//sends message so main server knows we joined a room
+	public boolean sendGSPJoinedRoom(int userId, int roomId) {
+		ByteBuffer block = ByteBuffer.allocate(9);
+		block.order(ByteOrder.LITTLE_ENDIAN);
+
+		block.put((byte) 0x52); //joined room identifier
+		block.putInt(userId); //user ID
+		block.putInt(roomId); //joined room ID
+		byte[] array = block.array();
+
+		ByteBuffer lbuf = null;
+		try {
+			byte[] encrypted = crypt.aesEncrypt(array);
+
+			lbuf = ByteBuffer.allocate(4 + encrypted.length);
+			lbuf.order(ByteOrder.LITTLE_ENDIAN);
+			lbuf.putShort((short) encrypted.length);
+			lbuf.put((byte) 0);
+			lbuf.put((byte) 1);
+
+			lbuf.put(encrypted);
+		} catch(Exception e) {
+			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			return false;
+		}
+
+		try {
+			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
@@ -1243,7 +1285,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public boolean chat(String text) {
+	public boolean sendGCRPChat(String text) {
 		Main.println("[GarenaInterface] Sending message: " + text);
 
 		byte[] chat_bytes = null;
@@ -1534,7 +1576,7 @@ public class GarenaInterface {
 						member.correctIP = packet.getAddress();
 						member.correctPort = packet.getPort();
 
-						sendHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
+						sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
 					} else {
 						//Main.println("[GInterface] Received HELLO from invalid member: " + id);
 					}
@@ -1621,7 +1663,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void lookupExternal() {
+	public void sendPeerLookup() {
 		//lookup external IP, port
 		byte[] tmp = new byte[8];
 		tmp[0] = 0x05;
@@ -1636,7 +1678,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void getRoomUsage() {
+	public void sendPeerRoomUsage() {
 		//lookup external IP, port
 		buf.clear();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -1656,7 +1698,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void sendHello() {
+	public void sendPeerHello() {
 		for(MemberInfo target : members) {
 			if(target.userID == user_id) {
 				continue;
@@ -1677,10 +1719,10 @@ public class GarenaInterface {
 
 			if(target.correctIP == null) {
 				//send on both external and internal
-				sendHello(target.userID, target.externalIP, target.externalPort);
-				sendHello(target.userID, target.internalIP, target.internalPort);
+				sendPeerHello(target.userID, target.externalIP, target.externalPort);
+				sendPeerHello(target.userID, target.internalIP, target.internalPort);
 			} else {
-				sendHello(target.userID, target.correctIP, target.correctPort);
+				sendPeerHello(target.userID, target.correctIP, target.correctPort);
 			}
 		}
 
@@ -1690,7 +1732,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void sendHello(int target_id, InetAddress address, int port) {
+	public void sendPeerHello(int target_id, InetAddress address, int port) {
 		buf.clear();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
 		buf.put(0, (byte) 0x02);
@@ -1708,7 +1750,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void sendHelloReply(int target_id, InetAddress address, int port, ByteBuffer lbuf) {
+	public void sendPeerHelloReply(int target_id, InetAddress address, int port, ByteBuffer lbuf) {
 		lbuf.clear();
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
 		lbuf.put(0, (byte) 0x0F);

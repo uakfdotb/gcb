@@ -76,7 +76,7 @@ public class ChatThread extends Thread {
 			}
 
 			if(message.target_user == MAIN_CHAT) {
-				garena.chat(message.str);
+				garena.sendGCRPChat(message.str);
 			} else if(message.target_user == ANNOUNCEMENT) {
 				garena.announce(message.str);
 			} else if(message.target_user == SLEEP) { //stops the bot sending messages too quickly

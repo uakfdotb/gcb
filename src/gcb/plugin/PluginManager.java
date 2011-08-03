@@ -137,7 +137,7 @@ public class PluginManager {
 		if(chatthread != null) {
 			chatthread.queueChat(s, chatthread.MAIN_CHAT);
 		} else {
-			garena.chat(s);
+			garena.sendGCRPChat(s);
 		}
 	}
 

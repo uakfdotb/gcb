@@ -151,7 +151,7 @@ public class Main {
 	public void lookup() {
 		if(loadPL) {
 			//lookup
-			garena.lookupExternal();
+			garena.sendPeerLookup();
 
 			Main.println("[Main] Waiting for lookup response...");
 			while(garena.iExternal == null) {
@@ -226,7 +226,7 @@ public class Main {
 					ioe.printStackTrace();
 				}
 
-				garena.sendHello();
+				garena.sendPeerHello();
 
 				playCounter++;
 				if(playCounter > 3) {
@@ -252,6 +252,30 @@ public class Main {
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) throws IOException {
+		/* Use this to decrypt Garena packets
+		try {
+			GarenaEncrypt encrypt = new GarenaEncrypt();
+			encrypt.initRSA();
+
+			byte[] data = readWS(args[0]);
+			byte[] plain = encrypt.rsaDecryptPrivate(data);
+
+			byte[] key = new byte[32];
+			byte[] init_vector = new byte[16];
+			System.arraycopy(plain, 0, key, 0, 32);
+			System.arraycopy(plain, 32, init_vector, 0, 16);
+			encrypt.initAES(key, init_vector);
+
+			data = readWS(args[1]);
+			byte[] out = encrypt.aesDecrypt(data);
+
+			Main.println(encrypt.hexEncode(out));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.exit(0);*/
+
+		
 		Main main = new Main();
 		main.init(args);
 
