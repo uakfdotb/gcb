@@ -156,7 +156,20 @@ public class GarenaInterface {
 
 		//init GP2PP socket
 		try {
-			peer_socket = new DatagramSocket(peer_port);
+			//determine bind address from configuration
+			InetAddress bindAddress = null;
+			String bindAddressString = GCBConfig.configuration.getString("gcb_bindaddress", null);
+
+			if(bindAddressString != null && !bindAddressString.trim().equals("")) {
+				bindAddress = InetAddress.getByName(bindAddressString);
+			}
+
+			//if bindAddress unset, then use wildcard address; otherwise bind to specified address
+			if(bindAddress == null) {
+				peer_socket = new DatagramSocket(peer_port);
+			} else {
+				peer_socket = new DatagramSocket(peer_port, bindAddress);
+			}
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
