@@ -1867,10 +1867,6 @@ public class GarenaInterface {
 	}
 
 	public void sendTCPFin(InetAddress address, int port, int conn_id, long last_time, ByteBuffer lbuf) {
-		if(!tcp_connections.contains(conn_id)) {
-			return; //probably already sent this
-		}
-
 		lbuf.clear();
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
 		lbuf.put(0, (byte) 0x0D); //CONN message type identifier
@@ -1893,10 +1889,6 @@ public class GarenaInterface {
 		} catch(IOException ioe) {
 			//ioe.printStackTrace();
 		}
-
-		Main.println("[GInterface] Removing TCP connection " + conn_id);
-		//connection is over, don't need GarenaTCP anymore
-		tcp_connections.remove(conn_id);
 	}
 	
 	public static String time() {

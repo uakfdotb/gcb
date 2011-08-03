@@ -166,7 +166,9 @@ public class GarenaTCP extends Thread {
 		//todo: move this to a better place
 		for(int i = 0; i < packets.size(); i++) {
 			GarenaTCPPacket curr = packets.get(i);
-			if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
+
+			int standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 2000);
+			if(curr.send_time < System.currentTimeMillis() - standardDelay) { //todo: set timeout to a more appropriate value
 				curr.send_time = System.currentTimeMillis();
 				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 				
@@ -192,7 +194,9 @@ public class GarenaTCP extends Thread {
 		//standard retransmission: resend old packets
 		for(int i = 0; i < packets.size(); i++) {
 			GarenaTCPPacket curr = packets.get(i);
-			if(curr.send_time < System.currentTimeMillis() - 2000) { //todo: set timeout to a more appropriate value
+
+			int standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 2000);
+			if(curr.send_time < System.currentTimeMillis() - standardDelay) { //todo: set timeout to a more appropriate value
 				curr.send_time = System.currentTimeMillis();
 				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 
