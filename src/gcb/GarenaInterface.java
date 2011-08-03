@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -169,6 +170,10 @@ public class GarenaInterface {
 				peer_socket = new DatagramSocket(peer_port);
 			} else {
 				peer_socket = new DatagramSocket(peer_port, bindAddress);
+			}
+
+			if(peer_socket.getInetAddress() instanceof Inet6Address) {
+				Main.println("[GInterface] Warning: binded to IPv6 address: " + peer_socket.getInetAddress());
 			}
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {

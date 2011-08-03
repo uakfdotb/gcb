@@ -95,12 +95,12 @@ public class GarenaTCP extends Thread {
 				" with user " + remote_username + " at " + remote_address + " to " + destination_port);
 
 		if(!isValidPort(destination_port)) {
-			Main.println("[GarenaTCP] User " + remote_id + " tried to connect on port " + destination_port + "; terminating");
+			Main.println("[GarenaTCP] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
 			end();
 			return false;
 		} else {
 			//establish real TCP connection with GHost (hopefully)
-			Main.println("[GarenaTCP] Connecting to GAMEHOST at " + local_hostname + " on port " + destination_port);
+			Main.println("[GarenaTCP] Connecting to GAMEHOST at " + local_hostname + " on port " + destination_port + " for connection " + conn_id);
 			try {
 				InetAddress local_address = InetAddress.getByName(local_hostname);
 				socket = new Socket(local_address, destination_port);
@@ -141,7 +141,7 @@ public class GarenaTCP extends Thread {
 		if(terminated) return;
 
 		if(Main.DEBUG) {
-			Main.println("[GarenaTCP] debug@connack: received acknowledge for " + seq + ", remote ack=" + ack);
+			Main.println("[GarenaTCP] debug@connack: received acknowledge for " + seq + ", remote ack=" + ack + " in connection " + conn_id);
 		}
 
 		//acknowledge packets =seq or <ack
@@ -191,7 +191,7 @@ public class GarenaTCP extends Thread {
 		if(terminated) return;
 
 		if(Main.DEBUG) {
-			Main.println("[GarenaTCP] debug@data: received SEQ=" + seq + "; remote ACK=" + ack);
+			Main.println("[GarenaTCP] debug@data: received SEQ=" + seq + "; remote ACK=" + ack + " in connection " + conn_id);
 		}
 
 		//acknowledge packets
@@ -226,7 +226,7 @@ public class GarenaTCP extends Thread {
 			this.ack = seq;
 
 			if(Main.DEBUG) {
-				Main.println("[GarenaTCP] debug@data: initializing our acknowledgement number to " + this.ack);
+				Main.println("[GarenaTCP] debug@data: initializing our acknowledgement number to " + this.ack + " in connection " + conn_id);
 			}
 		}
 
@@ -246,7 +246,7 @@ public class GarenaTCP extends Thread {
 				this.ack = packet.seq + 1;
 
 				if(Main.DEBUG) {
-					Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq);
+					Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
 				}
 				
 				try {
@@ -266,20 +266,20 @@ public class GarenaTCP extends Thread {
 			packet.data = copy;
 
 			if(Main.DEBUG) {
-				Main.println("[GarenaTCP] debug@data: storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack);
+				Main.println("[GarenaTCP] debug@data: storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 			}
 
 			out_packets.put(seq, packet);
 		} else {
 			//ignore packet if seq is less than our ack
 			if(Main.DEBUG) {
-				Main.println("[GarenaTCP] debug@data: ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack);
+				Main.println("[GarenaTCP] debug@data: ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 			}
 		}
 
 		//send conn ack
 		if(Main.DEBUG) {
-			Main.println("[GarenaTCP] debug@data: acknowledging " + seq + "; our ACK=" + this.ack);
+			Main.println("[GarenaTCP] debug@data: acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 		}
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
 	}
