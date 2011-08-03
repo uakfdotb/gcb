@@ -11,8 +11,10 @@ import gcb.plugin.PluginManager;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -255,14 +257,9 @@ public class Main {
 		//init log
 		if(GCBConfig.configuration.getBoolean("gcb_log")) {
 			if(GCBConfig.configuration.getBoolean("gcb_log_new_file", false)) {
-				if(date() + "gcb.log" != null) {
-					log_out = new PrintWriter(new FileWriter("log/" + date() + ".log", true), true);
-				}
+				log_out = new PrintWriter(new FileWriter("log/" + date() + ".log", true), true);
 			} else {
-				if("gcb.log" != null) {
-					log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
-					DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
-				}
+				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
 			}
 		}
 		
@@ -277,10 +274,13 @@ public class Main {
 	}
 
 	public static void println(String str) {
+		Date date = new Date();
+		String dateString = DateFormat.getDateTimeInstance().format(date);
+
 		System.out.println(str);
 
 		if(log_out != null) {
-			log_out.println("[" + date() + "] " + str);
+			log_out.println("[" + dateString + "] " + str);
 		}
 	}
 	
