@@ -35,8 +35,8 @@ public class GarenaTCP extends Thread {
 	int remote_port;
 
 	//thread safe objects
-	Vector<GarenaTCPPacket> packets;
-	Hashtable<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet
+	Vector<GarenaTCPPacket> packets; //to transmit to Garena
+	Hashtable<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet; to transmit to GHost++
 
 	GarenaInterface garena;
 	Socket socket;
@@ -140,6 +140,10 @@ public class GarenaTCP extends Thread {
 	public void connAck(int seq, int ack) {
 		if(terminated) return;
 
+		if(Main.DEBUG) {
+			Main.println("[GarenaTCP] debug@connack: received acknowledge for " + seq + ", remote ack=" + ack);
+		}
+
 		//acknowledge packets =seq or <ack
 		for(int i = 0; i < packets.size(); i++) {
 			GarenaTCPPacket curr = packets.get(i);
@@ -153,12 +157,14 @@ public class GarenaTCP extends Thread {
 		if(ack < seq + 1) {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
-				if(curr.send_time < System.currentTimeMillis() - 300 && curr.seq >= ack && curr.seq <= seq - 1) {
+				if(!curr.fastRetransmitted && curr.seq >= ack && curr.seq <= seq - 1) {
 					curr.send_time = System.currentTimeMillis();
+					curr.fastRetransmitted = true;
+					
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 
 					if(Main.DEBUG) {
-						Main.println("[GarenaTCP] debug@connack: fast retransmitting in connection " + conn_id);
+						Main.println("[GarenaTCP] debug@connack: fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
 					}
 				}
 			}
@@ -175,7 +181,7 @@ public class GarenaTCP extends Thread {
 				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 				
 				if(Main.DEBUG) {
-					Main.println("[GarenaTCP] debug@connack: standard retransmitting in connection " + conn_id);
+					Main.println("[GarenaTCP] debug@connack: standard retransmitting seq=" + curr.seq + " in connection " + conn_id);
 				}
 			}
 		}
@@ -183,6 +189,10 @@ public class GarenaTCP extends Thread {
 
 	public void data(int seq, int ack, byte[] data, int offset, int length) {
 		if(terminated) return;
+
+		if(Main.DEBUG) {
+			Main.println("[GarenaTCP] debug@data: received SEQ=" + seq + "; remote ACK=" + ack);
+		}
 
 		//acknowledge packets
 		for(int i = 0; i < packets.size(); i++) {
@@ -214,6 +224,10 @@ public class GarenaTCP extends Thread {
 
 		if(this.ack == 0) {
 			this.ack = seq;
+
+			if(Main.DEBUG) {
+				Main.println("[GarenaTCP] debug@data: initializing our acknowledgement number to " + this.ack);
+			}
 		}
 
 		if(seq == this.ack) {
@@ -230,6 +244,10 @@ public class GarenaTCP extends Thread {
 			while(packet != null) {
 				out_packets.remove(this.ack);
 				this.ack = packet.seq + 1;
+
+				if(Main.DEBUG) {
+					Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq);
+				}
 				
 				try {
 					out.write(packet.data);
@@ -247,10 +265,22 @@ public class GarenaTCP extends Thread {
 			packet.seq = seq;
 			packet.data = copy;
 
+			if(Main.DEBUG) {
+				Main.println("[GarenaTCP] debug@data: storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack);
+			}
+
 			out_packets.put(seq, packet);
-		} //ignore packet if seq is less than our ack
+		} else {
+			//ignore packet if seq is less than our ack
+			if(Main.DEBUG) {
+				Main.println("[GarenaTCP] debug@data: ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack);
+			}
+		}
 
 		//send conn ack
+		if(Main.DEBUG) {
+			Main.println("[GarenaTCP] debug@data: acknowledging " + seq + "; our ACK=" + this.ack);
+		}
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
 	}
 
@@ -326,4 +356,9 @@ class GarenaTCPPacket {
 	int seq;
 	long send_time;
 	byte[] data;
+	boolean fastRetransmitted;
+
+	public GarenaTCPPacket() {
+		fastRetransmitted = false;
+	}
 }
