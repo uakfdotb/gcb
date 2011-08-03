@@ -8,6 +8,7 @@ package gcb;
 import gcb.bot.ChatThread;
 import gcb.bot.SQLThread;
 import gcb.plugin.PluginManager;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -257,7 +258,14 @@ public class Main {
 		//init log
 		if(GCBConfig.configuration.getBoolean("gcb_log")) {
 			if(GCBConfig.configuration.getBoolean("gcb_log_new_file", false)) {
-				log_out = new PrintWriter(new FileWriter("log/" + date() + ".log", true), true);
+				File log_directory = new File("log/");
+				if(!log_directory.exists()) {
+					log_directory.mkdir();
+				}
+
+				File log_target = new File(log_directory, date() + ".log");
+
+				log_out = new PrintWriter(new FileWriter(log_target, true), true);
 			} else {
 				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
 			}
