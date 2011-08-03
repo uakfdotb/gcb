@@ -151,7 +151,7 @@ public class GarenaTCP extends Thread {
 		if(ack < seq + 1) {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
-				if(curr.seq >= ack && curr.seq <= seq - 1) {
+				if(curr.send_time < System.currentTimeMillis() - 300 && curr.seq >= ack && curr.seq <= seq - 1) {
 					curr.send_time = System.currentTimeMillis();
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 
