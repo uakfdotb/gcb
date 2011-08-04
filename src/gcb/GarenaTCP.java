@@ -11,10 +11,9 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Vector;
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -39,6 +38,9 @@ public class GarenaTCP extends Thread {
 	//not thread safe objects
 	ArrayList<GarenaTCPPacket> packets; //to transmit to Garena
 	HashMap<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet; to transmit to GHost++
+	ByteBuffer out_buffer; //if buffered output is use, only full packets will be sent and packets will be dissected to correct information
+	byte[] out_buffer_helper;
+	String[] reservedNames;
 
 	GarenaInterface garena;
 	Socket socket;
@@ -79,7 +81,21 @@ public class GarenaTCP extends Thread {
 			local_ports = new int[] {};
 		}
 
+		try {
+			reservedNames = GCBConfig.configuration.getStringArray("gcb_tcp_reservednames");
+		} catch(ConversionException e) {
+			Main.println("[GarenaTCP] Configuration error: while parsing gcb_tcp_reservednames as string array");
+			reservedNames = new String[] {};
+		}
+
 		tcpDebug = GCBConfig.configuration.getBoolean("gcb_tcp_debug", false);
+
+		boolean useBufferedOutput = GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true);
+		if(useBufferedOutput) {
+			out_buffer = ByteBuffer.allocate(65536 * 2);
+			out_buffer.order(ByteOrder.LITTLE_ENDIAN);
+			out_buffer_helper = new byte[65536 * 2];
+		}
 	}
 
 	public boolean isValidPort(int port) {
@@ -99,6 +115,15 @@ public class GarenaTCP extends Thread {
 
 		Main.println("[GarenaTCP] Starting new virtual TCP connection " + conn_id +
 				" with user " + remote_username + " at " + remote_address + " to " + destination_port);
+
+		//make sure their username is not reserved
+		if(isReservedName(remote_username)) {
+			Main.println("[GarenaTCP] User " + remote_username + " at " + remote_address + " in connection " + conn_id + " tried to use a reserved name");
+			end();
+			return false;
+		}
+		System.out.println(remote_username);
+		System.out.println(reservedNames[0]);
 
 		if(!isValidPort(destination_port)) {
 			Main.println("[GarenaTCP] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
@@ -240,11 +265,7 @@ public class GarenaTCP extends Thread {
 		if(seq == this.ack) {
 			this.ack = seq + 1;
 
-			try {
-				out.write(data, offset, length);
-			} catch(IOException ioe) {
-				ioe.printStackTrace();
-			}
+			writeOutData(data, offset, length, false);
 			
 			//send any other packets
 			synchronized(out_packets) {
@@ -257,11 +278,7 @@ public class GarenaTCP extends Thread {
 						Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
 					}
 
-					try {
-						out.write(packet.data);
-					} catch(IOException ioe) {
-						ioe.printStackTrace();
-					}
+					writeOutData(packet.data, false);
 
 					packet = out_packets.get(this.ack);
 				}
@@ -293,6 +310,111 @@ public class GarenaTCP extends Thread {
 			Main.println("[GarenaTCP] debug@data: acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 		}
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
+
+		//if buffered output, extract packets from out_buffer and process
+		if(out_buffer != null) {
+			while(out_buffer.position() >= 4) {
+				int header = GarenaEncrypt.unsignedByte(out_buffer.get(0));
+
+				//validate header
+				if(header == Constants.W3GS_HEADER_CONSTANT) {
+					int oLength = GarenaEncrypt.unsignedShort(out_buffer.getShort(2));
+
+					//validate length; minimum packet legnth is 4
+					if(oLength >= 4) {
+						if(out_buffer.position() >= oLength) {
+							//write the data if process returns true, else disconnect
+							processOutData(out_buffer, oLength);
+
+							//reset buffer: move everything so buffer starts at zero
+							int remainingBytes = out_buffer.position() - oLength;
+							System.arraycopy(out_buffer.array(), oLength, out_buffer_helper, 0, remainingBytes);
+							System.arraycopy(out_buffer_helper, 0, out_buffer.array(), 0, remainingBytes);
+							out_buffer.position(remainingBytes);
+						} else {
+							//not enough bytes yet
+							return;
+						}
+					} else {
+						Main.println("[GarenaTCP] Received invalid length in connection " + conn_id + ", disconnecting");
+						end();
+						return;
+					}
+				} else {
+					Main.println("[GarenaTCP] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
+					end();
+					return;
+				}
+			}
+		}
+	}
+
+	public void processOutData(ByteBuffer buf, int length) {
+		int old_position = buf.position();
+
+		if(GarenaEncrypt.unsignedByte(buf.get(1)) == Constants.W3GS_REQJOIN) {
+			if(length > 20) {
+				buf.position(4);
+				int hostCounter = buf.getInt();
+				int entryKey = buf.getInt();
+				byte unknown = buf.get();
+				short listenPort = buf.getShort();
+				int peerKey = buf.getInt();
+				String name = GarenaEncrypt.getTerminatedString(buf);
+
+				int remainderLength = length - buf.position();
+
+				if(!name.equalsIgnoreCase(remote_username)) {
+					Main.println("[GarenaTCP] User " + remote_username + " in connection " + conn_id + " attempted to use an invalid name: " + name);
+				}
+
+				//add part after username + part before username + name + null terminator
+				byte[] remote_username_bytes = remote_username.getBytes();
+				int rewrittenLength = remainderLength + 19 + remote_username_bytes.length + 1;
+
+				ByteBuffer rewrittenData = ByteBuffer.allocate(rewrittenLength);
+				rewrittenData.order(ByteOrder.LITTLE_ENDIAN);
+
+				rewrittenData.put((byte) Constants.W3GS_HEADER_CONSTANT);
+				rewrittenData.put((byte) Constants.W3GS_REQJOIN);
+				rewrittenData.putShort((short) rewrittenLength);
+				rewrittenData.putInt(hostCounter);
+				rewrittenData.putInt(entryKey);
+				rewrittenData.put(unknown);
+				rewrittenData.putShort(listenPort);
+				rewrittenData.putInt(peerKey);
+				rewrittenData.put(remote_username_bytes);
+				rewrittenData.put((byte) 0);
+				rewrittenData.put(buf.array(), buf.position(), remainderLength);
+
+				writeOutData(rewrittenData.array(), true);
+			} else {
+				Main.println("[GarenaTCP] Invalid length in join request in connection " + conn_id);
+				end();
+				return;
+			}
+		} else {
+			writeOutData(buf.array(), 0, length, true);
+		}
+
+		buf.position(old_position);
+	}
+
+	public void writeOutData(byte[] data, boolean force) {
+		writeOutData(data, 0, data.length, force);
+	}
+
+	public void writeOutData(byte[] data, int offset, int length, boolean force) {
+		if(out_buffer == null || force) {
+			try {
+				out.write(data, offset, length);
+			} catch(IOException ioe) {
+				ioe.printStackTrace();
+			}
+		} else {
+			//write to our output buffer to later extract packets
+			out_buffer.put(data, offset, length);
+		}
 	}
 
 	public void run() {
@@ -305,6 +427,7 @@ public class GarenaTCP extends Thread {
 				int len = in.read(rbuf); //definitely _don't_ want to readfully here!
 
 				if(len == -1) {
+					Main.println("[GarenaTCP] Local host for connection " + conn_id + " disconnected");
 					end();
 					break;
 				}
@@ -357,13 +480,24 @@ public class GarenaTCP extends Thread {
 		}
 
 		//send four times because that's what Windows client does
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf); //this will also cause garena to remove this object
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
 
 		//remove connection from GarenaInterface map
 		garena.tcp_connections.remove(conn_id);
+	}
+
+	//check if name is in the list of reserved names
+	public boolean isReservedName(String test) {
+		for(String name : reservedNames) {
+			if(name.equalsIgnoreCase(test)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 
