@@ -113,6 +113,15 @@ Creating plugins
 
 Plugins are relatively powerful as they have access to packets and commands from users, among other things. A guide for creating your own plugins is available at: http://code.google.com/p/gcb/wiki/CreatingPlugins. You may also wish to look at the included gcb example plugins.
 
+GCBI Protocol
+-------------
+
+gcb can send data on the joining user to GHost++ through GCBI. gcbi.patch should be included in your installation. Apply this patch on GHost++, and then in gcb.cfg, configure gcb_enablegcbi to true.
+
+The patch only prints out the information. Because there are different uses for the information, further modification of GHost++ must be done for there to be a purpose. The information sent includes: the user ID, the room ID, the user's actual IP address, the user's Garena country code, the user's Garena experience.
+
+Also note that if GCBI is enabled without applying the gcbi patch to GHost++, gcb will be disconnected and not allowed to join games.
+
 Protocol
 --------
 

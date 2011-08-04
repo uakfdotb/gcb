@@ -1567,16 +1567,14 @@ public class GarenaInterface {
 					int destination = crypt.byteArrayToIntLittle(buf_array, 16); //little endian short followed by two zeroes
 
 					MemberInfo member = memberFromID(remote_id);
-					String memberUsername = remote_id + "";
 					if(member != null) {
 						Main.println("[GInterface] Starting TCP connection with " +  member.username);
-						memberUsername = member.username;
 					} else {
 						Main.println("[GInterface] Starting TCP connection with " +  remote_id);
 					}
 					
 					GarenaTCP tcp_connection = new GarenaTCP(this);
-					tcp_connection.init(packet.getAddress(), packet.getPort(), remote_id, conn_id, destination, memberUsername);
+					tcp_connection.init(packet.getAddress(), packet.getPort(), remote_id, conn_id, destination, member);
 					
 					if(tcp_connections.contains(conn_id)) {
 						Main.println("[GInterface] Warning: duplicate TCP connection ID; overwriting previous");

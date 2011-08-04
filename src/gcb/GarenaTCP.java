@@ -106,12 +106,17 @@ public class GarenaTCP extends Thread {
 		return false;
 	}
 
-	public boolean init(InetAddress remote_address, int remote_port, int remote_id, int conn_id, int destination_port, String username) {
+	public boolean init(InetAddress remote_address, int remote_port, int remote_id, int conn_id, int destination_port, MemberInfo member) {
 		this.remote_address = remote_address;
 		this.remote_port = remote_port;
 		this.remote_id = remote_id;
 		this.conn_id = conn_id;
-		this.remote_username = username;
+
+		if(member != null) {
+			this.remote_username = member.username;
+		} else {
+			this.remote_username = remote_id + "";
+		}
 
 		Main.println("[GarenaTCP] Starting new virtual TCP connection " + conn_id +
 				" with user " + remote_username + " at " + remote_address + " to " + destination_port);
@@ -142,6 +147,29 @@ public class GarenaTCP extends Thread {
 				end();
 				ioe.printStackTrace();
 				return false;
+			}
+
+			//lastly, send the GCBI packet with information about the remote user
+			if(GCBConfig.configuration.getBoolean("gcb_enablegcbi", false)) {
+				buf.clear();
+				buf.order(ByteOrder.LITTLE_ENDIAN);
+				buf.put((byte) Constants.GCBI_HEADER_CONSTANT);
+				buf.put((byte) Constants.GCBI_INIT);
+				buf.putShort((short) 22);
+				buf.order(ByteOrder.BIG_ENDIAN);
+				buf.put(remote_address.getAddress());
+				buf.putInt(remote_id);
+				buf.putInt(garena.room_id);
+
+				if(member != null) {
+					buf.putInt(member.experience);
+					buf.put(member.country.substring(0, 2).getBytes());
+				} else {
+					buf.putInt(-1);
+					buf.put("??".getBytes());
+				}
+
+				writeOutData(buf.array(), 0, buf.position(), true);
 			}
 
 			start();
