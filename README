@@ -26,7 +26,7 @@ Apache Commons Configuration can be downloaded at http://commons.apache.org/conf
 
 Note that the above libraries are now included with gcb, so there is no need to download them. You can find the JAR files in gcb/bin/lib/; if you plan to move gcb.jar away from it's directory, make sure you move the lib/ folder as well because gcb will fail without it.
 
-Before running, you do need to install the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6. This can be downloaded at https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jce_policy-6-oth-JPR@CDS-CDS_Developer. The download will include installation instructions that you should follow.
+Before running, you do need to install the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6. This can be downloaded at http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html (unfortunately, it is not free software; if you are concerned about this, try gcj or OpenJDK). The download will include installation instructions that you should follow.
 
 The JRE can be downloaded at http://www.java.com/en/download/index.jsp.
 
