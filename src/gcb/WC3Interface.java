@@ -127,7 +127,7 @@ public class WC3Interface {
 			//so if filter succeeds, ignore; only if it fails, set filtersuccess to false
 			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
 				//first check IP address
-				if(tcpHost == null || packet.getAddress().equals(tcpHost)) {
+				if(tcpHost == null || packet.getAddress().equals(tcpHost) || (packet.getAddress().isAnyLocalAddress() && tcpHost.isAnyLocalAddress())) {
 					ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
 					buf.position(0);
 					buf.order(ByteOrder.LITTLE_ENDIAN);
