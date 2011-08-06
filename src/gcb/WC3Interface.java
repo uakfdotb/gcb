@@ -69,11 +69,13 @@ public class WC3Interface {
 			tcpPorts = new int[] {};
 		}
 
-		try {
-			tcpHost = InetAddress.getByName(GCBConfig.configuration.getString("gcb_tcp_host"));
-		} catch(IOException ioe) {
-			Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
-			tcpHost = null;
+		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
+			try {
+				tcpHost = InetAddress.getByName(GCBConfig.configuration.getString("gcb_tcp_host"));
+			} catch(IOException ioe) {
+				Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
+				tcpHost = null;
+			}
 		}
 	}
 
