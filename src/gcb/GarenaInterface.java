@@ -1852,12 +1852,12 @@ public class GarenaInterface {
 	}
 
 	public void sendTCPData(InetAddress address, int port, int conn_id, long last_time, int seq, int ack, byte[] data, int len, ByteBuffer lbuf) {
-		lbuf.clear();
+		lbuf.position(0);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
 		lbuf.put(0, (byte) 0x0D); //CONN message type identifier
 		lbuf.put(1, (byte) 0x14); //CONN DATA message type identifier
 
-		long timestamp = (System.nanoTime() - last_time) /  256000;
+		//long timestamp = (System.nanoTime() - last_time) /  256000;
 		//lbuf.putShort(2, (short) timestamp);
 
 		lbuf.putInt(4, conn_id); //connection ID
@@ -1879,12 +1879,12 @@ public class GarenaInterface {
 	}
 
 	public void sendTCPAck(InetAddress address, int port, int conn_id, long last_time, int seq, int ack, ByteBuffer lbuf) {
-		lbuf.clear();
+		lbuf.position(0);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
 		lbuf.put(0, (byte) 0x0D); //CONN message type identifier
 		lbuf.put(1, (byte) 0x0E); //CONN ACK message type identifier
 
-		long timestamp = (System.nanoTime() - last_time) /  256000;
+		//long timestamp = (System.nanoTime() - last_time) /  256000;
 		//lbuf.putShort(2, (short) timestamp);
 
 		lbuf.putInt(4, conn_id); //connection ID
@@ -1903,12 +1903,12 @@ public class GarenaInterface {
 	}
 
 	public void sendTCPFin(InetAddress address, int port, int conn_id, long last_time, ByteBuffer lbuf) {
-		lbuf.clear();
+		lbuf.position(0);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
 		lbuf.put(0, (byte) 0x0D); //CONN message type identifier
 		lbuf.put(1, (byte) 0x01); //CONN FIN message type identifier
 
-		long timestamp = (System.nanoTime() - last_time) /  256000;
+		//long timestamp = (System.nanoTime() - last_time) /  256000;
 		//lbuf.putShort(2, (short) timestamp);
 
 		lbuf.putInt(4, conn_id); //connection ID

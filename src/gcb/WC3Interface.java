@@ -8,6 +8,8 @@ package gcb;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import org.apache.commons.configuration.ConversionException;
 
 /**
  *
@@ -60,6 +62,22 @@ public class WC3Interface {
 			}
 
 			garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
+			
+			try {
+				String[] array = GCBConfig.configuration.getStringArray("gcb_rebroadcast");
+
+				for(String element : array) {
+					int port = Integer.parseInt(element);
+					DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
+					socket.send(retransmitPacket);
+
+				}
+			} catch(ConversionException ce) {
+				Main.println("[WC3Interface] Conversion exception while processing gcb_rebroadcast; ignoring rebroadcast");
+			} catch(NumberFormatException nfe) {
+				Main.println("[WC3Interface] Number format exception while processing gcb_rebroadcast; terminating rebroadcast");
+			}
+
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();

@@ -24,8 +24,8 @@ public class GarenaTCP extends Thread {
 	boolean terminated; //termination flag
 	int conn_id; //this virtual TCP connection identifier
 	long last_time; //last time in nanoseconds that a packet was sent
-	int seq; //our current sequence number
-	int ack; //our current acknowledgement number
+	Integer seq; //our current sequence number
+	Integer ack; //our current acknowledgement number
 
 	String local_hostname; //local server hostname
 	int[] local_ports; //port on local server we are connected to
@@ -39,7 +39,6 @@ public class GarenaTCP extends Thread {
 	ArrayList<GarenaTCPPacket> packets; //to transmit to Garena
 	HashMap<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet; to transmit to GHost++
 	ByteBuffer out_buffer; //if buffered output is use, only full packets will be sent and packets will be dissected to correct information
-	byte[] out_buffer_helper;
 	String[] reservedNames;
 
 	GarenaInterface garena;
@@ -94,7 +93,6 @@ public class GarenaTCP extends Thread {
 		if(useBufferedOutput) {
 			out_buffer = ByteBuffer.allocate(65536 * 2);
 			out_buffer.order(ByteOrder.LITTLE_ENDIAN);
-			out_buffer_helper = new byte[65536 * 2];
 		}
 	}
 
@@ -127,8 +125,6 @@ public class GarenaTCP extends Thread {
 			end();
 			return false;
 		}
-		System.out.println(remote_username);
-		System.out.println(reservedNames[0]);
 
 		if(!isValidPort(destination_port)) {
 			Main.println("[GarenaTCP] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
@@ -291,7 +287,9 @@ public class GarenaTCP extends Thread {
 		//todo: decrease latency... how?
 
 		if(seq == this.ack) {
-			this.ack = seq + 1;
+			synchronized(this.ack) {
+				this.ack++;
+			}
 
 			writeOutData(data, offset, length, false);
 			
@@ -300,7 +298,10 @@ public class GarenaTCP extends Thread {
 				GarenaTCPPacket packet = out_packets.get(this.ack);
 				while(packet != null) {
 					out_packets.remove(this.ack);
-					this.ack = packet.seq + 1;
+
+					synchronized(this.ack) {
+						this.ack++;
+					}
 
 					if(tcpDebug) {
 						Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
@@ -356,8 +357,7 @@ public class GarenaTCP extends Thread {
 
 							//reset buffer: move everything so buffer starts at zero
 							int remainingBytes = out_buffer.position() - oLength;
-							System.arraycopy(out_buffer.array(), oLength, out_buffer_helper, 0, remainingBytes);
-							System.arraycopy(out_buffer_helper, 0, out_buffer.array(), 0, remainingBytes);
+							System.arraycopy(out_buffer.array(), oLength, out_buffer.array(), 0, remainingBytes);
 							out_buffer.position(remainingBytes);
 						} else {
 							//not enough bytes yet
@@ -474,7 +474,10 @@ public class GarenaTCP extends Thread {
 				}
 
 				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, data, len, lbuf);
-				seq++;
+
+				synchronized(seq) {
+					seq++;
+				}
 			} catch(IOException ioe) {
 				end();
 				ioe.printStackTrace();
@@ -484,15 +487,16 @@ public class GarenaTCP extends Thread {
 	}
 
 	private long lastTime() {
-		//return current last_time and set last_time to current time
-		if(last_time == -1) {
-			last_time = System.nanoTime();
-			return last_time;
-		} else {
-			long old_time = last_time;
-			last_time = System.nanoTime();
-			return old_time;
-		}
+//		//return current last_time and set last_time to current time
+//		if(last_time == -1) {
+//			last_time = System.nanoTime();
+//			return last_time;
+//		} else {
+//			long old_time = last_time;
+//			last_time = System.nanoTime();
+//			return old_time;
+//		}
+		return -1; //todo: implement timestamp correctly in GarenaInterface
 	}
 
 	public void end() {
