@@ -23,9 +23,30 @@ public class WC3Interface {
 	byte[] buf;
 	GarenaInterface garena;
 
+	int[] rebroadcastPorts;
+
 	public WC3Interface(GarenaInterface garena) {
 		this.garena = garena;
 		buf = new byte[65536];
+
+		//config
+		try {
+			String[] array = GCBConfig.configuration.getStringArray("gcb_rebroadcast");
+			rebroadcastPorts = new int[array.length];
+
+			for(int i = 0; i < array.length; i++) {
+				rebroadcastPorts[i] = Integer.parseInt(array[i]);
+
+			}
+		} catch(ConversionException ce) {
+			Main.println("[WC3Interface] Conversion exception while processing gcb_rebroadcast; ignoring rebroadcast");
+			rebroadcastPorts = new int[] {};
+		} catch(NumberFormatException nfe) {
+			Main.println("[WC3Interface] Number format exception while processing gcb_rebroadcast; ignoring rebroadcast");
+			rebroadcastPorts = new int[] {};
+		}
+
+		System.out.println(rebroadcastPorts + "," + rebroadcastPorts.length);
 	}
 
 	public boolean init() {
@@ -63,19 +84,10 @@ public class WC3Interface {
 
 			garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
 			
-			try {
-				String[] array = GCBConfig.configuration.getStringArray("gcb_rebroadcast");
+			for(int port : rebroadcastPorts) {
+				DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
+				socket.send(retransmitPacket);
 
-				for(String element : array) {
-					int port = Integer.parseInt(element);
-					DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
-					socket.send(retransmitPacket);
-
-				}
-			} catch(ConversionException ce) {
-				Main.println("[WC3Interface] Conversion exception while processing gcb_rebroadcast; ignoring rebroadcast");
-			} catch(NumberFormatException nfe) {
-				Main.println("[WC3Interface] Number format exception while processing gcb_rebroadcast; terminating rebroadcast");
 			}
 
 		} catch(IOException ioe) {
