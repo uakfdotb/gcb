@@ -166,7 +166,8 @@ public class WC3Interface {
 			}
 
 			if(filterSuccess) {
-				garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
+				//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
+				garena.broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
 				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
