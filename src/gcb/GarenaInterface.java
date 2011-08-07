@@ -857,8 +857,9 @@ public class GarenaInterface {
 		}
 
 		//put internal port, in big endian
-		myinfo[42] = (byte) 5;
-		myinfo[43] = (byte) -23;
+		byte[] port = crypt.shortToByteArray((short) room_socket.getPort());
+		myinfo[42] = (byte) port[0];
+		myinfo[43] = (byte) port[1];
 
 		//add myinfo
 		byte[] deflated = crypt.deflate(myinfo);

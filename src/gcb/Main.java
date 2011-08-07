@@ -211,7 +211,7 @@ public class Main {
 			int reconnectCounter = 0;
 
 			//see how often to reconnect
-			int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", 24 * 60);
+			int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
 			//divide by six to get interval measured for 10 second delays
 			int reconnectInterval = -1;
 
@@ -237,6 +237,7 @@ public class Main {
 				if(reconnectInterval != -1 && reconnectCounter >= reconnectInterval) {
 					reconnectCounter = 0;
 					//reconnect to Garena room
+					Main.println("[Main] Reconnecting to Garena room");
 					garena.disconnectRoom();
 					garena.initRoom();
 				}

@@ -293,7 +293,7 @@ public class GarenaTCP extends Thread {
 
 			writeOutData(data, offset, length, false);
 			
-			//send any other packets
+			//send any other packets that we have stored
 			synchronized(out_packets) {
 				GarenaTCPPacket packet = out_packets.get(this.ack);
 				while(packet != null) {
@@ -400,6 +400,7 @@ public class GarenaTCP extends Thread {
 				byte[] remote_username_bytes = remote_username.getBytes();
 				int rewrittenLength = remainderLength + 19 + remote_username_bytes.length + 1;
 
+				//rewrite data to use their actual Garena username
 				ByteBuffer rewrittenData = ByteBuffer.allocate(rewrittenLength);
 				rewrittenData.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -415,6 +416,7 @@ public class GarenaTCP extends Thread {
 				rewrittenData.put((byte) 0);
 				rewrittenData.put(buf.array(), buf.position(), remainderLength);
 
+				//force so that it doesn't go straight back into the output buffer
 				writeOutData(rewrittenData.array(), true);
 			} else {
 				Main.println("[GarenaTCP] Invalid length in join request in connection " + conn_id);
@@ -473,6 +475,7 @@ public class GarenaTCP extends Thread {
 					packets.add(packet);
 				}
 
+				//don't use buf here so there isn't thread problems
 				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, data, len, lbuf);
 
 				synchronized(seq) {
@@ -502,6 +505,8 @@ public class GarenaTCP extends Thread {
 	public void end() {
 		Main.println("[GarenaTCP] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
+		//allocate a new buffer so we don't do anything thread-unsafe
+		ByteBuffer tbuf = ByteBuffer.allocate(65536);
 
 		if(socket != null) {
 			try {
@@ -512,10 +517,10 @@ public class GarenaTCP extends Thread {
 		}
 
 		//send four times because that's what Windows client does
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
-		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, buf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
+		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 
 		//remove connection from GarenaInterface map
 		garena.tcp_connections.remove(conn_id);
@@ -534,10 +539,10 @@ public class GarenaTCP extends Thread {
 }
 
 class GarenaTCPPacket {
-	int seq;
-	long send_time;
+	int seq; //this packet's sequence number
+	long send_time; //time that this packet was last sent (for standard retransmission)
 	byte[] data;
-	boolean fastRetransmitted;
+	boolean fastRetransmitted; //only fast retransmit packets once
 
 	public GarenaTCPPacket() {
 		fastRetransmitted = false;

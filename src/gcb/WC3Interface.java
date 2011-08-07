@@ -144,6 +144,7 @@ public class WC3Interface {
 							buf.get(); //skip game password
 							GarenaEncrypt.getTerminatedString(buf); //skip statstring
 							buf.position(buf.position() + 20); //skip to port
+							//read port in _little_ endian
 							int port = GarenaEncrypt.unsignedShort(buf.getShort());
 
 							if(!isValidPort(port)) {
