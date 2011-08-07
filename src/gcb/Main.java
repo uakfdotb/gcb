@@ -315,6 +315,12 @@ public class Main {
 			log_out.println("[" + dateString + "] " + str);
 		}
 	}
+
+	public static void debug(String str) {
+		if(Main.DEBUG) {
+			println(str);
+		}
+	}
 	
 	public static String date() {
 		Calendar cal = Calendar.getInstance();

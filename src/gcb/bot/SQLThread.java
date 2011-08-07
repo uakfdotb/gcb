@@ -96,9 +96,7 @@ public class SQLThread extends Thread {
 				}
 			}
 					
-			if(Main.DEBUG) {
-				Main.println("[SQLThread] Currently have " + connections.size() + " connections");
-			}
+			Main.debug("[SQLThread] Currently have " + connections.size() + " connections");
 
 			return connections.remove(0);
 		}
@@ -108,9 +106,7 @@ public class SQLThread extends Thread {
 		synchronized(connections) {
 			connections.add(connection);
 			
-			if(Main.DEBUG) {
-				Main.println("[SQLThread] Recovering connection; now at " + connections.size() + " connections");
-			}
+			Main.debug("[SQLThread] Recovering connection; now at " + connections.size() + " connections");
 		}
 	}
 
@@ -648,8 +644,8 @@ public class SQLThread extends Thread {
 				}
 			} catch(SQLException e) {
 				if(Main.DEBUG) {
-				e.printStackTrace();
-			}
+					e.printStackTrace();
+				}
 				Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
 			}
 

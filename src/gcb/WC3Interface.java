@@ -52,29 +52,34 @@ public class WC3Interface {
 			rebroadcastPorts = new int[] {};
 		}
 
+		Main.debug("[WC3Interface] Detected " + rebroadcastPorts.length + " rebroadcast ports");
 
-		try {
-			String[] array = GCBConfig.configuration.getStringArray("gcb_tcp_port");
-			tcpPorts = new int[array.length];
-
-			for(int i = 0; i < array.length; i++) {
-				tcpPorts[i] = Integer.parseInt(array[i]);
-
-			}
-		} catch(ConversionException ce) {
-			Main.println("[WC3Interface] Conversion exception while processing gcb_tcp_port; ignoring port filter");
-			tcpPorts = new int[] {};
-		} catch(NumberFormatException nfe) {
-			Main.println("[WC3Interface] Number format exception while processing gcb_tcp_port; ignoring port filter");
-			tcpPorts = new int[] {};
-		}
-
-		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
+		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
 			try {
-				tcpHost = InetAddress.getByName(GCBConfig.configuration.getString("gcb_tcp_host"));
-			} catch(IOException ioe) {
-				Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
-				tcpHost = null;
+				String[] array = GCBConfig.configuration.getStringArray("gcb_tcp_port");
+				tcpPorts = new int[array.length];
+
+				for(int i = 0; i < array.length; i++) {
+					tcpPorts[i] = Integer.parseInt(array[i]);
+
+				}
+			} catch(ConversionException ce) {
+				Main.println("[WC3Interface] Conversion exception while processing gcb_tcp_port; ignoring port filter");
+				tcpPorts = new int[] {};
+			} catch(NumberFormatException nfe) {
+				Main.println("[WC3Interface] Number format exception while processing gcb_tcp_port; ignoring port filter");
+				tcpPorts = new int[] {};
+			}
+
+			Main.debug("[WC3Interface] Detected " + tcpPorts.length + "");
+
+			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
+				try {
+					tcpHost = InetAddress.getByName(GCBConfig.configuration.getString("gcb_tcp_host"));
+				} catch(IOException ioe) {
+					Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
+					tcpHost = null;
+				}
 			}
 		}
 	}
@@ -119,9 +124,7 @@ public class WC3Interface {
 				data[22] = 119;
 			}
 
-			if(Main.DEBUG) {
-				Main.println("[WC3Interface] Received UDP packet from " + packet.getAddress());
-			}
+			Main.debug("[WC3Interface] Received UDP packet from " + packet.getAddress());
 
 			boolean filterSuccess = true;
 
@@ -144,30 +147,19 @@ public class WC3Interface {
 							int port = GarenaEncrypt.unsignedShort(buf.getShort());
 
 							if(!isValidPort(port)) {
-								if(Main.DEBUG) {
-									Main.println("[WC3Interface] Filter fail: invalid port " + port);
-								}
+								Main.debug("[WC3Interface] Filter fail: invalid port " + port);
 								filterSuccess = false;
 							}
 						} else {
-							if(Main.DEBUG) {
-								Main.println("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
-							}
-
+							Main.debug("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
 							filterSuccess = false;
 						}
 					} else {
-						if(Main.DEBUG) {
-							Main.println("[WC3Interface] Filter fail: invalid header constant");
-						}
-
+						Main.debug("[WC3Interface] Filter fail: invalid header constant");
 						filterSuccess = false;
 					}
 				} else {
-					if(Main.DEBUG) {
-						Main.println("[WC3Interface] Filter fail: wrong IP address: " + packet.getAddress());
-					}
-
+					Main.debug("[WC3Interface] Filter fail: wrong IP address: " + packet.getAddress());
 					filterSuccess = false;
 				}
 			}
@@ -176,14 +168,14 @@ public class WC3Interface {
 				garena.broadcastUDPEncap(broadcast_port, broadcast_port, data, offset, length);
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
-				Main.println("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
+				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
 			}
 
 			//always rebroadcast packets: other gcb instances may be using different TCP ports
 			for(int port : rebroadcastPorts) {
+				Main.debug("[WC3Interface] Retransmitting packet to port " + port);
 				DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
 				socket.send(retransmitPacket);
-
 			}
 
 		} catch(IOException ioe) {
