@@ -828,6 +828,7 @@ public class GarenaInterface {
 		Main.println("[GInterface] Sending GCRP me join...");
 		String username = GCBConfig.configuration.getString("gcb_username");
 		String password = GCBConfig.configuration.getString("gcb_password");
+		String roomPassword = GCBConfig.configuration.getString("gcb_roompassword", "");
 		
 		ByteBuffer buf = ByteBuffer.allocate(4096);
 		buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -878,12 +879,35 @@ public class GarenaInterface {
 
 		buf.put(deflated);
 
-		//suffix
-		buf.putInt(0);
-		buf.putInt(0);
-		buf.putInt(0);
-		buf.putShort((short) 0);
-		buf.put((byte) 0);
+		//begin suffix
+		
+		//first 15 bytes are for room password
+		byte[] roomPasswordBytes = null;
+		try {
+			roomPasswordBytes = roomPassword.getBytes("UTF-8");
+
+			if(roomPasswordBytes.length > 15) {
+				System.out.println("[GInterface] Warning: cutting room password to 15 bytes");
+			}
+
+			int len = Math.min(roomPasswordBytes.length, 15);
+
+			buf.put(roomPasswordBytes, 0, len);
+
+			if(len < 15) {
+				//fill in zero bytes; room password section must be exactly 15 bytes
+				byte[] remainder = new byte[15 - len];
+				buf.put(remainder); //values in byte arrays default to zero
+			}
+		} catch(UnsupportedEncodingException e) {
+			Main.println("[GInterface] Error: " + e.getLocalizedMessage() + "; ignoring room password");
+
+			buf.putInt(0);
+			buf.putInt(0);
+			buf.putInt(0);
+			buf.putShort((short) 0);
+			buf.put((byte) 0);
+		}
 
 		//now we need to hash password and send
 		String password_hash = crypt.md5(password);
