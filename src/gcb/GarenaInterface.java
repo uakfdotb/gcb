@@ -975,6 +975,8 @@ public class GarenaInterface {
 					}
 
 					Main.println("[GInterface] Error received: id: " + error_id + "; means: " + error_string);
+					disconnected(GARENA_ROOM);
+					return;
 				} else {
 					if(type == -1) {
 						disconnected(GARENA_ROOM);

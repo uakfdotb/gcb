@@ -567,7 +567,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					GCBConfig.configuration.setProperty("gcb_roomhost", parts[1]);
 				}
 				garena.disconnectRoom();
-				main.initRoom();
+				main.initRoom(true);
 				return null;
 			}
 		}

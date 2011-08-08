@@ -19,10 +19,13 @@ public class GarenaThread extends Thread {
 	WC3Interface wc3Interface;
 	int type;
 
+	boolean terminated;
+
 	public GarenaThread(GarenaInterface garenaInterface, WC3Interface wc3Interface, int type) {
 		this.garenaInterface = garenaInterface;
 		this.wc3Interface = wc3Interface;
 		this.type = type;
+		terminated = false;
 	}
 
 	public void run() {
@@ -36,5 +39,7 @@ public class GarenaThread extends Thread {
 		}
 
 		else return;
+
+		terminated = true;
 	}
 }

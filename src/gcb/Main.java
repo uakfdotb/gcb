@@ -93,16 +93,18 @@ public class Main {
 		}
 	}
 
-	public boolean initGarena() {
+	public boolean initGarena(boolean restart) {
 		//connect to garena
-		garena = new GarenaInterface(plugins);
-		garena.registerListener(new GarenaReconnect(this));
+		if(!restart) {
+			garena = new GarenaInterface(plugins);
+			garena.registerListener(new GarenaReconnect(this));
+		}
 
 		if(!garena.init()) {
 			return false;
 		}
 
-		if(loadWC3) {
+		if(loadWC3 && !restart) {
 			//setup wc3 broadcast reader
 			wc3i = new WC3Interface(garena);
 			if(!wc3i.init()) {
@@ -112,7 +114,7 @@ public class Main {
 
 		initPeer();
 
-		if(loadWC3) {
+		if(loadWC3 && (!restart || wc3_thread.terminated)) {
 			//start receiving and broadcasting wc3 packets
 			wc3_thread = new GarenaThread(garena, wc3i, GarenaThread.WC3_BROADCAST);
 			wc3_thread.start();
@@ -125,16 +127,18 @@ public class Main {
 		if(!garena.readGSPSessionHelloReply()) return false;
 		if(!garena.sendGSPSessionLogin()) return false;
 		if(!garena.readGSPSessionLoginReply()) return false;
-		
-		gsp_thread = new GarenaThread(garena, wc3i, GarenaThread.GSP_LOOP);
-		gsp_thread.start();
 
-		if(loadChat) {
+		if(!restart || gsp_thread.terminated) {
+			gsp_thread = new GarenaThread(garena, wc3i, GarenaThread.GSP_LOOP);
+			gsp_thread.start();
+		}
+
+		if(loadChat && !restart) {
 			chatthread = new ChatThread(garena);
 			chatthread.start();
 		}
 
-		//make sure we get correct external ip/port
+		//make sure we get correct external ip/port; do on restart in case they changed
 		lookup();
 
 		return true;
@@ -164,13 +168,16 @@ public class Main {
 		}
 	}
 
-	public boolean initRoom() {
+	//returns whether init succeeded; restart=true indicates this isn't the first time we're calling
+	public boolean initRoom(boolean restart) {
 		//connect to room
 		if(!garena.initRoom()) return false;
 		if(!garena.sendGCRPMeJoin()) return false;
 
-		gcrp_thread = new GarenaThread(garena, wc3i, GarenaThread.GCRP_LOOP);
-		gcrp_thread.start();
+		if(!restart || gcrp_thread.terminated) {
+			gcrp_thread = new GarenaThread(garena, wc3i, GarenaThread.GCRP_LOOP);
+			gcrp_thread.start();
+		}
 		
 		// we ought to say we're starting the game; we'll do later too
 		if(loadPL) {
@@ -184,6 +191,7 @@ public class Main {
 		if(loadBot) {
 			bot = new GChatBot(this);
 			bot.init();
+			
 			bot.garena = garena;
 			bot.plugins = plugins;
 			bot.sqlthread = sqlthread;
@@ -216,7 +224,7 @@ public class Main {
 			int reconnectInterval = -1;
 
 			if(reconnectMinuteInterval > 0) {
-				reconnectInterval = reconnectMinuteInterval / 6;
+				reconnectInterval = reconnectMinuteInterval * 6;
 			}
 
 			while(true) {
@@ -229,6 +237,8 @@ public class Main {
 				garena.sendPeerHello();
 
 				playCounter++;
+				reconnectCounter++;
+
 				if(playCounter > 3) {
 					playCounter = 0;
 					garena.startPlaying(); //make sure we're actually playing
@@ -239,7 +249,12 @@ public class Main {
 					//reconnect to Garena room
 					Main.println("[Main] Reconnecting to Garena room");
 					garena.disconnectRoom();
-					garena.initRoom();
+
+					try {
+						Thread.sleep(1000);
+					} catch(InterruptedException e) {}
+
+					initRoom(true);
 				}
 
 				try {
@@ -299,8 +314,8 @@ public class Main {
 		DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
 
 		main.initPlugins();
-		if(!main.initGarena()) return;
-		if(!main.initRoom()) return;
+		if(!main.initGarena(false)) return;
+		if(!main.initRoom(false)) return;
 		main.initBot();
 		main.loadPlugins();
 		main.helloLoop();

@@ -49,7 +49,7 @@ class GarenaReconnectThread extends Thread {
 
 	public void run() {
 		try {
-			Thread.sleep(90000);
+			Thread.sleep(10000);
 		} catch(InterruptedException e) {
 
 		}
@@ -57,11 +57,11 @@ class GarenaReconnectThread extends Thread {
 
 		//TODO:make this work...
 		if(garena.socket.isClosed()) {
-			main.initGarena();
+			main.initGarena(true);
 		}
 
 		if(garena.room_socket.isClosed()) {
-			main.initRoom();
+			main.initRoom(true);
 		}
 
 		if(garena.peer_socket.isClosed()) {
