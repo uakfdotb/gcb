@@ -824,6 +824,44 @@ public class GarenaInterface {
 		}
 	}
 
+	//only to be sent when connected to a room server
+	//should be sent every 15 minutes if connected to a room
+	public boolean sendGSPXP(int userId, int xpGain, int gameType) {
+		ByteBuffer block = ByteBuffer.allocate(13);
+		block.order(ByteOrder.LITTLE_ENDIAN);
+
+		block.put((byte) 0x67); //GSP XP
+		block.putInt(userId); //user ID
+		block.putInt(xpGain); //xpGain = 50 basic, 100 gold, 200 premium, 300 platinum
+		block.putInt(gameType); //game type
+		byte[] array = block.array();
+
+		ByteBuffer lbuf = null;
+		try {
+			byte[] encrypted = crypt.aesEncrypt(array);
+
+			lbuf = ByteBuffer.allocate(4 + encrypted.length);
+			lbuf.order(ByteOrder.LITTLE_ENDIAN);
+			lbuf.putShort((short) encrypted.length);
+			lbuf.put((byte) 0);
+			lbuf.put((byte) 1);
+
+			lbuf.put(encrypted);
+		} catch(Exception e) {
+			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			return false;
+		}
+
+		try {
+			out.write(lbuf.array());
+			return true;
+		} catch(IOException ioe) {
+			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			disconnected(GARENA_MAIN);
+			return false;
+		}
+	}
+
 	public boolean sendGCRPMeJoin() {
 		Main.println("[GInterface] Sending GCRP me join...");
 		String username = GCBConfig.configuration.getString("gcb_username");

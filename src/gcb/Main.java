@@ -217,6 +217,7 @@ public class Main {
 		if(loadPL) {
 			int playCounter = 0;
 			int reconnectCounter = 0;
+			int xpCounter = 0;
 
 			//see how often to reconnect
 			int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
@@ -226,6 +227,9 @@ public class Main {
 			if(reconnectMinuteInterval > 0) {
 				reconnectInterval = reconnectMinuteInterval * 6;
 			}
+
+			//see how often to send XP packet; every 15 minutes
+			int xpInterval = 90; //15 * 60 / 10
 
 			while(true) {
 				try {
@@ -238,12 +242,15 @@ public class Main {
 
 				playCounter++;
 				reconnectCounter++;
+				xpCounter++;
 
+				//handle player interval
 				if(playCounter > 3) {
 					playCounter = 0;
 					garena.startPlaying(); //make sure we're actually playing
 				}
 
+				//handle reconnection interval
 				if(reconnectInterval != -1 && reconnectCounter >= reconnectInterval) {
 					reconnectCounter = 0;
 					//reconnect to Garena room
@@ -255,6 +262,18 @@ public class Main {
 					} catch(InterruptedException e) {}
 
 					initRoom(true);
+				}
+
+				//handle xp interval
+				if(xpCounter >= xpInterval) {
+					xpCounter = 0;
+
+					//send GSP XP packet only if connected to room
+					if(garena.room_socket.isConnected()) {
+						//xp rate = 50 (assume basic user)
+						//gametype = 1001 for warcraft/dota
+						garena.sendGSPXP(garena.user_id, 50, 1001);
+					}
 				}
 
 				try {
