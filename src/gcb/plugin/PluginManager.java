@@ -129,7 +129,12 @@ public class PluginManager {
 
 		//call init on all plugins
 		for(Plugin plugin : pluginList) {
-			plugin.init(this);
+			//keep exceptions contained
+			try {
+				plugin.init(this);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -195,7 +200,12 @@ public class PluginManager {
 
 		Plugin plugin = plugins.get(name);
 		if(plugin != null) {
-			plugin.load();
+			//don't make exceptions go up and cause a big problem
+			try {
+				plugin.load();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			Main.println("[PluginManager] Load failed: plugin not found!");
 		}
@@ -204,7 +214,12 @@ public class PluginManager {
 	public void unloadPlugin(String name) {
 		Plugin plugin = plugins.get(name);
 		if(plugin != null) {
-			plugin.unload();
+			//don't make exception go up and cause a big problem
+			try {
+				plugin.unload();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

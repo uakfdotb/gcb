@@ -39,6 +39,7 @@ public class Main {
 	GarenaThread wc3_thread;
 	SQLThread sqlthread;
 	ChatThread chatthread;
+	GarenaReconnect reconnect;
 
 	//determine what will be loaded, what won't be loaded
 	boolean loadBot;
@@ -97,7 +98,8 @@ public class Main {
 		//connect to garena
 		if(!restart) {
 			garena = new GarenaInterface(plugins);
-			garena.registerListener(new GarenaReconnect(this));
+			reconnect = new GarenaReconnect(this);
+			garena.registerListener(reconnect);
 		}
 
 		if(!garena.init()) {
@@ -278,6 +280,16 @@ public class Main {
 
 				try {
 					Thread.sleep(10000);
+				} catch(InterruptedException e) {}
+			}
+		} else {
+			//send start playing so that we don't disconnect from the room
+
+			while(true) {
+				garena.startPlaying();
+
+				try {
+					Thread.sleep(30000);
 				} catch(InterruptedException e) {}
 			}
 		}
