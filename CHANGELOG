@@ -1,3 +1,21 @@
+0f
+- Plugin system improved, trivia plugin available for download
+- Multiple SQL connections are supported (thread-safe)
+- Kick with reason supported
+- Logging can be arranged so that a new file is created for each day
+- Bind address can be configured
+- Room updates sent to main Garena server so that the bot can be traced to a room from friends list
+- Virtual TCP can be buffered so that gcb captures packets such as the join request for several purposes
+- UDP packets can be filtered so that only games from one GHost++ instance are sent
+- Rebroadcast is supported, where received UDP packets are broadcasted to different ports so multiple gcb instances can be run on one server
+- XP packets are sent by gcb so that the bot will gain XP while in the Garena room
+- Password-protected rooms are supported
+- GCBI protocol established, where information can be sent to GHost++ (such as Garena user ID and user's actual IP address)
+- fix: various issues with virtual TCP connection
+- fix: reconnection should be working well now; bots should not disconnect
+- fix: plugin failure will not cause problems elsewhere in gcb
+- fix: correct internal port sent to main server and room server
+
 0e
 - Support for REVERSE (connect as a client to Garena hosts on Garena-unsupported systems) added
 - Autoban based on presence of specific words in user chat
