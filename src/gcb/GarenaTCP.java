@@ -205,6 +205,7 @@ public class GarenaTCP extends Thread {
 				GarenaTCPPacket curr = packets.get(i);
 				if(curr.seq < ack || curr.seq == seq) {
 					packets.remove(i);
+					packets.notifyAll();
 					i--;
 				}
 			}
@@ -261,6 +262,7 @@ public class GarenaTCP extends Thread {
 				GarenaTCPPacket curr = packets.get(i);
 				if(curr.seq < ack) {
 					packets.remove(i);
+					packets.notifyAll();
 					i--;
 				}
 			}
@@ -472,6 +474,12 @@ public class GarenaTCP extends Thread {
 				packet.data = data;
 
 				synchronized(packets) {
+					while(packets.size() > 20) { //let's wait a while before sending more
+						try {
+							packets.wait();
+						} catch(InterruptedException e) {}
+					}
+
 					packets.add(packet);
 				}
 
