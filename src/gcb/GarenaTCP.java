@@ -23,7 +23,8 @@ import org.apache.commons.configuration.ConversionException;
 public class GarenaTCP extends Thread {
 	boolean terminated; //termination flag
 	int conn_id; //this virtual TCP connection identifier
-	long last_time; //last time in nanoseconds that a packet was sent
+	long last_time; //last time in milliseconds that a packet was sent
+	long last_received; //last time in milliseconds that a packet was received from GHost++
 	Integer seq; //our current sequence number
 	Integer ack; //our current acknowledgement number
 
@@ -56,7 +57,8 @@ public class GarenaTCP extends Thread {
 		out_packets = new HashMap<Integer, GarenaTCPPacket>();
 
 		terminated = false;
-		last_time = -1;
+		last_time = System.currentTimeMillis();
+		last_received = System.currentTimeMillis();
 		seq = 0;
 		ack = 0;
 
@@ -457,6 +459,7 @@ public class GarenaTCP extends Thread {
 			try {
 				//read as many bytes as we can and relay them onwards to remote
 				int len = in.read(rbuf); //definitely _don't_ want to readfully here!
+				last_received = System.currentTimeMillis();
 
 				if(len == -1) {
 					Main.println("[GarenaTCP] Local host for connection " + conn_id + " disconnected");
@@ -497,7 +500,7 @@ public class GarenaTCP extends Thread {
 		}
 	}
 
-	private long lastTime() {
+	private synchronized long lastTime() {
 //		//return current last_time and set last_time to current time
 //		if(last_time == -1) {
 //			last_time = System.nanoTime();
@@ -507,6 +510,8 @@ public class GarenaTCP extends Thread {
 //			last_time = System.nanoTime();
 //			return old_time;
 //		}
+		//this method is synchronized and only one that edits last_time
+		last_time = System.currentTimeMillis();
 		return -1; //todo: implement timestamp correctly in GarenaInterface
 	}
 
@@ -531,7 +536,7 @@ public class GarenaTCP extends Thread {
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 
 		//remove connection from GarenaInterface map
-		garena.tcp_connections.remove(conn_id);
+		garena.removeTCPConnection(conn_id);
 	}
 
 	//check if name is in the list of reserved names
@@ -543,6 +548,15 @@ public class GarenaTCP extends Thread {
 		}
 
 		return false;
+	}
+
+	public boolean isTimeout() {
+		long minTime = Math.min(System.currentTimeMillis() - last_time, System.currentTimeMillis() - last_received);
+		if(minTime > 300000) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 

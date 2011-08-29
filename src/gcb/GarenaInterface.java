@@ -22,11 +22,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Hashtable;
 import java.util.Vector;
 import java.util.zip.CRC32;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
@@ -65,7 +66,7 @@ public class GarenaInterface {
 	Vector<MemberInfo> members;
 	Vector<RoomInfo> rooms;
 	Vector<GarenaListener> listeners;
-	Hashtable<Integer, GarenaTCP> tcp_connections;
+	HashMap<Integer, GarenaTCP> tcp_connections;
 	
 	//our user ID
 	int user_id;
@@ -98,7 +99,7 @@ public class GarenaInterface {
 		members = new Vector<MemberInfo>();
 		rooms = new Vector<RoomInfo>();
 		listeners = new Vector<GarenaListener>();
-		tcp_connections = new Hashtable<Integer, GarenaTCP>();
+		tcp_connections = new HashMap<Integer, GarenaTCP>();
 
 		//configuration
 		room_id = GCBConfig.configuration.getInt("gcb_roomid", 590633);
@@ -1232,7 +1233,7 @@ public class GarenaInterface {
 
 		for(int i = 0; i < members.size(); i++) {
 			if(members.get(i).userID == user_id) {
-				member = members.get(i);
+				member = members.remove(i);
 			}
 		}
 
@@ -1640,12 +1641,14 @@ public class GarenaInterface {
 					
 					GarenaTCP tcp_connection = new GarenaTCP(this);
 					tcp_connection.init(packet.getAddress(), packet.getPort(), remote_id, conn_id, destination, member);
-					
-					if(tcp_connections.contains(conn_id)) {
-						Main.println("[GInterface] Warning: duplicate TCP connection ID; overwriting previous");
-					}
 
-					tcp_connections.put(conn_id, tcp_connection);
+					synchronized(tcp_connections) {
+						if(tcp_connections.containsKey(conn_id)) {
+							Main.println("[GInterface] Warning: duplicate TCP connection ID; overwriting previous");
+						}
+
+						tcp_connections.put(conn_id, tcp_connection);
+					}
 				} else if(buf_array[0] == 0x0D) {
 					int conn_id = crypt.byteArrayToIntLittle(buf_array, 4);
 
@@ -1653,33 +1656,35 @@ public class GarenaInterface {
 						continue; //happens sometimes
 					}
 
-					GarenaTCP tcp_connection = tcp_connections.get(conn_id);
-					
-					int remote_id = crypt.byteArrayToIntLittle(buf_array, 8);
-					
-					if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
-						Main.println("[GInterface] Warning: CONN packet received from user " +
-								remote_id + " at " + packet.getAddress() +
-								", but connection " + conn_id + " not started with user");
-						continue;
-					}
+					synchronized(tcp_connections) {
+						GarenaTCP tcp_connection = tcp_connections.get(conn_id);
 
-					int seq = crypt.byteArrayToIntLittle(buf_array, 12);
-					int ack = crypt.byteArrayToIntLittle(buf_array, 16);
-					
-					//CONN ACK, CONN DATA, or CONN FIN?
-					
-					if(buf_array[1] == 0x14) { //CONN DATA
-						tcp_connection.data(seq, ack, buf_array, 20, length - 20);
-					} else if(buf_array[1] == 0x0E) { //CONN ACK
-						tcp_connection.connAck(seq, ack);
-					} else if(buf_array[1] == 0x01) {
-						Main.println("[GInterface] User requested termination on connection " + conn_id);
-						// tcp_connections will be updated by GarenaTCP
-						// tcp_connections.remove(conn_id);
-						tcp_connection.end();
-					} else {
-						Main.println("[GInterface] PeerLoop: unknown CONN type received: " + buf_array[1]);
+						int remote_id = crypt.byteArrayToIntLittle(buf_array, 8);
+
+						if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
+							Main.println("[GInterface] Warning: CONN packet received from user " +
+									remote_id + " at " + packet.getAddress() +
+									", but connection " + conn_id + " not started with user");
+							continue;
+						}
+
+						int seq = crypt.byteArrayToIntLittle(buf_array, 12);
+						int ack = crypt.byteArrayToIntLittle(buf_array, 16);
+
+						//CONN ACK, CONN DATA, or CONN FIN?
+
+						if(buf_array[1] == 0x14) { //CONN DATA
+							tcp_connection.data(seq, ack, buf_array, 20, length - 20);
+						} else if(buf_array[1] == 0x0E) { //CONN ACK
+							tcp_connection.connAck(seq, ack);
+						} else if(buf_array[1] == 0x01) {
+							Main.println("[GInterface] User requested termination on connection " + conn_id);
+							// tcp_connections will be updated by GarenaTCP
+							// tcp_connections.remove(conn_id);
+							tcp_connection.end();
+						} else {
+							Main.println("[GInterface] PeerLoop: unknown CONN type received: " + buf_array[1]);
+						}
 					}
 				} else if(buf_array[0] == 0x01) {
 					int senderId = lbuf.getInt(4);
@@ -1907,11 +1912,13 @@ public class GarenaInterface {
 			Main.println("[GInterface] Starting reverse TCP connection with " +  remote_id);
 		}
 
-		if(tcp_connections.contains(conn_id)) {
-			Main.println("[GInterface] Warning: duplicate TCP connection ID; overwriting previous");
-		}
+		synchronized(tcp_connections) {
+			if(tcp_connections.containsKey(conn_id)) {
+				Main.println("[GInterface] Warning: duplicate TCP connection ID; overwriting previous");
+			}
 
-		tcp_connections.put(conn_id, tcp_connection);
+			tcp_connections.put(conn_id, tcp_connection);
+		}
 
 		return tcp_connection;
 	}
@@ -2020,5 +2027,32 @@ public class GarenaInterface {
 		}
 
 		plugins.onDisconnect(x);
+	}
+
+	public void cleanTCPConnections() {
+		Object[] keySet = null;
+
+		synchronized(tcp_connections) {
+			keySet = tcp_connections.keySet().toArray();
+		}
+
+		for(Object key : keySet) {
+			int x = (Integer) key;
+			GarenaTCP connection = tcp_connections.get(x);
+
+			if(connection.isTimeout()) {
+				if(Main.DEBUG) {
+					Main.println("[GarenaInterface] Disconnecting connection " + x + " due to timeout.");
+				}
+
+				connection.end(); //this removes the connection as well
+			}
+		}
+	}
+
+	public void removeTCPConnection(int conn_id) {
+		synchronized(tcp_connections) {
+			tcp_connections.remove(conn_id);
+		}
 	}
 }
