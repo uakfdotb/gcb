@@ -412,7 +412,18 @@ public class GarenaTCP extends Thread {
 				rewrittenData.put((byte) Constants.W3GS_REQJOIN);
 				rewrittenData.putShort((short) rewrittenLength);
 				rewrittenData.putInt(hostCounter);
-				rewrittenData.putInt(entryKey);
+
+				//if we're using gcb_broadcastfilter_key, then we've been broadcasting a fake entry key to Garena
+				//replace with the actual entry key here
+				if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
+					WC3GameIdentifier identifier = garena.getWC3Interface().getGameIdentifier(entryKey);
+					rewrittenData.putInt(identifier.ghostEntryKey);
+
+					Main.debug("[GarenaTCP] Rewrote entry key (" + entryKey + " -> " + identifier.ghostEntryKey + ")");
+				} else {
+					rewrittenData.putInt(entryKey);
+				}
+
 				rewrittenData.put(unknown);
 				rewrittenData.putShort(listenPort);
 				rewrittenData.putInt(peerKey);

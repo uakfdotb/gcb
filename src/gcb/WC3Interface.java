@@ -11,6 +11,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -26,14 +30,31 @@ public class WC3Interface {
 	GarenaInterface garena;
 
 	int[] rebroadcastPorts;
+
 	//gcb_tcp_port list; only set if broadcastfilter is true
 	int[] tcpPorts;
+
 	//gcb_tcp_host; only set if broadcastfilter is true
 	InetAddress tcpHost;
+
+	//games that we have detected for gcb_broadcastfilter_key
+	//use this to generate unique entry keys for Garena so that people can't spoof regular LAN joining
+	//that is, LAN entry key is hidden from Garena users
+	HashMap<WC3GameIdentifier, Integer> entryKeys;
+	HashMap<Integer, WC3GameIdentifier> games;
+
+	//this random is used to generate entry keys for Garena
+	Random random;
 
 	public WC3Interface(GarenaInterface garena) {
 		this.garena = garena;
 		buf = new byte[65536];
+
+		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
+			random = new SecureRandom();
+			entryKeys = new HashMap<WC3GameIdentifier, Integer>();
+			games = new HashMap<Integer, WC3GameIdentifier>();
+		}
 
 		//config
 		try {
@@ -140,7 +161,7 @@ public class WC3Interface {
 					if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_HEADER_CONSTANT) {
 						if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_GAMEINFO) {
 							buf.position(buf.position() + 18); //skip to gamename
-							GarenaEncrypt.getTerminatedString(buf); //skip gamename
+							String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
 							buf.get(); //skip game password
 							GarenaEncrypt.getTerminatedString(buf); //skip statstring
 							buf.position(buf.position() + 20); //skip to port
@@ -150,6 +171,49 @@ public class WC3Interface {
 							if(!isValidPort(port)) {
 								Main.debug("[WC3Interface] Filter fail: invalid port " + port);
 								filterSuccess = false;
+							} else {
+								//if we let Garena users know the LAN entry key, they can spoof joining through LAN directly (without gcb)
+								//if they do this, then they can spoof owner names and other bad stuff, avoiding gcb filter
+								//so, we broadcast a different entry key to Garena so that they can only connect through gcb
+								
+								if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
+									if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
+										Main.println("[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
+									}
+
+									//return to entry key
+									buf.position(16);
+									int ghostEntryKey = buf.getInt();
+
+									//check if we have received this game already
+									Integer garenaEntryKey = getGameExists(gamename, port, ghostEntryKey);
+
+									if(garenaEntryKey == null) {
+										//generate a new entry key and put into hashmap
+										garenaEntryKey = random.nextInt();
+										WC3GameIdentifier game = new WC3GameIdentifier(gamename, port, ghostEntryKey, garenaEntryKey);
+
+										Main.println("[WC3Interface] Detected new game with name " + gamename +
+												"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
+
+										synchronized(games) {
+											games.put(garenaEntryKey, game);
+										}
+
+										synchronized(entryKeys) {
+											entryKeys.put(game, garenaEntryKey);
+										}
+									} else {
+										//update the existing WC3GameIdentifier so it doesn't get deleted
+										games.get(garenaEntryKey).update();
+									}
+
+									//replace packet's entry key from GHost with our generated one
+									//replacing in bytebuffer will cause modifications to data (wrapped)
+									buf.putInt(16, garenaEntryKey);
+
+									removeOldGames();
+								}
 							}
 						} else {
 							Main.debug("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
@@ -186,6 +250,81 @@ public class WC3Interface {
 			}
 
 			Main.println("[WC3Interface] Error: " + ioe.getLocalizedMessage());
+		}
+	}
+
+	public WC3GameIdentifier getGameIdentifier(int key) {
+		synchronized(games) {
+			if(games.containsKey(key)) {
+				return games.get(key);
+			} else {
+				return null;
+			}
+		}
+	}
+	
+	private Integer getGameExists(String gamename, int gameport, int ghostEntryKey) {
+		synchronized(entryKeys) {
+			Iterator<WC3GameIdentifier> i = entryKeys.keySet().iterator();
+			
+			while(i.hasNext()) {
+				WC3GameIdentifier game = i.next();
+				
+				if(game.check(gamename, gameport, ghostEntryKey)) {
+					return entryKeys.get(game);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void removeOldGames() {
+		synchronized(entryKeys) {
+			Iterator<WC3GameIdentifier> i = entryKeys.keySet().iterator();
+
+			while(i.hasNext()) {
+				WC3GameIdentifier game = i.next();
+
+				if(System.currentTimeMillis() - game.timeReceived > 1000 * 30) {
+					entryKeys.remove(game);
+					games.remove(game.garenaEntryKey);
+
+					Main.println("[WC3Interface] Removed old game with name: " + game.gamename);
+				}
+			}
+		}
+	}
+}
+
+class WC3GameIdentifier {
+	long timeReceived; //last time when this game was detected
+	String gamename;
+	int ghostEntryKey; //LAN entry key to join GHost++
+	int gameport;
+	Integer garenaEntryKey; //null if gcb_broadcastfilter_key is off
+
+	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey) {
+		this(gamename, gameport, ghostEntryKey, null);
+	}
+
+	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, Integer garenaEntryKey) {
+		this.timeReceived = System.currentTimeMillis();
+		this.gamename = gamename;
+		this.gameport = gameport;
+		this.ghostEntryKey = ghostEntryKey;
+		this.garenaEntryKey = garenaEntryKey;
+	}
+
+	public void update() {
+		timeReceived = System.currentTimeMillis();
+	}
+
+	public boolean check(String name, int port, int key) {
+		if(gamename.equals(name) && gameport == port && key == ghostEntryKey) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

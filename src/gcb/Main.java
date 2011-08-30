@@ -109,6 +109,8 @@ public class Main {
 		if(loadWC3 && !restart) {
 			//setup wc3 broadcast reader
 			wc3i = new WC3Interface(garena);
+			garena.setWC3Interface(wc3i);
+
 			if(!wc3i.init()) {
 				return false;
 			}

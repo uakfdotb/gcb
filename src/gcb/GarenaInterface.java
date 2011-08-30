@@ -92,6 +92,9 @@ public class GarenaInterface {
 	GCBReverseHost reverseHost;
 	boolean reverseEnabled;
 
+	//used for gcb_broadcastfilter_key
+	private WC3Interface wc3i;
+
 	public GarenaInterface(PluginManager plugins) {
 		this.plugins = plugins;
 		
@@ -105,6 +108,14 @@ public class GarenaInterface {
 		room_id = GCBConfig.configuration.getInt("gcb_roomid", 590633);
 		peer_port = GCBConfig.configuration.getInt("gcb_peerport", 1513);
 		reverseEnabled = GCBConfig.configuration.getBoolean("gcb_reverse", false);
+	}
+
+	public void setWC3Interface(WC3Interface wc3i) {
+		this.wc3i = wc3i;
+	}
+
+	public WC3Interface getWC3Interface() {
+		return wc3i;
 	}
 
 	public boolean init() {
