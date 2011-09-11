@@ -50,7 +50,7 @@ public class WC3Interface {
 		this.garena = garena;
 		buf = new byte[65536];
 
-		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
+		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
 			random = new SecureRandom();
 			entryKeys = new HashMap<WC3GameIdentifier, Integer>();
 			games = new HashMap<Integer, WC3GameIdentifier>();
@@ -176,7 +176,7 @@ public class WC3Interface {
 								//if they do this, then they can spoof owner names and other bad stuff, avoiding gcb filter
 								//so, we broadcast a different entry key to Garena so that they can only connect through gcb
 								
-								if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
+								if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
 									if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
 										Main.println("[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
 									}
