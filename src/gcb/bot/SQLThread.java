@@ -8,6 +8,7 @@ package gcb.bot;
 import gcb.GCBConfig;
 import gcb.GChatBot;
 import gcb.Main;
+import gcb.UserInfo;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,8 +36,11 @@ public class SQLThread extends Thread {
 	String realm;
 	int botId;
 	int dbtype;
+	int bannedWordDetectType;
+	int dbRefreshRate; //how often to synchronize database with bot
 	GChatBot bot;
 	boolean initial;
+	boolean channelAdmin;
 
 	public SQLThread(GChatBot bot) {
 		this.bot = bot;
@@ -48,6 +52,9 @@ public class SQLThread extends Thread {
 		password = GCBConfig.configuration.getString("gcb_bot_db_password");
 		realm = GCBConfig.configuration.getString("gcb_bot_realm", "gcb");
 		botId = GCBConfig.configuration.getInt("gcb_bot_id", 0);
+		bannedWordDetectType = GCBConfig.configuration.getInt("gcb_bot_detect", 3);
+		dbRefreshRate = GCBConfig.configuration.getInt("gcb_bot_refresh_rate", 60);
+		channelAdmin = GCBConfig.configuration.getBoolean("gcb_bot_channel_admin", false);
 
 		String dbtype_str = GCBConfig.configuration.getString("gcb_bot_db_type", "gcb");
 
@@ -110,7 +117,7 @@ public class SQLThread extends Thread {
 		}
 	}
 
-	public boolean addAdmin(String username, int access) {
+	public boolean addBotAdmin(String username, int access) {
 		try {
 			PreparedStatement statement = null;
 			Connection connection = connection();
@@ -140,7 +147,7 @@ public class SQLThread extends Thread {
 		return false;
 	}
 
-	public boolean delAdmin(String username) {
+	public boolean delBotAdmin(String username) {
 		try {
 			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM admins WHERE name=?");
@@ -158,7 +165,7 @@ public class SQLThread extends Thread {
 		return false;
 	}
 
-	public boolean addSafelist(String username, String voucher) {
+	public boolean addBotSafelist(String username, String voucher) {
 		if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
 			return false;
 		}
@@ -188,7 +195,7 @@ public class SQLThread extends Thread {
 		return false;
 	}
 
-	public boolean delSafelist(String username) {
+	public boolean delBotSafelist(String username) {
 		if(dbtype != TYPE_GHOSTONE && dbtype != TYPE_GCB && dbtype != TYPE_GHOSTPP_EXTENDED) {
 			return false;
 		}
@@ -210,68 +217,92 @@ public class SQLThread extends Thread {
 
 		return false;
 	}
-
-	public boolean addBannedWord(String bannedWord) {
+	
+	public boolean add(String username, String properUsername, int uid, int rank, String ipAddress, String lastSeen, String promotedBy, String unbannedBy) {
 		try {
 			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, 'bannedword', ?)");
-			statement.setString(1, bannedWord);
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO users (id, username, properusername, uid, rank, ipaddress, lastseen, promotedby, unbannedby) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)");
+			statement.setString(1, username);
+			statement.setString(2, properUsername);
+			statement.setInt(3, uid);
+			statement.setInt(4, rank);
+			statement.setString(5, ipAddress);
+			statement.setString(6, lastSeen);
+			statement.setString(7, promotedBy);
+			statement.setString(8, unbannedBy);
 			statement.execute();
-			
 			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
+			Main.println("[SQLThread] Unable to add user " + properUsername + ": " + e.getLocalizedMessage());
 		}
-
-		return false;
-	}
-
-	public boolean delBannedWord(String bannedWord) {
-		try {
-			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=? and type ='bannedword'");
-			statement.setString(1, bannedWord);
-			statement.execute();
-			
-			connectionReady(connection);
-			return true;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to delete banned word: " + e.getLocalizedMessage());
-		}
-
 		return false;
 	}
 	
-	public boolean addBan(String bannedUser, String ipAddress, String currentDate, String admin, String reason, String expireDate) {
+	public boolean deleteUser(String user) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE username=?");
+			statement.setString(1, user);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to delete rank for user " + user + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean ban(String user, String ipAddress, String date, String bannedBy, String reason, String expireDate) {
 		try {
 			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("INSERT INTO bans (id, botid, server, name, ip, date, gamename, admin, reason, gamecount, expiredate, warn) VALUES (NULL, ?, ?, ?, ?, ?, 'Room Ban', ?, ?, 0, ?, 0)");
 			statement.setInt(1, botId);
 			statement.setString(2, realm);
-			statement.setString(3, bannedUser);
+			statement.setString(3, user);
 			statement.setString(4, ipAddress);
-			statement.setString(5, currentDate);
-			statement.setString(6, admin);
+			statement.setString(5, date);
+			statement.setString(6, bannedBy);
 			statement.setString(7, reason);
 			statement.setString(8, expireDate);
 			statement.execute();
-			
 			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add ban to MySQL database: " + e.getLocalizedMessage());
+			Main.println("[SQLThread] Unable to add bot ban to MySQL database: " + e.getLocalizedMessage());
 		}
-		
+		return false;
+	}
+	
+	public boolean kick(String user, String ipAddress, String date, String kickedBy, String reason) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO kicks (id, botid, server, name, ip, date, admin, reason) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)");
+			statement.setInt(1, botId);
+			statement.setString(2, realm);
+			statement.setString(3, user);
+			statement.setString(4, ipAddress);
+			statement.setString(5, date);
+			statement.setString(6, kickedBy);
+			statement.setString(7, reason);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to add kick to MySQL database: " + e.getLocalizedMessage());
+		}
 		return false;
 	}
 	
@@ -281,7 +312,6 @@ public class SQLThread extends Thread {
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM bans WHERE name=?");
 			statement.setString(1, user);
 			statement.execute();
-			
 			connectionReady(connection);
 			return true;
 		} catch(SQLException e) {
@@ -290,97 +320,21 @@ public class SQLThread extends Thread {
 			}
 			Main.println("[SQLThread] Unable to remove ban from MySQL database: " + e.getLocalizedMessage());
 		}
-		
 		return false;
 	}
 	
-	public String getBanInfo(String user) {
-		String date = "";
-		String admin = "";
-		String reason = "";
-		String expireDate = "";
-		try {
-			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("SELECT date, admin, reason, expiredate FROM bans WHERE name=?");
-			statement.setString(1, user);
-			ResultSet result = statement.executeQuery();
-			while (result.next()) {
-				date = result.getString(1);
-				admin = result.getString(2);
-				reason = result.getString(3);
-				expireDate = result.getString(4);
-				date = date.substring(0, date.length()-2); //removes the millisecond value from the time
-			}
-			
-			connectionReady(connection);
-			return "banned on " + date + " by <" + admin + "> for: " + reason + ". Ban expires on " + expireDate;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to get ban information on user: " + e.getLocalizedMessage());
-		}
-		
-		return "";
-	}
-	
-	public String getBanReason(String user) {
-		String reason = "";
-		try {
-			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("SELECT reason FROM bans WHERE name=?");
-			statement.setString(1, user);
-			ResultSet result = statement.executeQuery();
-			while (result.next()) {
-				reason = result.getString(1);
-			}
-			
-			connectionReady(connection);
-			return reason;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to get ban reason on user: " + e.getLocalizedMessage());
-		}
-		return "";
-	}
-	
-	public String getBanExpiryDate(String user) {
-		String expiryDate = "";
-		try {
-			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("SELECT expiredate FROM bans WHERE name=?");
-			statement.setString(1, user);
-			ResultSet result = statement.executeQuery();
-			while (result.next()) {
-				expiryDate = result.getString(1);
-			}
-			
-			connectionReady(connection);
-			return expiryDate;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to get ban reason on user: " + e.getLocalizedMessage());
-		}
-		return "";
-	}
-	
 	public boolean doesBanExist(String user) {
+		int count = 0;
 		try {
 			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE name=?");
+			PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM bans WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
-			String name = "";
-			while (result.next()) {
-				name = result.getString(1);
-			}
-			
 			connectionReady(connection);
-			if(name.equals("")) {
+			while (result.next()) {
+				count = result.getInt(1);
+			}
+			if(count == 0) {
 				return false;
 			} else {
 				return true;
@@ -389,33 +343,302 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] User can not be found in bans list: " + e.getLocalizedMessage());
+			Main.println("[SQLThread] Unable to check if " + user + " is banned: " + e.getLocalizedMessage());
 		}
-		
 		return false;
 	}
 	
-	public String getBannedUserFromIp(String ip) {
+	public boolean doesKickExist(String user) {
+		int count = 0;
 		try {
 			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("SELECT name FROM bans WHERE ip=?");
-			statement.setString(1, ip);
+			PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM kicks WHERE name=?");
+			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
-			String name = "";
-			while (result.next()) {
-				name = name + " " + result.getString(1);
-			}
-			
 			connectionReady(connection);
-			return name;
+			while (result.next()) {
+				count = result.getInt(1);
+			}
+			if(count == 0) {
+				return false;
+			} else {
+				return true;
+			}
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] User can not be found in bans list: " + e.getLocalizedMessage());
+			Main.println("[SQLThread] Unable to check if " + user + " has been kicked: " + e.getLocalizedMessage());
 		}
-		
+		return false;
+	}
+	
+	public String getBanInfo(String user) {
+		String name = "";
+		String date = "";
+		String admin = "";
+		String reason = "";
+		String expireDate = "";
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("SELECT name, date, admin, reason, expiredate FROM bans WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			connectionReady(connection);
+			while (result.next()) {
+				name = result.getString(1);
+				date = result.getString(2);
+				admin = result.getString(3);
+				reason = result.getString(4);
+				expireDate = result.getString(5);
+				date = date.substring(0, date.length()-2); //removes the millisecond value from the time
+			}
+			return name + " last banned on " + date + " by <" + admin + ">. Reason: " + reason + ". Ban expires on " + expireDate;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to get ban information on " + user + ": " + e.getLocalizedMessage());
+		}
 		return "";
+	}
+	
+	public String getKickInfo(String user) {
+		String name = "";
+		String date = "";
+		String admin = "";
+		String reason = "";
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("SELECT name, date, admin, reason FROM kicks WHERE name=?");
+			statement.setString(1, user);
+			ResultSet result = statement.executeQuery();
+			connectionReady(connection);
+			while (result.next()) {
+				name = result.getString(1);
+				date = result.getString(2);
+				admin = result.getString(3);
+				reason = result.getString(4);
+				date = date.substring(0, date.length()-2); //removes the millisecond value from time
+			}
+			return name + " last kicked on " + date + " by <" + admin + ">. Reason: " + reason;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to get kick information on " + user + ": " + e.getLocalizedMessage());
+		}
+		return "";
+	}
+
+	public boolean command(String command) {
+		if(dbtype != TYPE_GHOSTPP_EXTENDED) {
+			return false;
+		}
+
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
+			statement.setInt(1, botId);
+			statement.setString(2, command);
+			statement.execute();
+			
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
+		}
+
+		return false;
+	}
+	
+	public boolean banWord(String word) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, ?, ?)");
+			statement.setString(1, "bannedword");
+			statement.setString(2, word);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean unbanWord(String word) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=?");
+			statement.setString(1, word);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to remove banned word from database: " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean addAutoAnnounce(String message) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("INSERT INTO phrases (id, type, phrase) VALUES (NULL, ?, ?)");
+			statement.setString(1, "automessage");
+			statement.setString(2, message);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to add auto announcement: " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean delAutoAnnounce(String ann) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM phrases WHERE phrase=?");
+			statement.setString(1, ann);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to delete announcement: " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean setRank(String username, String promotedBy, int rank) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("UPDATE users SET rank=?, promotedby=? WHERE username=?");
+			statement.setInt(1, rank);
+			statement.setString(2, promotedBy);
+			statement.setString(3, username);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to change rank for user " + username + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean setUnbannedBy(String username, String admin) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("UPDATE users SET unbannedby=? WHERE username=?");
+			statement.setString(1, username);
+			statement.setString(2, admin);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to set unbanned by for user " + username + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean setUser(String properUsername, int userID, String ipAddress, String lastSeen) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("UPDATE users SET properusername=?, uid=?, ipaddress=?, lastseen=? WHERE username=?");
+			statement.setString(1, properUsername);
+			statement.setInt(2, userID);
+			statement.setString(3, ipAddress);
+			statement.setString(4, lastSeen);
+			statement.setString(5, properUsername.toLowerCase());
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to set user details for user " + properUsername + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public boolean setLastSeen(String username, String lastSeen) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("UPDATE users SET lastseen=? WHERE username=?");
+			statement.setString(1, lastSeen);
+			statement.setString(2, username);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to set last seen for user " + username + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
+	public int countBans() {
+		int count = 0;
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM bans");
+			ResultSet result = statement.executeQuery();
+			connectionReady(connection);
+			while (result.next()) {
+				count = result.getInt(1);
+			}
+			return count;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to count number of rows in bans table: " + e.getLocalizedMessage());
+		}
+		return 0;
+	}
+	
+	public int countKicks() {
+		int count = 0;
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("SELECT COUNT(*) FROM kicks");
+			ResultSet result = statement.executeQuery();
+			connectionReady(connection);
+			while (result.next()) {
+				count = result.getInt(1);
+			}
+			return count;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to count number of rows in kicks table: " + e.getLocalizedMessage());
+		}
+		return 0;
 	}
 	
 	public boolean doesUserHaveStats(String user) {
@@ -424,12 +647,11 @@ public class SQLThread extends Thread {
 			PreparedStatement statement = connection.prepareStatement("SELECT name FROM gameplayers WHERE name=?");
 			statement.setString(1, user);
 			ResultSet result = statement.executeQuery();
+			connectionReady(connection);
 			String name = "";
 			while (result.next()) {
 				name = result.getString(1);
 			}
-			
-			connectionReady(connection);
 			if(name.equals("")) {
 				return false;
 			} else {
@@ -497,6 +719,7 @@ public class SQLThread extends Thread {
 				statement3.setInt(1, gameId);
 				statement3.setInt(2, colour);
 				ResultSet result3 = statement3.executeQuery();
+				connectionReady(connection);
 				while (result3.next()) {
 					totalKills += result3.getInt(1);
 					totalDeaths += result3.getInt(2);
@@ -537,45 +760,63 @@ public class SQLThread extends Thread {
 			avgRaxKills = bdAvgRaxKills.doubleValue();
 			BigDecimal bdAvgCourierKills = new BigDecimal((double)totalCourierKills/(double)totalGames);	
 			bdAvgCourierKills = bdAvgCourierKills.setScale(decimalPlace, BigDecimal.ROUND_UP);
-			avgCourierKills = bdAvgCourierKills.doubleValue();
-			
-			connectionReady(connection);
+			avgCourierKills = bdAvgCourierKills.doubleValue();	
 			return "has played " + totalGames + " DotA games on this hostbot (W/L: " + totalWins + "/" + totalLoss + ") Hero K/D/A: " + avgKills + "/" + avgDeaths + "/" + avgAssists + " Creep K/D/N: " + avgCreepKills + "/" + avgCreepDenies + "/" + avgNeutralKills + " T/R/C: " + avgTowerKills + "/" + avgRaxKills + "/" + avgCourierKills;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
+            Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
 		}
 		return "";
 	}
 
-	public boolean command(String command) {
-		if(dbtype != TYPE_GHOSTPP_EXTENDED) {
-			return false;
-		}
-
-		try {
-			Connection connection = connection();
-			PreparedStatement statement = connection.prepareStatement("INSERT INTO commands (botid, command) VALUES (?, ?)");
-			statement.setInt(1, botId);
-			statement.setString(2, command);
-			statement.execute();
-			
-			connectionReady(connection);
-			return true;
-		} catch(SQLException e) {
-			if(Main.DEBUG) {
-				e.printStackTrace();
-			}
-			Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
-		}
-
-		return false;
-	}
-
 	public void run() {
 		while(true) {
+			if(initial) {
+				Connection connection = connection();
+				try {
+					Main.println("[SQLThread] Creating bans table if not exists...");
+					Statement statement = connection.createStatement();
+					statement.execute("CREATE TABLE IF NOT EXISTS bans (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, botid int(11) NOT NULL, server varchar(100) NOT NULL, name varchar(15) NOT NULL, ip varchar(15) NOT NULL, date datetime NOT NULL, gamename varchar(31) NOT NULL, admin varchar(15) NOT NULL, reason varchar(255) NOT NULL, gamecount int(11) NOT NULL DEFAULT '0', expiredate varchar(31) NOT NULL DEFAULT '', warn int(11) NOT NULL DEFAULT '0') ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
+				} catch(SQLException e) {
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
+					Main.println("[SQLThread] Error while creating bans table: " + e.getLocalizedMessage());
+				}
+				try {
+					Main.println("[SQLThread] Creating kicks table if not exists...");
+					Statement statement = connection.createStatement();
+					statement.execute("CREATE TABLE IF NOT EXISTS kicks (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, botid int(11) NOT NULL, server varchar(100) NOT NULL, name varchar(15) NOT NULL, ip varchar(15) NOT NULL, date datetime NOT NULL, admin varchar(15) NOT NULL, reason varchar (150) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
+				} catch(SQLException e) {
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
+					Main.println("[SQLThread] Error while creating kicks table: " + e.getLocalizedMessage());
+				}
+				try {
+					Main.println("[SQLThread] Creating phrases table if not exists...");
+					Statement statement = connection.createStatement();
+					statement.execute("CREATE TABLE IF NOT EXISTS phrases (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, type varchar(100) NOT NULL, phrase varchar(150) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
+				} catch(SQLException e) {
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
+					Main.println("[SQLThread] Error while creating phrases table: " + e.getLocalizedMessage());
+				}
+				try {
+					Main.println("[SQLThread] Creating users table if not exists...");
+					Statement statement = connection.createStatement();
+					statement.execute("CREATE TABLE IF NOT EXISTS users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, username varchar(15) NOT NULL, properusername varchar(15) NOT NULL DEFAULT 'unknown', uid INT(10) NOT NULL DEFAULT '0', rank INT(2) NOT NULL DEFAULT '0', ipaddress varchar(15) NOT NULL DEFAULT 'unknown', lastseen varchar(31) NOT NULL DEFAULT 'unknown', promotedby varchar(15) NOT NULL DEFAULT 'unknown', unbannedby varchar(15) NOT NULL DEFAULT 'unknown') ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
+				} catch(SQLException e) {
+					if(Main.DEBUG) {
+						e.printStackTrace();
+					}
+					Main.println("[SQLThread] Error while creating users table: " + e.getLocalizedMessage());
+				}
+				connectionReady(connection);
+			}
 			if(Main.DEBUG) {
 				Main.println("[SQLThread] Refreshing internal lists with database...");
 			}
@@ -584,101 +825,68 @@ public class SQLThread extends Thread {
 			
 			try {
 				//refresh admin list
-				//if ghostone, then get access; access >= 8191 -> roomadmin
-				//if not ghostone, they are automatically a room admin
-				if(dbtype == TYPE_GHOSTONE) {
-					PreparedStatement statement = connection.prepareStatement("SELECT name, access FROM admins");
-					ResultSet result = statement.executeQuery();
-					bot.roomAdmins.clear();
-					bot.botAdmins.clear();
-					while(result.next()) {
-						if(result.getInt(2) < 8191) {
-							bot.botAdmins.add(result.getString(1).toLowerCase());
-						} else {
-							bot.roomAdmins.add(result.getString(1).toLowerCase());
-						}
+				PreparedStatement statement = connection.prepareStatement("SELECT username, properUsername, uid, rank, ipaddress, lastseen, promotedby, unbannedby FROM users");
+				ResultSet result = statement.executeQuery();
+				bot.userDB.clear();
+				while(result.next()) {
+					UserInfo user = new UserInfo();
+					user.username = result.getString("username");
+					user.properUsername = result.getString("properUsername");
+					user.userID = result.getInt("uid");
+					int rank = result.getInt("rank");
+					if(rank == bot.LEVEL_ROOT_ADMIN) {
+						rank = bot.LEVEL_ADMIN;
 					}
-				} else {
-					PreparedStatement statement = connection.prepareStatement("SELECT name FROM admins");
-					ResultSet result = statement.executeQuery();
-					bot.roomAdmins.clear();
+					user.rank = rank;
+					user.ipAddress = result.getString("ipaddress");
+					user.lastSeen = result.getString("lastseen");
+					user.promotedBy = result.getString("promotedby");
+					user.unbannedBy = result.getString("unbannedby");
+					bot.userDB.add(user);
+				}
+				
+				if(channelAdmin) {
+					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='automessage'");
+					bot.autoAnn.clear();
 					while(result.next()) {
-						bot.roomAdmins.add(result.getString(1).toLowerCase());
+						bot.autoAnn.add(result.getString("phrase"));
 					}
 				}
-
-				if(initial) {
-					Main.println("[SQLThread] Initial refresh: found " + bot.roomAdmins.size() + " room admins");
-					Main.println("[SQLThread] Initial refresh: found " + bot.botAdmins.size() + " bot admins");
-				}
-
-				if(GCBConfig.configuration.getBoolean("gcb_bot_detect", false)) {
-					Statement statement = connection.createStatement();
-					ResultSet result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
+				
+				if(bannedWordDetectType > 0) {
+					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
 					bot.bannedWords.clear();
 					while(result.next()) {
-						bot.bannedWords.add(result.getString("phrase").toLowerCase());
+						bot.bannedWords.add(result.getString("phrase"));
 					}
-
-					if(initial) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " banned words");
-					}
-					result = statement.executeQuery("SELECT ip FROM bans");
-					bot.bannedIpAddress.clear();
-					while(result.next()) {
-						bot.bannedIpAddress.add(result.getString("ip"));
-					}
-					
-					if(initial) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.bannedIpAddress.size() + " banned IP addresses");
-					}
-					result = statement.executeQuery("SELECT name FROM bans");
-					bot.bannedPlayers.clear();
-					while(result.next()) {
-						bot.bannedPlayers.add(result.getString("name"));
-					}
-					
-					if(initial) {
-						Main.println("[SQLThread] Intitial refresh: found " + bot.bannedPlayers.size() + " banned players");
+				}
+				
+				if(initial) {
+					Main.println("[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
+					Main.println("[SQLThread] Initial refresh: found " + bot.autoAnn.size() + " Auto Announcements");
+					if(bannedWordDetectType > 0) {
+						Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");
 					}
 				}
 			} catch(SQLException e) {
 				if(Main.DEBUG) {
 					e.printStackTrace();
 				}
-				Main.println("[SQLThread] Unable to refresh admin list: " + e.getLocalizedMessage());
-			}
-
-			if(dbtype == TYPE_GHOSTONE || dbtype == TYPE_GCB || dbtype == TYPE_GHOSTPP_EXTENDED) {
-				try {
-					//refresh safelist list
-					Statement statement = connection.createStatement();
-					ResultSet result = statement.executeQuery("SELECT name FROM safelist");
-					bot.safelist.clear();
-					while(result.next()) {
-						bot.safelist.add(result.getString("name").toLowerCase());
-					}
-
-					if(initial) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.safelist.size() + " safelist");
-					}
-				} catch(SQLException e) {
-					if(Main.DEBUG) {
-						e.printStackTrace();
-					}
-					Main.println("[SQLThread] Unable to refresh safelist list: " + e.getLocalizedMessage());
-				}
-			}
-
-			if(initial) {
-				initial = false;
+				Main.println("[SQLThread] Unable to refresh lists: " + e.getLocalizedMessage());
 			}
 			
 			connectionReady(connection);
-
+			
+			if(initial) {
+				initial = false;
+			}
+			bot.addRoomList();
+			bot.addRoot();
 			try {
-				Thread.sleep(60000);
-			} catch(InterruptedException e) {}
+				Thread.sleep(dbRefreshRate*1000);
+			} catch(InterruptedException e) {
+				Main.println("[SQLThread] Run sleep was interrupted: " + e.getLocalizedMessage());
+			}
 		}
 	}
 }

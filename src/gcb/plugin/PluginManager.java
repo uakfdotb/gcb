@@ -50,9 +50,7 @@ public class PluginManager {
 		pluginPath = GCBConfig.configuration.getString("gcb_plugin_path", "plugin/");
 	}
 
-	public void setGarena(GarenaInterface garena, WC3Interface wc3i, GarenaThread gsp_thread,
-			GarenaThread gcrp_thread, GarenaThread pl_thread, GarenaThread wc3_thread,
-			SQLThread sqlthread, ChatThread chatthread) {
+	public void setGarena(GarenaInterface garena, WC3Interface wc3i, GarenaThread gsp_thread, GarenaThread gcrp_thread, GarenaThread pl_thread, GarenaThread wc3_thread, SQLThread sqlthread, ChatThread chatthread) {
 		this.garena = garena;
 		this.wc3i = wc3i;
 		this.gsp_thread = gsp_thread;
@@ -223,12 +221,12 @@ public class PluginManager {
 		}
 	}
 
-	public String onCommand(MemberInfo player, String command, String payload, boolean isRoomAdmin, boolean isBotAdmin, boolean isSafelist) {
+	public String onCommand(MemberInfo player, String command, String payload, int rank) {
 		ArrayList<Plugin> registerList = register.get("onCommand");
 		
 		if(registerList != null) {
 			for(Plugin p : registerList) {
-				String response = p.onCommand(player, command, payload, isRoomAdmin, isBotAdmin, isSafelist);
+				String response = p.onCommand(player, command, payload, rank);
 				if(response != null) {
 					return response;
 				}

@@ -26,7 +26,7 @@ public class Plugin implements GarenaListener {
 	}
 
 	//called when GChatBot receives a command
-	public String onCommand(MemberInfo player, String command, String payload, boolean isRoomAdmin, boolean isBotAdmin, boolean isSafelist) {
+	public String onCommand(MemberInfo player, String command, String payload, int rank) {
 		return null;
 	}
 

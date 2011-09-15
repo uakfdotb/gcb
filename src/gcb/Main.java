@@ -25,8 +25,15 @@ public class Main {
 	public static String VERSION = "gcb 0f";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	static boolean log;
+	static boolean newLog;
+	static boolean logCommands;
+	boolean botDisable;
+	boolean reverse;
+	int currentDay;
 
 	static PrintWriter log_out;
+	static PrintWriter log_cmd_out;
 	
 	GChatBot bot;
 
@@ -55,8 +62,11 @@ public class Main {
 
 		//determine what to load based on gcb_reverse and gcb_bot
 		loadBot = GCBConfig.configuration.getBoolean("gcb_bot", false);
-		boolean botDisable = GCBConfig.configuration.getBoolean("gcb_bot_disable", true);
-		boolean reverse = GCBConfig.configuration.getBoolean("gcb_reverse", false);
+		botDisable = GCBConfig.configuration.getBoolean("gcb_bot_disable", true);
+		reverse = GCBConfig.configuration.getBoolean("gcb_reverse", false);
+		log = GCBConfig.configuration.getBoolean("gcb_log", false);
+		newLog = GCBConfig.configuration.getBoolean("gcb_log_new_file", false);
+		logCommands = GCBConfig.configuration.getBoolean("gcb_log_commands", false);
 
 		//first load all the defaults
 		loadPlugins = true;
@@ -78,6 +88,8 @@ public class Main {
 		if(reverse) {
 			loadWC3 = false; //or else we'll broadcast our own packets
 		}
+		
+		currentDay = getDay();
 	}
 
 	public void initPlugins() {
@@ -184,9 +196,7 @@ public class Main {
 		}
 		
 		// we ought to say we're starting the game; we'll do later too
-		if(loadPL) {
-			garena.startPlaying();
-		}
+		garena.startPlaying();
 
 		return true;
 	}
@@ -216,25 +226,39 @@ public class Main {
 		}
 
 	}
+	
+	public void newDayLoop() {
+		while(true) {
+			if(newLog) {
+				newDay();
+			}
+			try {
+				Thread.sleep(10000);
+			} catch(InterruptedException e) {
+				println("[Main] New day loop sleep interrupted");
+			}
+		}
+	}
 
 	public void helloLoop() {
+		
+		int playCounter = 0;
+		int reconnectCounter = 0;
+		int xpCounter = 0;
+		
+		//see how often to reconnect
+		int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
+		//divide by six to get interval measured for 10 second delays
+		int reconnectInterval = -1;
+
+		if(reconnectMinuteInterval > 0) {
+			reconnectInterval = reconnectMinuteInterval * 6;
+		}
+
+		//see how often to send XP packet; every 15 minutes
+		int xpInterval = 90; //15 * 60 / 10
+		
 		if(loadPL) {
-			int playCounter = 0;
-			int reconnectCounter = 0;
-			int xpCounter = 0;
-
-			//see how often to reconnect
-			int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
-			//divide by six to get interval measured for 10 second delays
-			int reconnectInterval = -1;
-
-			if(reconnectMinuteInterval > 0) {
-				reconnectInterval = reconnectMinuteInterval * 6;
-			}
-
-			//see how often to send XP packet; every 15 minutes
-			int xpInterval = 90; //15 * 60 / 10
-
 			while(true) {
 				try {
 					garena.displayMemberInfo();
@@ -249,7 +273,7 @@ public class Main {
 				xpCounter++;
 
 				//handle player interval
-				if(playCounter > 3) {
+				if(playCounter > 360000) { //1 hour
 					playCounter = 0;
 					garena.startPlaying(); //make sure we're actually playing
 				}
@@ -274,9 +298,12 @@ public class Main {
 
 					//send GSP XP packet only if connected to room
 					if(garena.room_socket.isConnected()) {
-						//xp rate = 50 (assume basic user)
+						//xp rate = 100 (doesn't matter what they actually are, server determines amount of exp gained)
 						//gametype = 1001 for warcraft/dota
-						garena.sendGSPXP(garena.user_id, 50, 1001);
+						garena.sendGSPXP(garena.user_id, 100, 1001);
+						if(DEBUG) {
+							println("[Main] Sent exp packet to Garena");
+						}
 					}
 				}
 
@@ -286,12 +313,37 @@ public class Main {
 			}
 		} else {
 			//send start playing so that we don't disconnect from the room
-
+			
 			while(true) {
-				garena.startPlaying();
+				
+				garena.sendPeerHello();
+				
+				playCounter++;
+				xpCounter++;
+				
+				//handle player interval
+				if(playCounter > 360000) { //1 hour
+					playCounter = 0;
+					garena.startPlaying();
+				}
+				
+				//handle xp interval
+				if(xpCounter >= xpInterval) {
+					xpCounter = 0;
+					
+					//send GSP XP packet only if connected to room
+					if(garena.room_socket.isConnected()) {
+						//xp rate = 100 (doesn't matter what they actually are, server determines amount of exp gained)
+						//gametype = 1001 for warcraft/dota
+						garena.sendGSPXP(garena.user_id, 100, 1001);
+						if(DEBUG) {
+							println("[Main] Sent exp packet to Garena");
+						}
+					}
+				}
 
 				try {
-					Thread.sleep(30000);
+					Thread.sleep(10000);
 				} catch(InterruptedException e) {}
 			}
 		}
@@ -329,18 +381,32 @@ public class Main {
 		main.init(args);
 
 		//init log
-		if(GCBConfig.configuration.getBoolean("gcb_log")) {
-			if(GCBConfig.configuration.getBoolean("gcb_log_new_file", false)) {
+		if(log) {
+			if(newLog) {
 				File log_directory = new File("log/");
 				if(!log_directory.exists()) {
 					log_directory.mkdir();
 				}
-
+				
 				File log_target = new File(log_directory, date() + ".log");
 
 				log_out = new PrintWriter(new FileWriter(log_target, true), true);
 			} else {
 				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+			}
+		}
+		if(logCommands) {
+			if(newLog) {
+				File log_cmd_directory = new File("cmd_log/");
+				if(!log_cmd_directory.exists()) {
+					log_cmd_directory.mkdir();
+				}
+				
+				File log_cmd_target = new File(log_cmd_directory, date() + ".log");
+				
+				log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
+			} else {
+				log_cmd_out = new PrintWriter(new FileWriter("gcb_cmd.log", true), true);
 			}
 		}
 		
@@ -352,16 +418,66 @@ public class Main {
 		main.initBot();
 		main.loadPlugins();
 		main.helloLoop();
+		main.newDayLoop();
+	}
+	
+	public void newDay() {
+		int day = getDay();
+		if(currentDay != day) {
+			log_out.close();
+			File log_directory = new File("log/");
+			if(!log_directory.exists()) {
+				log_directory.mkdir();
+			}
+			
+			File log_target = new File(log_directory, new Date() + ".log");
+			
+			try {
+				log_out = new PrintWriter(new FileWriter(log_target, true), true);
+			} catch(IOException e) {
+				if(DEBUG) {
+					e.printStackTrace();
+				}
+				println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
+			}
+			
+			log_cmd_out.close();
+			File log_cmd_directory = new File("cmd_log/");
+			if(!log_cmd_directory.exists()) {
+				log_cmd_directory.mkdir();
+			}
+			
+			File log_cmd_target = new File(log_cmd_directory, new Date() + ".log");
+			
+			try {
+				log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
+			} catch(IOException e) {
+				if(DEBUG) {
+					e.printStackTrace();
+				}
+				println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
+			}
+			currentDay = day;
+		}
 	}
 
 	public static void println(String str) {
 		Date date = new Date();
 		String dateString = DateFormat.getDateTimeInstance().format(date);
-
+		
 		System.out.println(str);
-
+		
 		if(log_out != null) {
 			log_out.println("[" + dateString + "] " + str);
+		}
+	}
+	
+	public static void cmdprintln(String str) {
+		Date date = new Date();
+		String dateString = DateFormat.getDateTimeInstance().format(date);
+		
+		if(log_cmd_out != null) {
+			log_cmd_out.println("[" + dateString + "] " + str);
 		}
 	}
 
@@ -375,6 +491,11 @@ public class Main {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		return sdf.format(cal.getTime());
+	}
+	
+	public int getDay() {
+		Calendar calendar = Calendar.getInstance();
+		return calendar.get(Calendar.DATE);
 	}
 
 	//hexadecimal string to byte array

@@ -8,6 +8,7 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import gcb.plugindb;
+import gcb.GChatBot;
 
 public class trivia extends Plugin {
 	PluginManager manager;
@@ -93,12 +94,12 @@ public class trivia extends Plugin {
 		}
 	}
 
-	public String onCommand(MemberInfo player, String command, String payload, boolean isRoomAdmin, boolean isBotAdmin, boolean isSafelist) {
-		if(command.equalsIgnoreCase(commandTrigger)) {
+	public String onCommand(MemberInfo player, String command, String payload, int rank) {
+		if(command.equals(commandTrigger)) {
 			String[] parts = payload.split(" ");
 			
-			if(isRoomAdmin) {
-				if(parts[0].equals("on")) {
+			if(rank >= GChatBot.LEVEL_ADMIN) {
+				if(parts[0].equalsIgnoreCase("on")) {
 					triviaEnabled = true;
 					triviaState = 0;
 					lastTime = 0;
@@ -106,7 +107,7 @@ public class trivia extends Plugin {
 					manager.log("[TRIVIA] Enabled with category=" + questionCategory + " and diff=" + questionDifficulty);
 					
 					return "Enabled trivia!";
-				} else if(parts[0].equals("off")) {
+				} else if(parts[0].equalsIgnoreCase("off")) {
 					triviaEnabled = false;
 					return "Disabled trivia!";
 				} else if(parts[0].equals("delay") && parts.length >= 2) {
@@ -138,7 +139,7 @@ public class trivia extends Plugin {
 			if(parts[0].equals("top")) {
 				//display top five
 				return pdb.dbScoreTopStr(5);
-			} else if(parts[0].equals("score")) {
+			} else if(parts[0].equalsIgnoreCase("score")) {
 				String lowername = player.username.toLowerCase();
 				
 				if(parts.length >= 2) {

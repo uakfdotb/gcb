@@ -26,7 +26,7 @@ public class MemberInfo {
 	public boolean inRoom;
 
 	int numWarnings;
-	String[] lastMessages = new String[6];
+	String[] lastMessages = {"", "", ""}; //stores last 3 messages sent
 	
 	//these will be set after HELLO is received
 	public int correctPort = -1;

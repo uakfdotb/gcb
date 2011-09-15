@@ -33,21 +33,38 @@ public class ChatThread extends Thread {
 
 	public void queueChat(String message, int target_user) {
 		synchronized(chat_queue) { //LinkedList is not thread safe
-			if(message.length() < 150) {
+			if(target_user == ANNOUNCEMENT) {
+				if(message.length() < 499) {
 				ChatMessage add = new ChatMessage(message, target_user);
 				chat_queue.add(add);
+				} else {
+					for(int i = 0; i < message.length(); i+=499) {
+						String split = message.substring(i, Math.min(i + 499, message.length() - 1));
+						ChatMessage add = new ChatMessage(split, target_user);
+						chat_queue.add(add);
+					}
+				}
 			} else {
-				for(int i = 0; i < message.length(); i+=150) {
-					String split = message.substring(i, Math.min(i + 150, message.length() - 1));
-					ChatMessage add = new ChatMessage(split, target_user);
+				if(message.length() < 150) {
+					ChatMessage add = new ChatMessage(message, target_user);
 					chat_queue.add(add);
+				} else {
+					while(message.length() > 150) {
+						String split = message.substring(0, 150);
+						int indexOfLastSpace = split.lastIndexOf(' ');
+						split = split.substring(0, indexOfLastSpace);
+						message = message.substring(split.length()+1);
+						ChatMessage add = new ChatMessage(split, target_user);
+						chat_queue.add(add);
+					}
+					ChatMessage lastPart = new ChatMessage(message, target_user);
+					chat_queue.add(lastPart);
 				}
 			}
 
 			chat_queue.notifyAll(); //in case run() is waiting for us
+			Main.println("[QUEUED: " + target_user + "] " + message);
 		}
-		
-		Main.println("[QUEUED:" + target_user + "] " + message);
 	}
 
 	//in case we're flooding or something
@@ -79,7 +96,17 @@ public class ChatThread extends Thread {
 				garena.sendGCRPChat(message.str);
 			} else if(message.target_user == ANNOUNCEMENT) {
 				garena.sendGCRPAnnounce(message.str);
+				try {
+					Thread.sleep(1500);
+				} catch(InterruptedException e) {
+					Main.println("[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
+				}
 			} else if(message.target_user == SLEEP) { //stops the bot sending messages too quickly
+				try {
+				Thread.sleep(1500); //prevent flooding
+				} catch(InterruptedException e) {
+					Main.println("[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
+				}
 			} else {
 				garena.sendGCRPWhisper(message.target_user, message.str);
 			}
