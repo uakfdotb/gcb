@@ -25,7 +25,7 @@ public class MemberInfo {
 
 	public boolean inRoom;
 
-	int numWarnings;
+	int numWarnings = 0;
 	String[] lastMessages = {"", "", ""}; //stores last 3 messages sent
 	
 	//these will be set after HELLO is received

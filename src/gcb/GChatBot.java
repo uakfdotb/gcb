@@ -58,6 +58,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 	int maxLevel; //maximum entry level to not be kicked from the room, only used if gcb_bot_entry_level = true
 	int bannedWordDetectType;
 	int bannedWordBanLength;
+	int spamWarnLines; //number of \n a user can have per message to not get a warning
+	int spamMaxLines; //number of \n a user can have per message before getting autokicked
+	int spamKick; //number of warnings for the user to be kicked
+	int spamWarnEquality;
+	int spamMaxEquality;
 	String access_message; //response to when a user does not have enough access to use a command
 	String welcome_message; //sends this message to all public users when they join the room
 	String banned_word_detect_message; //sends this message as an announcement when a user types a banned word
@@ -74,6 +79,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	boolean entryLevel; //whether to kick low level users when they join the room
 	boolean checkSameMessage; //whether to check if players are bypassing flood protection
 	boolean triviaPluginAlias;
+	boolean checkSpam; //whether to check if a user is spamming
 	private Timer autoAnn_timer;
 	private Timer startUp_timer;
 	String root_admin; //root admin for this bot; null if root is disabled
@@ -142,6 +148,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 		startUp_timer = new Timer(1000, this);
 		startUp_timer.start();
 		
+		//spam configuration settings
+		checkSpam = GCBConfig.configuration.getBoolean("gcb_bot_check_spam", false);
+		spamWarnLines = GCBConfig.configuration.getInt("gcb_bot_spam_warn_lines", 10);
+		spamMaxLines = GCBConfig.configuration.getInt("gcb_bot_spam_max_lines", 15);
+		spamKick = Math.max(GCBConfig.configuration.getInt("gcb_bot_spam_kick", 5), 3);
+		spamWarnEquality = GCBConfig.configuration.getInt("gcb_bot_spam_warn_equality", 16);
+		spamMaxEquality = GCBConfig.configuration.getInt("gcb_bot_spam_max_equality", 40);
+		
 		if(channelAdmin) {
 			registerCommand("kick", LEVEL_ADMIN);
 			registerCommand("quickkick", LEVEL_ADMIN);
@@ -176,6 +190,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("unloadplugin", LEVEL_ADMIN);
 		registerCommand("bot", LEVEL_ADMIN);
 		registerCommand("ban", LEVEL_ADMIN);
+		registerCommand("unban", LEVEL_ADMIN);
 		
 		registerCommand("say", LEVEL_EXAMINER);
 		registerCommand("whisper", LEVEL_EXAMINER);
@@ -1303,7 +1318,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(cmd.equals("exit")) {
 					return "Rank required: Root Admin. Format: " + trigger + "exit. Info: shuts down the bot";
 				} else if(cmd.equals("addadmin")) {
-					return "Rank required: Root Admin. Format: " + trigger + "addadmin [username]. Example: " + trigger + "addadmin Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, or promote a user that has never been seen by the bot";
+					return "Rank required: Root Admin. Format: " + trigger + "addadmin [username]. Example: " + trigger + "addadmin Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, or promote a user that has never been seen by the bot. Only Root Admins can promote other users to Admin";
 				} else if(cmd.equals("deleteuser")) {
 					return "Rank required: Root Admin. Format: " + trigger + "deleteuser [username]. Example: " + trigger + "deleteuser Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Deletes a user from the user database";
 				} else if(cmd.equals("room")) {
@@ -1812,7 +1827,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						}
 					} else if(bannedWordDetectType == 3) {
 						if(sqlthread.ban(player.username, player.externalIP.toString().substring(1), time(), "Auto detection", "Banned word detected", time(bannedWordBanLength))) {
-							chatthread.queueChat(player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
+							garena.ban(player.username, bannedWordBanLength);
 							try {
 								Thread.sleep(1000);
 							} catch(InterruptedException e) {
@@ -1821,7 +1836,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 								}
 								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
-							garena.ban(player.username, bannedWordBanLength);
+							chatthread.queueChat(player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
 							return;
 						} else {
 							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
@@ -1839,7 +1854,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						String expireDate = time(8760);
 						String ipAddress = player.externalIP.toString().substring(1);
 						if(sqlthread.ban(player.username, ipAddress, currentDate, "Auto detection", "Bypassing flood protection", expireDate)) {
-							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
+							garena.ban(player.username, 8760); //365 days
 							try {
 								Thread.sleep(1000);
 							} catch(InterruptedException e) {
@@ -1848,7 +1863,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 								}
 								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
-							garena.ban(player.username, 8760); //365 days
+							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
 							return;
 						} else {
 							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
@@ -1873,6 +1888,89 @@ public class GChatBot implements GarenaListener, ActionListener {
 			}
 			if(!whisper) { //adds current chat into array
 				player.lastMessages[player.lastMessages.length-1] = chat;
+			}
+		}
+		if(checkSpam) {
+			int numNewLines = 0; //the enter key aka \n
+			int numEqualitySigns = 0; //'<' and '>'
+			for(int i = 0; i < chat.length()-1; i++) {
+				if(chat.charAt(i) == '<' || chat.charAt(i) == '>') {
+					numEqualitySigns++;
+				} else if(chat.charAt(i) == '\n') {
+					numNewLines++;
+				}
+			}
+			if(numNewLines > spamMaxLines) {
+				String currentDate = time();
+				if(sqlthread.kick(player.username, player.externalIP.toString().substring(1), currentDate, "Autodetect", "Spammed too many new lines in 1 message")) {
+					garena.kick(player, "Autodetection of spam - too many new lines in 1 message");
+					try {
+						Thread.sleep(1000);
+					} catch(InterruptedException e) {
+						if(Main.DEBUG) {
+							e.printStackTrace();
+						}
+						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+					}
+					chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+					return;
+				}
+			} else if(numNewLines > spamWarnLines) {
+				player.numWarnings++;
+				if(player.numWarnings > spamKick) {
+					String currentDate = time();
+					if(sqlthread.kick(player.username, player.externalIP.toString().substring(1), currentDate, "Autodetect", "Spammed too many new lines")) {
+						garena.kick(player, "Autodetection of spam - too many new lines");
+						try {
+							Thread.sleep(1000);
+						} catch(InterruptedException e) {
+							if(Main.DEBUG) {
+								e.printStackTrace();
+							}
+							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+						}
+						chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+						return;
+					}
+				} else if(player.numWarnings == spamKick) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). FINAL WARNING!!!", ANNOUNCEMENT);
+					return;
+				} else if(player.numWarnings == spamKick-1) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). Second warning!", ANNOUNCEMENT);
+					return;
+				} else if(player.numWarnings == spamKick-2) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked. (use less new lines). First warning!", ANNOUNCEMENT);
+					return;
+				}
+			} else if(numEqualitySigns > spamWarnEquality) {
+				player.numWarnings++;
+				if(numEqualitySigns > spamMaxEquality) {
+					String currentDate = time();
+					if(sqlthread.kick(player.username, player.externalIP.toString().substring(1), currentDate, "Autodetect", "Spammed too many equality symbols in 1 message")) {
+						garena.kick(player, "Autodetection of spam - too many equality symbols in 1 message");
+						try {
+							Thread.sleep(1000);
+						} catch(InterruptedException e) {
+							if(Main.DEBUG) {
+								e.printStackTrace();
+							}
+							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+						}
+						chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+						return;
+					}
+				} else if(player.numWarnings == spamKick) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). FINAL WARNING!!!", ANNOUNCEMENT);
+					return;
+				} else if(player.numWarnings == spamKick-1) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). Second warning!", ANNOUNCEMENT);
+					return;
+				} else if(player.numWarnings == spamKick-2) {
+					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked. (use less equality symbols). First warning!", ANNOUNCEMENT);
+					return;
+				}
+			} else {
+				player.numWarnings--;
 			}
 		}
 		if(player != null && chat.startsWith("?trigger")) {
