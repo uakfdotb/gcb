@@ -25,12 +25,13 @@ public class Main {
 	public static String VERSION = "gcb 0f";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public static final String DAY_FORMAT = "dd";
 	static boolean log;
 	static boolean newLog;
 	static boolean logCommands;
 	boolean botDisable;
 	boolean reverse;
-	int currentDay;
+	String currentDay;
 
 	static PrintWriter log_out;
 	static PrintWriter log_cmd_out;
@@ -228,14 +229,14 @@ public class Main {
 	}
 	
 	public void newDayLoop() {
-		while(true) {
-			if(newLog) {
+		if(newLog) {
+			while(true) {
 				newDay();
-			}
-			try {
-				Thread.sleep(10000);
-			} catch(InterruptedException e) {
-				println("[Main] New day loop sleep interrupted");
+				try {
+					Thread.sleep(10000);
+				} catch(InterruptedException e) {
+					println("[Main] New day loop sleep interrupted");
+				}
 			}
 		}
 	}
@@ -422,15 +423,17 @@ public class Main {
 	}
 	
 	public void newDay() {
-		int day = getDay();
-		if(currentDay != day) {
+		String day = getDay();
+		if(!currentDay.equals(day)) {
+			println("[Main] New day - end of log file");
+			String currentDate = date();
 			log_out.close();
 			File log_directory = new File("log/");
 			if(!log_directory.exists()) {
 				log_directory.mkdir();
 			}
 			
-			File log_target = new File(log_directory, new Date() + ".log");
+			File log_target = new File(log_directory, currentDate + ".log");
 			
 			try {
 				log_out = new PrintWriter(new FileWriter(log_target, true), true);
@@ -441,21 +444,23 @@ public class Main {
 				println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
 			}
 			
-			log_cmd_out.close();
-			File log_cmd_directory = new File("cmd_log/");
-			if(!log_cmd_directory.exists()) {
-				log_cmd_directory.mkdir();
-			}
-			
-			File log_cmd_target = new File(log_cmd_directory, new Date() + ".log");
-			
-			try {
-				log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
-			} catch(IOException e) {
-				if(DEBUG) {
-					e.printStackTrace();
+			if(logCommands) {
+				log_cmd_out.close();
+				File log_cmd_directory = new File("cmd_log/");
+				if(!log_cmd_directory.exists()) {
+					log_cmd_directory.mkdir();
 				}
-				println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
+				
+				File log_cmd_target = new File(log_cmd_directory, currentDate + ".log");
+				
+				try {
+					log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
+				} catch(IOException e) {
+					if(DEBUG) {
+						e.printStackTrace();
+					}
+					println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
+				}
 			}
 			currentDay = day;
 		}
@@ -493,9 +498,10 @@ public class Main {
 		return sdf.format(cal.getTime());
 	}
 	
-	public int getDay() {
-		Calendar calendar = Calendar.getInstance();
-		return calendar.get(Calendar.DATE);
+	public String getDay() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(DAY_FORMAT);
+		return sdf.format(cal.getTime());
 	}
 
 	//hexadecimal string to byte array

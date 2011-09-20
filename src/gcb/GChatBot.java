@@ -51,6 +51,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	ChatThread chatthread;
 	ArrayList<String> channelAdminCommands;
 	ArrayList<String> muteList;
+	ArrayList<String> voteLeaver;
 
 	//config
 	int publicDelay;
@@ -91,7 +92,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 
 	HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
 	HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
-	Vector<String> rootAdminCommands; //includes all commands accessible by admins, including safelist/public commands
+	Vector<String> rootAdminCommands; //includes all commands accessible by root admins including admin, examiner, vip, safelist, public
 	Vector<String> adminCommands;
 	Vector<String> examinerCommands;
 	Vector<String> vipCommands;
@@ -116,6 +117,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		commandToAlias = new HashMap<String, String[]>();
 		channelAdminCommands = new ArrayList<String>();
 		muteList = new ArrayList<String>();
+		voteLeaver = new ArrayList<String>();
 		startTime = time();
 	}
 
@@ -231,12 +233,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 		registerCommand("help", public_level);
 		
 		if(triviaPluginAlias) {
-			registerCommand("trivia", LEVEL_ADMIN);
-			registerCommand("delay", LEVEL_ADMIN);
-			registerCommand("category", LEVEL_ADMIN);
-			registerCommand("difficulty", LEVEL_ADMIN);
-			registerCommand("top", public_level);
-			registerCommand("score", public_level);
+			registerCommand("trivia on", LEVEL_ADMIN);
+			registerCommand("trivia off", LEVEL_ADMIN);
+			/*registerCommand("trivia delay", LEVEL_ADMIN);
+			registerCommand("trivia category", LEVEL_ADMIN);
+			registerCommand("trivia difficulty", LEVEL_ADMIN);
+			registerCommand("trivia top", public_level);
+			registerCommand("trivia score", public_level);*/
 		}
 		
 		//start input thread
@@ -299,7 +302,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			}
 		}
 		
-		if(muteList.contains(member.username.toLowerCase())) {
+		if(muteList.contains(member.username)) {
 			chatthread.queueChat("You are muted! An examiner must unmute you to allow you to use commands again", member.userID);
 		}
 
@@ -357,6 +360,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Failed. It is impossible to delete a Root Admin!";
 				}
 				if(sqlthread.deleteUser(target.toLowerCase())) {
+					for(int i = 0; i < userDB.size(); i++) {
+						if(userDB.get(i).username.equals(target.toLowerCase())) {
+							userDB.remove(i);
+						}
+					}
 					return "Success! " + targetUser.username + " no longer has a rank";
 				} else {
 					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
@@ -904,7 +912,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else if(targetRank == LEVEL_EXAMINER && (memberRank != LEVEL_ROOT_ADMIN || memberRank != LEVEL_ADMIN)) {
 					return "Failed. " + victim.username + " is an Examiner!";
 				}
-				muteList.add(payload.toLowerCase());
+				muteList.add(victim.username);
 				return "Success! " + victim.username + " is now muted and can not use any commands";
 			} else if(command.equals("unmute")) {
 				if(payload.equals("")) {
@@ -1024,7 +1032,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("getpromote")) {
 				String target = trimUsername(removeSpaces(payload));
 				if(target.equals("")) {
-					return "Invalid format detected. Correct format is " + trigger + "getpromote <username>. For further help use " + trigger + "help getpromote";
+					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "getpromote <username>. For further help use " + trigger + "help getpromote", member.userID);
 				}
 				UserInfo targetUser = userFromName(target.toLowerCase());
 				if(targetUser == null) {
@@ -1245,6 +1253,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 					str += publicCommands.toString();
 				}
 				return str;
+			} else if(command.equals("voteleaver")) {
+				payload = trimUsername(removeSpaces(payload));
+				if(payload.equals("")) {
+					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "voteleaver <username>. For further help use " + trigger + "help baninfo", member.userID);
+					return null;
+				}
+				
 			} else if(command.equals("version")) {
 				String dotaVersion = GCBConfig.configuration.getString("gcb_bot_dota_version", "6.72f");
 				String warcraftVersion = GCBConfig.configuration.getString("gcb_bot_warcraft_version", "1.24e / 1.24.4.6387");
@@ -1316,7 +1331,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				String cmd = processAlias(payload.toLowerCase()); //converts payload to alias
 				if(cmd.equals("exit")) {
-					return "Rank required: Root Admin. Format: " + trigger + "exit. Info: shuts down the bot";
+					return "Rank required: Root Admin. Format: " + trigger + "exit. Shuts down the bot";
 				} else if(cmd.equals("addadmin")) {
 					return "Rank required: Root Admin. Format: " + trigger + "addadmin [username]. Example: " + trigger + "addadmin Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, or promote a user that has never been seen by the bot. Only Root Admins can promote other users to Admin";
 				} else if(cmd.equals("deleteuser")) {
@@ -1804,9 +1819,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 		} else if(rank == LEVEL_VIP) {
 			return "V.I.P.";
 		} else if(rank == LEVEL_SAFELIST) {
-			return "SAFELIST";
+			return "Safelist";
 		} else {
-			return "Unvouched";
+			return "Random";
 		}
 	}
 
@@ -1984,7 +1999,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 
 		//do we have a command?
-		if(player != null && chat.startsWith(trigger) && !chat.substring(1).startsWith(trigger)) {
+		if(player != null && chat.startsWith(trigger) && !chat.substring(1).startsWith(trigger) && !chat.equals(trigger)) {
 			//remove trigger from string, and split with space separator
 			String[] array = chat.substring(trigger.length()).split(" ", 2);
 			String command = array[0];
@@ -2007,16 +2022,20 @@ public class GChatBot implements GarenaListener, ActionListener {
 	}
 
 	public void playerJoined(MemberInfo player) {
+		UserInfo user = userFromName(player.username.toLowerCase());
 		if(entryLevel) {
-			if(player.experience < minLevel) {
-				garena.kick(player, "Level below minimum entry level of " + minLevel);
-				return;
-			} else if(player.experience > maxLevel) {
-				garena.kick(player, "Level above maximum entry level of " + maxLevel);
-				return;
+			if(user != null) {
+				if(user.rank == LEVEL_PUBLIC) {
+					if(player.experience < minLevel) {
+						garena.kick(player, "Level below minimum entry level of " + minLevel);
+						return;
+					} else if(player.experience > maxLevel) {
+						garena.kick(player, "Level above maximum entry level of " + maxLevel);
+						return;
+					}
+				}
 			}
 		}
-		UserInfo user = userFromName(player.username.toLowerCase());
 		UserInfo newUser = new UserInfo();
 		int userRank = LEVEL_PUBLIC;
 		if(user == null) {
@@ -2047,7 +2066,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 		if(userJoinAnnouncement) {
 			if(userRank == LEVEL_ROOT_ADMIN) {
-				chatthread.queueChat("Root Administator <" + player.username + "> has entered the room", ANNOUNCEMENT);
+				chatthread.queueChat("Root Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(userRank == LEVEL_ADMIN) {
 				chatthread.queueChat("Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(userRank == LEVEL_EXAMINER) {

@@ -21,12 +21,11 @@ public class MemberInfo {
 	public int externalPort;
 	public int internalPort;
 	public int virtualSuffix;
-	long lastCommandTime;
+	public long lastCommandTime;
 
 	public boolean inRoom;
-
-	int numWarnings = 0;
-	String[] lastMessages = {"", "", ""}; //stores last 3 messages sent
+	public int numWarnings = 0;
+	public String[] lastMessages = {"", "", ""}; //stores last 3 messages sent
 	
 	//these will be set after HELLO is received
 	public int correctPort = -1;

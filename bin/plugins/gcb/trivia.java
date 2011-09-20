@@ -238,7 +238,7 @@ public class trivia extends Plugin {
 		questionUncover = new char[firstAnswer.length()];
 		for(int i = 0; i < questionUncover.length; i++) {
 			if(firstAnswer.charAt(i) != ' ')
-				questionUncover[i] = '?';
+				questionUncover[i] = '_';
 			else
 				questionUncover[i] = firstAnswer.charAt(i);
 		}
