@@ -25,13 +25,12 @@ public class Main {
 	public static String VERSION = "gcb 0f";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
-	public static final String DAY_FORMAT = "dd";
 	static boolean log;
-	static boolean newLog;
 	static boolean logCommands;
 	boolean botDisable;
 	boolean reverse;
-	String currentDay;
+	long lastLog; //when the log file(s) were created
+	static int newLogInterval; //ms interval between creating new log file(s)
 
 	static PrintWriter log_out;
 	static PrintWriter log_cmd_out;
@@ -66,8 +65,8 @@ public class Main {
 		botDisable = GCBConfig.configuration.getBoolean("gcb_bot_disable", true);
 		reverse = GCBConfig.configuration.getBoolean("gcb_reverse", false);
 		log = GCBConfig.configuration.getBoolean("gcb_log", false);
-		newLog = GCBConfig.configuration.getBoolean("gcb_log_new_file", false);
 		logCommands = GCBConfig.configuration.getBoolean("gcb_log_commands", false);
+		newLogInterval = GCBConfig.configuration.getInt("gcb_log_new_file", 86400000);
 
 		//first load all the defaults
 		loadPlugins = true;
@@ -90,7 +89,7 @@ public class Main {
 			loadWC3 = false; //or else we'll broadcast our own packets
 		}
 		
-		currentDay = getDay();
+		lastLog = System.currentTimeMillis();
 	}
 
 	public void initPlugins() {
@@ -228,10 +227,49 @@ public class Main {
 
 	}
 	
-	public void newDayLoop() {
-		if(newLog) {
+	public void newLogLoop() {
+		if(newLogInterval != 0) {
 			while(true) {
-				newDay();
+				if(System.currentTimeMillis() - lastLog > newLogInterval) {
+					println("[Main] Closing old log file and creating new log file");
+					log_out.close();
+					String currentDate = date();
+					File log_directory = new File("log/");
+					if(!log_directory.exists()) {
+						log_directory.mkdir();
+					}
+					
+					File log_target = new File(log_directory, currentDate + ".log");
+					
+					try {
+						log_out = new PrintWriter(new FileWriter(log_target, true), true);
+					} catch(IOException e) {
+						if(DEBUG) {
+							e.printStackTrace();
+						}
+						println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
+					}
+					
+					if(logCommands) {
+						log_cmd_out.close();
+						File log_cmd_directory = new File("cmd_log/");
+						if(!log_cmd_directory.exists()) {
+							log_cmd_directory.mkdir();
+						}
+						
+						File log_cmd_target = new File(log_cmd_directory, currentDate + ".log");
+						
+						try {
+							log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
+						} catch(IOException e) {
+							if(DEBUG) {
+								e.printStackTrace();
+							}
+							println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
+						}
+					}
+					lastLog = System.currentTimeMillis();
+				}
 				try {
 					Thread.sleep(10000);
 				} catch(InterruptedException e) {
@@ -383,7 +421,7 @@ public class Main {
 
 		//init log
 		if(log) {
-			if(newLog) {
+			if(newLogInterval != 0) {
 				File log_directory = new File("log/");
 				if(!log_directory.exists()) {
 					log_directory.mkdir();
@@ -397,7 +435,7 @@ public class Main {
 			}
 		}
 		if(logCommands) {
-			if(newLog) {
+			if(newLogInterval != 0) {
 				File log_cmd_directory = new File("cmd_log/");
 				if(!log_cmd_directory.exists()) {
 					log_cmd_directory.mkdir();
@@ -419,51 +457,7 @@ public class Main {
 		main.initBot();
 		main.loadPlugins();
 		main.helloLoop();
-		main.newDayLoop();
-	}
-	
-	public void newDay() {
-		String day = getDay();
-		if(!currentDay.equals(day)) {
-			println("[Main] New day - end of log file");
-			String currentDate = date();
-			log_out.close();
-			File log_directory = new File("log/");
-			if(!log_directory.exists()) {
-				log_directory.mkdir();
-			}
-			
-			File log_target = new File(log_directory, currentDate + ".log");
-			
-			try {
-				log_out = new PrintWriter(new FileWriter(log_target, true), true);
-			} catch(IOException e) {
-				if(DEBUG) {
-					e.printStackTrace();
-				}
-				println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
-			}
-			
-			if(logCommands) {
-				log_cmd_out.close();
-				File log_cmd_directory = new File("cmd_log/");
-				if(!log_cmd_directory.exists()) {
-					log_cmd_directory.mkdir();
-				}
-				
-				File log_cmd_target = new File(log_cmd_directory, currentDate + ".log");
-				
-				try {
-					log_cmd_out = new PrintWriter(new FileWriter(log_cmd_target, true), true);
-				} catch(IOException e) {
-					if(DEBUG) {
-						e.printStackTrace();
-					}
-					println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
-				}
-			}
-			currentDay = day;
-		}
+		main.newLogLoop();
 	}
 
 	public static void println(String str) {
@@ -495,12 +489,6 @@ public class Main {
 	public static String date() {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-		return sdf.format(cal.getTime());
-	}
-	
-	public String getDay() {
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat(DAY_FORMAT);
 		return sdf.format(cal.getTime());
 	}
 
