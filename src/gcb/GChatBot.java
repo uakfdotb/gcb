@@ -968,17 +968,16 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(targetUser.ipAddress.equals("unknown")) {
 					return "Failed. " + payload + " has never entered this room and has no known IP address! For further help use " + trigger + "help checkuserip";
 				}
-				String ip = "/" + targetUser.ipAddress;
 				ArrayList<String> listOfUsers = new ArrayList<String>();
 				for(int i = 0; i < garena.members.size(); i++) {
-					if(garena.members.get(i).externalIP.toString().equals(ip)) {
+					if(garena.members.get(i).externalIP.toString().substring(1).equals(targetUser.ipAddress)) {
 						listOfUsers.add("<" + garena.members.get(i).username + ">");
 					}
 				}
 				if(listOfUsers.size() > 0) {
-					return "The following users have IP address " + ip + ": " + listOfUsers.toString();
+					return "The following users have IP address " + targetUser.ipAddress + ": " + listOfUsers.toString();
 				} else {
-					return "There are no users in the room who have IP address: " + ip + ". For further help use " + trigger + "help checkuserip";
+					return "There are no users in the room who have IP address: " + targetUser.ipAddress + ". For further help use " + trigger + "help checkuserip";
 				}
 			}
 		}
@@ -2062,6 +2061,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 		} else {
 			if(sqlthread.setLastSeen(player.username.toLowerCase(), time())) {
 				user.lastSeen = time();
+			}
+			if(sqlthread.setIP(player.username.toLowerCase(), player.externalIP.toString().substring(1))) {
+				user.ipAddress = player.externalIP.toString().substring(1);
 			}
 			userRank = user.rank;
 		}

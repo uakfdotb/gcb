@@ -601,6 +601,24 @@ public class SQLThread extends Thread {
 		return false;
 	}
 	
+	public boolean setIP(String username, String ip) {
+		try {
+			Connection connection = connection();
+			PreparedStatement statement = connection.prepareStatement("UPDATE users SET ipaddress=? WHERE username=?");
+			statement.setString(1, ip);
+			statement.setString(2, username);
+			statement.execute();
+			connectionReady(connection);
+			return true;
+		} catch(SQLException e) {
+			if(Main.DEBUG) {
+				e.printStackTrace();
+			}
+			Main.println("[SQLThread] Unable to set IP address for user " + username + ": " + e.getLocalizedMessage());
+		}
+		return false;
+	}
+	
 	public int countBans() {
 		int count = 0;
 		try {
