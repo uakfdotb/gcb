@@ -304,6 +304,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		
 		if(muteList.contains(member.username)) {
 			chatthread.queueChat("You are muted! An examiner must unmute you to allow you to use commands again", member.userID);
+			return null;
 		}
 
 		if(memberRank >= LEVEL_ROOT_ADMIN) {
