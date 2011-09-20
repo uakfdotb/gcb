@@ -1286,7 +1286,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return null;
 				}
 				if(sqlthread.doesBanExist(payload.toLowerCase())) {
-					return "<" + payload + "> " + sqlthread.getBanInfo(payload.toLowerCase());
+					return sqlthread.getBanInfo(payload.toLowerCase());
 				} else {
 					return "Failed. Can not find any ban information for " + payload + ". Are you sure they were banned by this bot?";
 				}

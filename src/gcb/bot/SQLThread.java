@@ -393,7 +393,7 @@ public class SQLThread extends Thread {
 				expireDate = result.getString(5);
 				date = date.substring(0, date.length()-2); //removes the millisecond value from the time
 			}
-			return name + " last banned on " + date + " by <" + admin + ">. Reason: " + reason + ". Ban expires on " + expireDate;
+			return "<" + name + "> last banned on " + date + " by <" + admin + ">. Reason: " + reason + ". Ban expires on " + expireDate;
 		} catch(SQLException e) {
 			if(Main.DEBUG) {
 				e.printStackTrace();
