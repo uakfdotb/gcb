@@ -120,6 +120,8 @@ gcb can send data on the joining user to GHost++ through GCBI. gcbi.patch should
 
 The patch only prints out the information. Because there are different uses for the information, further modification of GHost++ must be done for there to be a purpose. The information sent includes: the user ID, the room ID, the user's actual IP address, the user's Garena country code, the user's Garena experience.
 
+gcbi_extend.patch also sets the external IP string of each player to their actual IP address from Garena, so that bans should work.
+
 Also note that if GCBI is enabled without applying the gcbi patch to GHost++, gcb will be disconnected and not allowed to join games.
 
 Protocol
