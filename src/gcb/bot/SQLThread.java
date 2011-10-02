@@ -548,8 +548,8 @@ public class SQLThread extends Thread {
 		try {
 			Connection connection = connection();
 			PreparedStatement statement = connection.prepareStatement("UPDATE users SET unbannedby=? WHERE username=?");
-			statement.setString(1, username);
-			statement.setString(2, admin);
+			statement.setString(1, admin);
+			statement.setString(2, username);
 			statement.execute();
 			connectionReady(connection);
 			return true;

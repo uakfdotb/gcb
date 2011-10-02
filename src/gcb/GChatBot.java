@@ -1072,11 +1072,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				ArrayList<String> listOfUsers = new ArrayList<String>();
 				for(int i = 0; i < userDB.size(); i++) {
-					if(userDB.get(i).unbannedBy.equalsIgnoreCase(target)) {
-						if(userDB.get(i).unbannedBy.equals("unknown")) {
-							listOfUsers.add("<" + userDB.get(i).username + ">");
-						} else {
-							listOfUsers.add("<" + userDB.get(i).properUsername + ">");
+					if(userDB.get(i).unbannedBy != null) {
+						if(userDB.get(i).unbannedBy.equalsIgnoreCase(target)) {
+							if(userDB.get(i).properUsername.equals("unknown")) {
+								listOfUsers.add("<" + userDB.get(i).username + ">");
+							} else {
+								listOfUsers.add("<" + userDB.get(i).properUsername + ">");
+							}
 						}
 					}
 				}
