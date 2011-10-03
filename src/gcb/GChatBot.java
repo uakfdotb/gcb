@@ -1864,7 +1864,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			}
 		}
 		if(checkSameMessage) {
-			for(int i = 0; i < player.lastMessages.length-1; i++) { //checks current chat against previous chat
+			for(int i = 0; i < player.lastMessages.length; i++) { //checks current chat against previous chat
 				if(chat.equals(player.lastMessages[i])) {
 					if(channelAdmin && memberRank == LEVEL_PUBLIC) {
 						String currentDate = time();
