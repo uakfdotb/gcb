@@ -417,9 +417,13 @@ public class GarenaTCP extends Thread {
 				//replace with the actual entry key here
 				if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key")) {
 					WC3GameIdentifier identifier = garena.getWC3Interface().getGameIdentifier(entryKey);
-					rewrittenData.putInt(identifier.ghostEntryKey);
-
-					Main.debug("[GarenaTCP] Rewrote entry key (" + entryKey + " -> " + identifier.ghostEntryKey + ")");
+					
+					if(identifier != null) {
+						rewrittenData.putInt(identifier.ghostEntryKey);
+						Main.debug("[GarenaTCP] Rewrote entry key (" + entryKey + " -> " + identifier.ghostEntryKey + ")");
+					} else {
+						rewrittenData.putInt(entryKey);
+					}
 				} else {
 					rewrittenData.putInt(entryKey);
 				}
