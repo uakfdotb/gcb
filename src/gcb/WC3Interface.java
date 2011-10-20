@@ -281,14 +281,15 @@ public class WC3Interface {
 
 	private void removeOldGames() {
 		synchronized(entryKeys) {
-			Iterator<WC3GameIdentifier> i = entryKeys.keySet().iterator();
+			WC3GameIdentifier[] game_identifiers = (WC3GameIdentifier[]) entryKeys.keySet().toArray();
 
-			while(i.hasNext()) {
-				WC3GameIdentifier game = i.next();
-
+			for(WC3GameIdentifier game : game_identifiers) {
 				if(System.currentTimeMillis() - game.timeReceived > 1000 * 30) {
 					entryKeys.remove(game);
-					games.remove(game.garenaEntryKey);
+					
+					synchronized(games) {
+						games.remove(game.garenaEntryKey);
+					}
 
 					Main.println("[WC3Interface] Removed old game with name: " + game.gamename);
 				}

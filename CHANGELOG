@@ -1,3 +1,6 @@
+0g
+- fix: concurrent exceptions should be fixed
+
 0f
 - Plugin system improved, trivia plugin available for download
 - Multiple SQL connections are supported (thread-safe)
