@@ -830,6 +830,54 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					return "Failed!";
 				}
+			} else if(command.equals("multiban")) {
+				String[] parts = payload.split(" ", 3);
+				String usernames[] = parts[0].split(",");
+				if(parts.length < 3 || GarenaEncrypt.isInteger(parts[1])) {
+					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "multiban <username1>,<username2>,<username_X> <length_in_hours> <reason>. For further help use " + trigger + "help multiban", member.userID);
+				}
+				int banLength = Integer.parseInt(parts[1]);
+				String reason = parts[2];
+				String currentDate = time();
+				String expireDate = time(banLength);
+				for(int i = 0; i < usernames.length; i++) {
+					String ipAddress = "unknown";
+					usernames[i] = trimUsername(usernames[i]).toLowerCase();
+					if(usernames[i].equalsIgnoreCase(member.username)) {
+						return "Failed. You can not ban yourself!";
+					}
+					UserInfo targetUser = userFromName(usernames[i]);
+					if(targetUser != null) {
+						if(!targetUser.properUsername.equals("unknown")) {
+							usernames[i] = targetUser.properUsername;
+						}
+						if(targetUser.rank == LEVEL_ROOT_ADMIN) {
+							return "Failed. " + usernames[i] + " is a Root Admin!";
+						} else if(targetUser.rank == LEVEL_ADMIN && memberRank != LEVEL_ROOT_ADMIN) {
+							return "Failed. " + usernames[i] + " is an Admin!";
+						}
+						ipAddress = targetUser.ipAddress;
+					}
+					if(sqlthread.ban(usernames[i], ipAddress, currentDate, member.username, reason, expireDate)) {
+						if(roomBan && channelAdmin) {
+							chatthread.queueChat("Success! " + usernames[i] + " can no longer access this room. For information about this ban use " + trigger + "baninfo " + usernames[i], ANNOUNCEMENT);
+							try {
+								Thread.sleep(1000);
+							} catch(InterruptedException e) {
+								if(Main.DEBUG) {
+									e.printStackTrace();
+								}
+								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+							}
+							garena.ban(usernames[i], banLength);
+						} else {
+							return "Succes! " + usernames[i] + " has been banned from joining GCB";
+						}
+					} else {
+						return "Failed. There was an error with your database. Please inform Lethal_Dragon";
+					}
+				}
+				return null;
 			}
 		}
 						
@@ -1366,6 +1414,8 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Rank required: Admin. Format: " + trigger + "banword [word]. Example: " + trigger + "banword Lethal_Dragon is noob. Not case sensitive. Bot will automatically respond when banned words are used in main chat, depending on settings";
 				} else if(cmd.equals("unbanword")) {
 					return "Rank required: Admin. Format: " + trigger + "unbanword [word]. Example: " + trigger + "unbanword Lethal_Dragon is pro. Not case sensitive. Removes the word from the banned words list";
+				} else if(cmd.equals("multiban")) {
+					return "Rank required: Admin. Format: " + trigger + "multiban [username1],[username2],[username3],[username4]. Example: " + trigger + "multiban Lethal_Dragon,XIII.Dragon 10 too pro. Usernames are seperated by ONLY a comma - VERY IMPORTANT. Automatically removes all \">\" and \"<\" characters from the usernames. Not case sensitive. Bans all the users from the room if specified in settings. Else bans all the users from joining games hosted by GCB.";			
 				} else if(cmd.equals("bot")) {
 					return "Rank required: Admin. Format: " + trigger + "bot [command]. Example: " + trigger + "bot priv Lethal_Dragon -apso. Saves the command to MySQL database so GHost can read it. Only works if you have uakf.b's GHost modifications installed";
 				} else if(cmd.equals("loadplugin")) {
