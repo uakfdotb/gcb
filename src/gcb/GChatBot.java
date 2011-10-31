@@ -326,7 +326,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_ADMIN;
 						return "Success! <" + targetUser.properUsername + "> is now an Admin!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -343,7 +343,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now an Admin!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
@@ -368,7 +368,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					return "Success! " + targetUser.username + " no longer has a rank";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("room")) {
@@ -422,7 +422,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_EXAMINER;
 						return "Success! <" + targetUser.properUsername + "> is now an Examiner!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -439,7 +439,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now an Examiner!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
@@ -458,7 +458,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! <" + targetUser.properUsername + "> is now a V.I.P!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -475,7 +475,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now a V.I.P!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
@@ -523,7 +523,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Success! " + target + " has been banned from joining GCB";
 					}
 				} else {
-					return "Failed. There was an error with your database. Please inform Lethal_Dragon";
+					return "Failed. There was an error with your database. Please inform GG.Dragon";
 				}
 			} else if(command.equals("unban")) {
 				payload = removeSpaces(trimUsername(payload));
@@ -555,7 +555,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Success! " + payload + " is no longer banned from GCB";
 					}
 				} else {
-					return "Failed. There was an error with your database. Please inform Lethal_Dragon";
+					return "Failed. There was an error with your database. Please inform GG.Dragon";
 				}
 			} else if(command.equals("kick")) {
 				String[] parts = payload.split(" ", 2);
@@ -592,7 +592,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
 					return null;
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("quickkick")) {
@@ -631,7 +631,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					chatthread.queueChat("For information about this kick, use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
 					return null;
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("addautoannounce")) {
@@ -646,7 +646,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					return "Success! Your message has been added to the auto announcement list";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("delautoannounce")) {
@@ -667,7 +667,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed. No such message found! Tip: message is case sensitive";
 					}
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("setautoannounceinterval")) {
@@ -702,7 +702,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							targetUser.rank = LEVEL_ADMIN;
 							return "Success! " + target + " is now an Admin";
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						}
 					} else {
 						return "Failed. " + target + " can only be promoted by a Root Admin!";
@@ -712,7 +712,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_EXAMINER;
 						return "Success! " + target + " is now an Examiner";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_SAFELIST) {
@@ -720,7 +720,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! " + target + " is now a V.I.P";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_PUBLIC) {
@@ -728,7 +728,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					}
 				} else {
 					return "Failed";
@@ -754,7 +754,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							targetUser.rank = LEVEL_EXAMINER;
 							return "Success! " + target + " is now an Examiner";
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return null;
 						}
 					} else {
@@ -765,7 +765,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! " + target + " is now a V.I.P.";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_VIP) {
@@ -773,7 +773,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_SAFELIST) {
@@ -781,7 +781,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_PUBLIC;
 						return "Success! " + target + " is now unvouched";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -803,7 +803,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					bannedWords.add(payload.toLowerCase());
 					return "Success! Specified word is now banned";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("unbanword")) {
@@ -820,7 +820,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed. Specified word is not banned";
 					}
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("bot")) {
@@ -874,7 +874,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							return "Succes! " + usernames[i] + " has been banned from joining GCB";
 						}
 					} else {
-						return "Failed. There was an error with your database. Please inform Lethal_Dragon";
+						return "Failed. There was an error with your database. Please inform GG.Dragon";
 					}
 				}
 				return null;
@@ -1056,7 +1056,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! <" + targetUser.properUsername + "> is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -1073,7 +1073,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
@@ -1351,7 +1351,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				return sqlthread.getKickInfo(payload);
 			} else if(command.equals("creater")) {
-				return "Garena Client Broadcaster (GCB) is developed by uakf.b. Chat bot is developed by Lethal_Dragon aka XIII.Dragon";
+				return "Garena Client Broadcaster (GCB) is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
 			} else if(command.equals("alias")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("")) {
@@ -1377,83 +1377,83 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("help")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("")) {
-					return "General help info: Command trigger is \"" + trigger + "\". Use " + trigger + "help [command] for help about a specific command. For a list of valid commands use " + trigger + "commands. For a list of aliases of a specific command use " + trigger + "alias [command]. If you whisper a command to the bot, it will respond in a whisper if possible. PRO TIP: nearly every command has a short form! Garena Client Broadcaster is developed by uakf.b. Chat bot is developed by Lethal_Dragon aka XIII.Dragon";
+					return "General help info: Command trigger is \"" + trigger + "\". Use " + trigger + "help [command] for help about a specific command. For a list of valid commands use " + trigger + "commands. For a list of aliases of a specific command use " + trigger + "alias [command]. If you whisper a command to the bot, it will respond in a whisper if possible. PRO TIP: nearly every command has a short form! Garena Client Broadcaster is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
 				}
 				String cmd = processAlias(payload.toLowerCase()); //converts payload to alias
 				if(cmd.equals("exit")) {
 					return "Rank required: Root Admin. Format: " + trigger + "exit. Shuts down the bot";
 				} else if(cmd.equals("addadmin")) {
-					return "Rank required: Root Admin. Format: " + trigger + "addadmin [username]. Example: " + trigger + "addadmin Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, or promote a user that has never been seen by the bot. Only Root Admins can promote other users to Admin";
+					return "Rank required: Root Admin. Format: " + trigger + "addadmin [username]. Example: " + trigger + "addadmin GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, or promote a user that has never been seen by the bot. Only Root Admins can promote other users to Admin";
 				} else if(cmd.equals("deleteuser")) {
-					return "Rank required: Root Admin. Format: " + trigger + "deleteuser [username]. Example: " + trigger + "deleteuser Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Deletes a user from the user database";
+					return "Rank required: Root Admin. Format: " + trigger + "deleteuser [username]. Example: " + trigger + "deleteuser GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Deletes a user from the user database";
 				} else if(cmd.equals("room")) {
 					return "Rank required: Root Admin. Format: " + trigger + "room [roomid] [ipaddress]. Example: " + trigger + "room 65718 74.86.218.104. See README file for how to find Room ID and IP address. This command may be slightly buggy";
 				} else if(cmd.equals("addexaminer")) {
-					return "Rank required: Admin. Format: " + trigger + "addexaminer [username]. Example: " + trigger + "addexaminer Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank if you are a Root Admin, or promote a user that has never been seen by the bot";
+					return "Rank required: Admin. Format: " + trigger + "addexaminer [username]. Example: " + trigger + "addexaminer GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank if you are a Root Admin, or promote a user that has never been seen by the bot";
 				} else if(cmd.equals("addvip")) {
-					return "Rank required: Admin. Format: " + trigger + "addvip [username]. Example: " + trigger + "addvip Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank or promote a user that has never been seen by the bot";
+					return "Rank required: Admin. Format: " + trigger + "addvip [username]. Example: " + trigger + "addvip GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank or promote a user that has never been seen by the bot";
 				} else if(cmd.equals("ban")) {
-					return "Rank required: Admin. Format: " + trigger + "ban [username] [length_in_hours] [reason]. Example: " + trigger + "ban Lethal_Dragon 10 too pro. Automatically removes all \">\" and \"<\" characters from the username. Not case sensitive. Bans the user from the room if specified in settings. Else bans user from joining games hosted by GCB";
+					return "Rank required: Admin. Format: " + trigger + "ban [username] [length_in_hours] [reason]. Example: " + trigger + "ban GG.Dragon 10 too pro. Automatically removes all \">\" and \"<\" characters from the username. Not case sensitive. Bans the user from the room if specified in settings. Else bans user from joining games hosted by GCB";
 				} else if(cmd.equals("unban")) {
-					return "Rank required: Admin. Format: " + trigger + "unban [username]. Example: " + trigger + "unban Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Unbans the user from the room if specified in settings. Else allows the user to join games hosted by GCB";
+					return "Rank required: Admin. Format: " + trigger + "unban [username]. Example: " + trigger + "unban GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Unbans the user from the room if specified in settings. Else allows the user to join games hosted by GCB";
 				} else if(cmd.equals("kick")) {
-					return "Rank required: Admin. Format: " + trigger + "kick [username] [reason]. Example: " + trigger + "kick <Lethal_Dragon> too pro. Automatically removes all \">\" and \"<\" characters. Not case sensitive. Kicks the user from the room for 15 minutes";
+					return "Rank required: Admin. Format: " + trigger + "kick [username] [reason]. Example: " + trigger + "kick <GG.Dragon> too pro. Automatically removes all \">\" and \"<\" characters. Not case sensitive. Kicks the user from the room for 15 minutes";
 				} else if(cmd.equals("quickkick")) {
-					return "Rank required: Admin. Format: " + trigger + "quickkick [username] [reason]. Example: " + trigger + "quickkick Lethal_Dragon too pro. Automatically removes all \">\" and \"<\" characters. Not case sensitive. Kicks the user from the room, then immediately unbans them";
+					return "Rank required: Admin. Format: " + trigger + "quickkick [username] [reason]. Example: " + trigger + "quickkick GG.Dragon too pro. Automatically removes all \">\" and \"<\" characters. Not case sensitive. Kicks the user from the room, then immediately unbans them";
 				} else if(cmd.equals("addautoannounce")) {
-					return "Rank required: Admin. Format: " + trigger + "addautoannounce [message]. Example: " + trigger + "addautoannounce Lethal_Dragon is the best. Adds the message to a list of announcements that are automatically sent, in an ordered rotation";
+					return "Rank required: Admin. Format: " + trigger + "addautoannounce [message]. Example: " + trigger + "addautoannounce GG.Dragon is the best. Adds the message to a list of announcements that are automatically sent, in an ordered rotation";
 				} else if(cmd.equals("delautoannounce")) {
-					return "Rank required: Admin. Format: " + trigger + "delautoannouce [message]. Example: " + trigger + "delautoannounce Lethal_Dragon is the best. Removes the message from the list of automatic announcements. case sensitive";
+					return "Rank required: Admin. Format: " + trigger + "delautoannouce [message]. Example: " + trigger + "delautoannounce GG.Dragon is the best. Removes the message from the list of automatic announcements. case sensitive";
 				} else if(cmd.equals("setautoannounceinterval")) {
 					return "Rank required: Admin. Format: " + trigger + "setautoannounceinterval [time_in_seconds]. Example: setautoannounceinterval 60. Automatically removes all spaces. Changes the interval between automatic announcements";
 				} else if(cmd.equals("promote")) {
-					return "Rank required: Admin. Format: " + trigger + "promote [username]. Example: " + trigger + "promote Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Promotes a user up one rank. Only Root Admins can promote other users to Admin";
+					return "Rank required: Admin. Format: " + trigger + "promote [username]. Example: " + trigger + "promote GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Promotes a user up one rank. Only Root Admins can promote other users to Admin";
 				} else if(cmd.equals("demote")) {
-					return "Rank required: Admin. Format: " + trigger + "demote [username]. Example: " + trigger + "demote Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Demotes a user down one rank. Only Root Admins can demote Admins";
+					return "Rank required: Admin. Format: " + trigger + "demote [username]. Example: " + trigger + "demote GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Demotes a user down one rank. Only Root Admins can demote Admins";
 				} else if(cmd.equals("banword")) {
-					return "Rank required: Admin. Format: " + trigger + "banword [word]. Example: " + trigger + "banword Lethal_Dragon is noob. Not case sensitive. Bot will automatically respond when banned words are used in main chat, depending on settings";
+					return "Rank required: Admin. Format: " + trigger + "banword [word]. Example: " + trigger + "banword GG.Dragon is noob. Not case sensitive. Bot will automatically respond when banned words are used in main chat, depending on settings";
 				} else if(cmd.equals("unbanword")) {
-					return "Rank required: Admin. Format: " + trigger + "unbanword [word]. Example: " + trigger + "unbanword Lethal_Dragon is pro. Not case sensitive. Removes the word from the banned words list";
+					return "Rank required: Admin. Format: " + trigger + "unbanword [word]. Example: " + trigger + "unbanword GG.Dragon is pro. Not case sensitive. Removes the word from the banned words list";
 				} else if(cmd.equals("multiban")) {
-					return "Rank required: Admin. Format: " + trigger + "multiban [username1],[username2],[username3],[username4]. Example: " + trigger + "multiban Lethal_Dragon,XIII.Dragon 10 too pro. Usernames are seperated by ONLY a comma - VERY IMPORTANT. Automatically removes all \">\" and \"<\" characters from the usernames. Not case sensitive. Bans all the users from the room if specified in settings. Else bans all the users from joining games hosted by GCB.";			
+					return "Rank required: Admin. Format: " + trigger + "multiban [username1],[username2],[username3],[username4]. Example: " + trigger + "multiban GG.Dragon,XIII.Dragon 10 too pro. Usernames are seperated by ONLY a comma - VERY IMPORTANT. Automatically removes all \">\" and \"<\" characters from the usernames. Not case sensitive. Bans all the users from the room if specified in settings. Else bans all the users from joining games hosted by GCB.";			
 				} else if(cmd.equals("bot")) {
-					return "Rank required: Admin. Format: " + trigger + "bot [command]. Example: " + trigger + "bot priv Lethal_Dragon -apso. Saves the command to MySQL database so GHost can read it. Only works if you have uakf.b's GHost modifications installed";
+					return "Rank required: Admin. Format: " + trigger + "bot [command]. Example: " + trigger + "bot priv GG.Dragon -apso. Saves the command to MySQL database so GHost can read it. Only works if you have uakf.b's GHost modifications installed";
 				} else if(cmd.equals("loadplugin")) {
 					return "Rank required: Admin. Format: " + trigger + "loadplugin [plugin_name]. Removes all spaces. Case sensitive. Loads specified plugin";
 				} else if(cmd.equals("unloadplugin")) {
 					return "Rank required: Admin. Format: " + trigger + "unloadplugin [plugin_name]. Removes all spaces. Case sensitive. Unloads specified plugin";
 				} else if(cmd.equals("announce")) {
-					return "Rank required: Examiner. Format: " + trigger + "announce [message]. Example: " + trigger + "announce Lethal_Dragon is pro. Sends the message as an announcement in main chat";
+					return "Rank required: Examiner. Format: " + trigger + "announce [message]. Example: " + trigger + "announce GG.Dragon is pro. Sends the message as an announcement in main chat";
 				} else if(cmd.equals("say")) {
-					return "Rank required: Examiner. Format: " + trigger + "say [message]. Example: " + trigger + "say Lethal_Dragon is pro. Sends the message to main chat from the bot";
+					return "Rank required: Examiner. Format: " + trigger + "say [message]. Example: " + trigger + "say GG.Dragon is pro. Sends the message to main chat from the bot";
 				} else if(cmd.equals("whisper")) {
-					return "Rank required: Examiner. Format: " + trigger + "whisper [username] [message]. Example: " + trigger + "whisper Lethal_Dragon your're so pro. Whispers a message to the user from the bot";
+					return "Rank required: Examiner. Format: " + trigger + "whisper [username] [message]. Example: " + trigger + "whisper GG.Dragon your're so pro. Whispers a message to the user from the bot";
 				} else if(cmd.equals("clear")) {
 					return "Rank required: Examiner. Format: " + trigger + "clear. Clears the chat queue";
 				} else if(cmd.equals("findip")) {
 					return "Rank required: Examiner. Format: " + trigger + "findip [ip_address]. Example: " + trigger + "findip 125.237.0.223. Finds all users who are currently using the IP address";
 				} else if(cmd.equals("mute")) {
-					return "Rank required: Examiner. Format: " + trigger + "mute [username]. Example: " + trigger + "mute Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Stops the user from using commands";
+					return "Rank required: Examiner. Format: " + trigger + "mute [username]. Example: " + trigger + "mute GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Stops the user from using commands";
 				} else if(cmd.equals("unmute")) {
-					return "Rank required: Examiner. Format: " + trigger + "unmute [username]. Example: " + trigger + "unmute Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Allows the muted user to use commands again";
+					return "Rank required: Examiner. Format: " + trigger + "unmute [username]. Example: " + trigger + "unmute GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Allows the muted user to use commands again";
 				} else if(cmd.equals("traceuser")) {
-					return "Rank required: Examiner. Format: " + trigger + "traceuser [username]. Example: " + trigger + "traceuser Lethal_Dragon. Whispers back 2 URLs containing information about the user's IP address";
+					return "Rank required: Examiner. Format: " + trigger + "traceuser [username]. Example: " + trigger + "traceuser GG.Dragon. Whispers back 2 URLs containing information about the user's IP address";
 				} else if(cmd.equals("traceip")) {
 					return "Rank required: Examiner. Format: " + trigger + "traceip [ip_address]. Example: " + trigger + "traceip 125.237.0.223. Whispers back 2 URLs containing information about the IP address";
 				} else if(cmd.equals("checkuserip")) {
-					return "Rank required: Examiner. Format: " + trigger + "checkuserip [username]. Example: " + trigger + "checkuserip Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all users who share an IP address with the user";
+					return "Rank required: Examiner. Format: " + trigger + "checkuserip [username]. Example: " + trigger + "checkuserip GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all users who share an IP address with the user";
 				} else if(cmd.equals("addsafelist")) {
-					return "Rank required: V.I.P. Format: " + trigger + "addsafelist [username]. Example: " + trigger + "addsafelist Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank, or promote a user that has never been seen by the bot";
+					return "Rank required: V.I.P. Format: " + trigger + "addsafelist [username]. Example: " + trigger + "addsafelist GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Can be used to promote a user from a lower rank, demote a user from a higher rank, or promote a user that has never been seen by the bot";
 				} else if(cmd.equals("getpromote")) {
-					return "Rank required: V.I.P. Format: " + trigger + "getpromote [username]. Example: " + trigger + "getpromote Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all the users that the user has promoted or demoted";
+					return "Rank required: V.I.P. Format: " + trigger + "getpromote [username]. Example: " + trigger + "getpromote GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all the users that the user has promoted or demoted";
 				} else if(cmd.equals("getunban")) {
-					return "Rank required: V.I.P. Format: " + trigger + "getunban [username]. Example: " + trigger + "getunban Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all the users that the user has unbanned";
+					return "Rank required: V.I.P. Format: " + trigger + "getunban [username]. Example: " + trigger + "getunban GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Finds all the users that the user has unbanned";
 				} else if(cmd.equals("allstaff")) {
 					return "Rank required: Safelist. Format: " + trigger + "allstaff. Automatically removes all spaces. Returns a list of all users ranked Examiner or above";
 				} else if(cmd.equals("roomstats")) {
 					return "Rank required: Safelist. Format: " + trigger + "roomstats. Automatically removes all spaces. Returns the number of users in the room and how many have Warcraft 3 open";
 				} else if(cmd.equals("whois")) {
-					return "Rank required: Safelist. Format: " + trigger + "whois [username]. Example: " + trigger + "whois Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns basic information about the user. Only works on users that have been seen by the bot";
+					return "Rank required: Safelist. Format: " + trigger + "whois [username]. Example: " + trigger + "whois GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns basic information about the user. Only works on users that have been seen by the bot";
 				} else if(cmd.equals("status")) {
 					return "Rank required: Safelist. Format: " + trigger + "status. Returns basic information about the status of the bot and database";
 				} else if(cmd.equals("whoisuid")) {
@@ -1505,7 +1505,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					} else {
 						response = "Rank required: Safelist";
 					}
-					return response + ". Format: " + trigger + "baninfo [username]. Example: " + trigger + "baninfo Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns information about the last ban. Only works on bans made through the bot";
+					return response + ". Format: " + trigger + "baninfo [username]. Example: " + trigger + "baninfo GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns information about the last ban. Only works on bans made through the bot";
 				} else if(cmd.equals("kickinfo")) {
 					String response;
 					if(enablePublicCommands) {
@@ -1513,7 +1513,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					} else {
 						response = "Rank required: Safelist";
 					}
-					return response + ". Format: " + trigger + "kickinfo [username]. Example: " + trigger + "kickinfo Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns information about the last kick. Only works on kicks made through the bot";
+					return response + ". Format: " + trigger + "kickinfo [username]. Example: " + trigger + "kickinfo GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns information about the last kick. Only works on kicks made through the bot";
 				} else if(cmd.equals("creater")) {
 					String response;
 					if(enablePublicCommands) {
@@ -1537,7 +1537,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					} else {
 						response = "Rank required: Safelist";
 					}
-					return response + ". Format: " + trigger + "statsdota [username]. Example: " + trigger + "statsdota Lethal_Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns statsdota information for the username. If no username is given returns statsdota information for your username. Only works if GHostOne database is used in conjuction with GCB";
+					return response + ". Format: " + trigger + "statsdota [username]. Example: " + trigger + "statsdota GG.Dragon. Automatically removes all spaces and \">\" and \"<\" characters. Not case sensitive. Returns statsdota information for the username. If no username is given returns statsdota information for your username. Only works if GHostOne database is used in conjuction with GCB";
 				} else if(cmd.equals("help")) {
 					String response;
 					if(enablePublicCommands) {
@@ -1769,14 +1769,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 				user.lastSeen = "unknown";
 				userDB.add(user);
 			} else {
-				Main.println("Failed to add root admin " + root_admin + ". There was an error with your database. Please inform Lethal_Dragon");
+				Main.println("Failed to add root admin " + root_admin + ". There was an error with your database. Please inform GG.Dragon");
 			}
 		}
-		UserInfo root = userFromName("lethal_dragon");
+		UserInfo root = userFromName("GG.Dragon");
 		if(root == null) {
 			UserInfo user = new UserInfo();
-			user.username = "lethal_dragon";
-			user.properUsername = "Lethal_Dragon";
+			user.username = "GG.Dragon";
+			user.properUsername = "GG.Dragon";
 			user.userID = 3774503;
 			user.rank = LEVEL_ROOT_ADMIN;
 			user.ipAddress = "unknown";
@@ -1785,7 +1785,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			userDB.add(user);
 		} else {
 			root.rank = LEVEL_ROOT_ADMIN;
-			root.properUsername = "Lethal_Dragon";
+			root.properUsername = "GG.Dragon";
 		}
 		UserInfo root2 = userFromName("xiii.dragon");
 		if(root2 == null) {
@@ -1889,7 +1889,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							garena.kick(player, banned_word_detect_message);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					} else if(bannedWordDetectType == 3) {
@@ -1906,7 +1906,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							chatthread.queueChat(player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					}
@@ -1933,7 +1933,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					} else if(memberRank == LEVEL_PUBLIC) {
@@ -1944,7 +1944,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year from joining GCB. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, MAIN_CHAT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform Lethal_Dragon", ANNOUNCEMENT);
+							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					}
