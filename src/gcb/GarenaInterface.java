@@ -1201,7 +1201,9 @@ public class GarenaInterface {
 	public void displayMemberInfo() throws IOException {
 		FileWriter out = new FileWriter("room_users.txt");
 
-		for(MemberInfo member : members) {
+		for(int i = 0; i < members.size(); i++) {
+			MemberInfo member = members.get(i);
+			
 			out.write("user id: " + member.userID);
 			out.write("\tusername: " + member.username);
 			out.write("\tcountry: " + member.country);
