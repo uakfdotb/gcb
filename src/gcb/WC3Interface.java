@@ -281,9 +281,11 @@ public class WC3Interface {
 
 	private void removeOldGames() {
 		synchronized(entryKeys) {
-			WC3GameIdentifier[] game_identifiers = (WC3GameIdentifier[]) entryKeys.keySet().toArray();
+			Object[] game_identifiers = entryKeys.keySet().toArray();
 
-			for(WC3GameIdentifier game : game_identifiers) {
+			for(Object o : game_identifiers) {
+				WC3GameIdentifier game = (WC3GameIdentifier) o;
+				
 				if(System.currentTimeMillis() - game.timeReceived > 1000 * 30) {
 					entryKeys.remove(game);
 					
