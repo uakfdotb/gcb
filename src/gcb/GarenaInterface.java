@@ -919,7 +919,7 @@ public class GarenaInterface {
 		buf.putInt(deflated.length + 66); //message size
 		buf.put((byte) 0x22); //JOIN message identifier
 		buf.putInt(room_id);
-		buf.putInt(0);
+		buf.putInt(1);
 		buf.putInt(deflated.length + 4); //CRC and myinfo size
 
 		//generate CRC32
