@@ -2086,6 +2086,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return;
 					}
 				}
+			} else {
+				if(player.experience < minLevel) {
+					garena.kick(player, "Level below minimum entry level of " + minLevel);
+					return;
+				} else if(player.experience > maxLevel) {
+					garena.kick(player, "Level below minimum entry level of " + maxLevel);
+				}
 			}
 		}
 		UserInfo newUser = new UserInfo();
