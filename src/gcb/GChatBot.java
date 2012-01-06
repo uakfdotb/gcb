@@ -2091,7 +2091,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					garena.kick(player, "Level below minimum entry level of " + minLevel);
 					return;
 				} else if(player.experience > maxLevel) {
-					garena.kick(player, "Level above minimum entry level of " + maxLevel);
+					garena.kick(player, "Level above maximum entry level of " + maxLevel);
 				}
 			}
 		}
