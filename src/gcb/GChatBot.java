@@ -2092,6 +2092,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return;
 				} else if(player.experience > maxLevel) {
 					garena.kick(player, "Level above maximum entry level of " + maxLevel);
+					return;
 				}
 			}
 		}
@@ -2109,7 +2110,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				newUser.unbannedBy = "unknown";
 				userDB.add(newUser);
 			}
-		} else if(user.properUsername.equals("unknown")){
+		} else if(user.properUsername.equals("unknown")) {
 			if(sqlthread.setUser(player.username, player.userID, player.externalIP.toString().substring(1), time())) {
 				user.properUsername = player.username;
 				user.userID = player.userID;
