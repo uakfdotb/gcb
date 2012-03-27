@@ -1010,7 +1010,7 @@ public class GarenaInterface {
 				} else if(type == 34) {
 					//JOIN message
 					MemberInfo added = readMemberInfo(size - 1, lbuf);
-					Main.println("[GarenaInterface] New member joined: " + added.username + " with id " + added.userID);
+					Main.println("[GarenaInterface] New member joined: " + added.username + " (" + added.country + ") with id " + added.userID);
 
 					for(GarenaListener listener : listeners) {
 						listener.playerJoined(added);

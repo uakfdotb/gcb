@@ -690,7 +690,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				UserInfo targetUser = userFromName(target.toLowerCase());
 				if(targetUser == null) {
-					return "Failed. " + target + " is an unknown user! Use " + trigger + "addsafelist <username>. For further help use " + trigger + "help promote";
+					return "Failed. " + target + " is an unknown user! For further help use " + trigger + "help promote";
 				}
 				if(targetUser.rank == LEVEL_ROOT_ADMIN) {
 					return "Failed. " + target + " is a Root Admin!";
@@ -703,6 +703,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							return "Success! " + target + " is now an Admin";
 						} else {
 							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							return null;
 						}
 					} else {
 						return "Failed. " + target + " can only be promoted by a Root Admin!";
@@ -1081,6 +1082,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				String target = trimUsername(removeSpaces(payload));
 				if(target.equals("")) {
 					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "getpromote <username>. For further help use " + trigger + "help getpromote", member.userID);
+					return null;
 				}
 				UserInfo targetUser = userFromName(target.toLowerCase());
 				if(targetUser == null) {
