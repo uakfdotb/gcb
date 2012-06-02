@@ -91,21 +91,29 @@ public class SQLThread extends Thread {
 		synchronized(connections) {
 			if(connections.isEmpty()) {
 				try {
-					Main.println("[SQLThread] Creating new connection...");
+					System.out.println("[SQL] Creating new connection...");
 					connections.add(DriverManager.getConnection(host, username, password));
 				}
 				catch(SQLException e) {
-					Main.println("[SQLThread] Unable to connect to mysql database: " + e.getLocalizedMessage());
-					
-					if(Main.DEBUG) {
-						e.printStackTrace();
-					}
+					System.out.println("[SQL] Unable to connect to mysql database: " + e.getLocalizedMessage());
+					e.printStackTrace();
 				}
 			}
-					
-			Main.debug("[SQLThread] Currently have " + connections.size() + " connections");
 
-			return connections.remove(0);
+			//might still have no connections if creating a connection failed
+			if(connections.isEmpty()) return null;
+			else {
+				Connection connection = connections.remove(0);
+				try {
+					if(connection.isClosed()) {
+						return connection();
+					} else {
+						return connection;
+					}
+				} catch(SQLException e) {
+					return connection();
+				}
+			}
 		}
 	}
 	
