@@ -5,9 +5,9 @@
 
 package gcb;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -44,11 +44,12 @@ public class GarenaTCP extends Thread {
 
 	GarenaInterface garena;
 	Socket socket;
-	OutputStream out;
-	InputStream in;
+	DataOutputStream out;
+	DataInputStream in;
 	ByteBuffer buf;
 
 	boolean tcpDebug;
+	boolean localBuffered;
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
@@ -96,6 +97,8 @@ public class GarenaTCP extends Thread {
 			out_buffer = ByteBuffer.allocate(65536 * 2);
 			out_buffer.order(ByteOrder.LITTLE_ENDIAN);
 		}
+		
+		localBuffered = GCBConfig.configuration.getBoolean("gcb_tcp_localbuffer", true);
 	}
 
 	public boolean isValidPort(int port) {
@@ -139,8 +142,8 @@ public class GarenaTCP extends Thread {
 				InetAddress local_address = InetAddress.getByName(local_hostname);
 				socket = new Socket(local_address, destination_port);
 
-				out = socket.getOutputStream();
-				in = socket.getInputStream();
+				out = new DataOutputStream(socket.getOutputStream());
+				in = new DataInputStream(socket.getInputStream());
 			} catch(IOException ioe) {
 				end();
 				ioe.printStackTrace();
@@ -183,8 +186,8 @@ public class GarenaTCP extends Thread {
 		this.socket = socket;
 
 		try {
-			out = socket.getOutputStream();
-			in = socket.getInputStream();
+			out = new DataOutputStream(socket.getOutputStream());
+			in = new DataInputStream(socket.getInputStream());
 		} catch(IOException ioe) {
 			end();
 			ioe.printStackTrace();
@@ -467,19 +470,35 @@ public class GarenaTCP extends Thread {
 	}
 
 	public void run() {
-		byte[] rbuf = new byte[2048];
+		byte[] rbuf = new byte[65536];
 		ByteBuffer lbuf = ByteBuffer.allocate(65536);
 
 		while(!terminated) {
 			try {
-				//read as many bytes as we can and relay them onwards to remote
-				int len = in.read(rbuf); //definitely _don't_ want to readfully here!
-				last_received = System.currentTimeMillis();
+				int len;
+				
+				if(localBuffered) {
+					//read packet header, which includes packet length
+					in.readFully(rbuf, 0, 4);
+					len = rbuf[2] + rbuf[3] * 256;
+					
+					if(len >= 4) {
+						in.readFully(rbuf, 4, len - 4);
+					} else  {
+						Main.println("[GarenaTCP] Read invalid packet length (len=" + len + "), terminating");
+						end();
+						break;
+					}
+				} else {
+					//read as many bytes as we can and relay them onwards to remote
+					len = in.read(rbuf); //definitely _don't_ want to readfully here!
+					last_received = System.currentTimeMillis();
 
-				if(len == -1) {
-					Main.println("[GarenaTCP] Local host for connection " + conn_id + " disconnected");
-					end();
-					break;
+					if(len == -1) {
+						Main.println("[GarenaTCP] Local host for connection " + conn_id + " disconnected");
+						end();
+						break;
+					}
 				}
 
 				byte[] data = new byte[len];
