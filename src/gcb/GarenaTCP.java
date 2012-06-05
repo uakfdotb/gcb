@@ -480,7 +480,7 @@ public class GarenaTCP extends Thread {
 				if(localBuffered) {
 					//read packet header, which includes packet length
 					in.readFully(rbuf, 0, 4);
-					len = rbuf[2] + rbuf[3] * 256;
+					len = GarenaEncrypt.unsignedByte(rbuf[2]) + GarenaEncrypt.unsignedByte(rbuf[3]) * 256;
 					
 					if(len >= 4) {
 						in.readFully(rbuf, 4, len - 4);
