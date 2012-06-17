@@ -1720,7 +1720,10 @@ public class GarenaInterface {
 				}
 			} catch(IOException ioe) {
 				Main.println("[GInterface] PeerLoop: error: " + ioe.getLocalizedMessage());
-				return;
+				Main.println("[GInterface] PeerLoop: peer socket failed!");
+				ioe.printStackTrace();
+				
+				disconnected(GARENA_PEER);
 			}
 		}
 	}
