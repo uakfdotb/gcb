@@ -147,7 +147,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error while connecting to main host: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -160,7 +160,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error(2) while connecting to main host: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -293,7 +293,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error while connecting to room host: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -306,7 +306,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error(2) while connecting to room host: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -392,7 +392,7 @@ public class GarenaInterface {
 
 			//next byte should be 1
 			if(in.read() != 1) {
-				Main.println("[GInterface] Warning: invalid data from Garena server");
+				Main.println("[GInterface] Warning in readGSPSessionInitReply: invalid data from Garena server");
 			}
 
 			byte[] bb = new byte[size];
@@ -407,11 +407,11 @@ public class GarenaInterface {
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in readGSPSessionInitReply: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface] Decryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Decryption error in readGSPSessionInitReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
@@ -481,11 +481,11 @@ public class GarenaInterface {
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in readGSPSessionHelloReply: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface] Decryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Decryption error in readGSPSessionHelloReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
@@ -613,11 +613,11 @@ public class GarenaInterface {
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in readGSPSessionLoginReply: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface] Decryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Decryption error in readGSPSessionLoginReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
@@ -736,7 +736,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPQueryUser: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -744,7 +744,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O error in sendGSPQueryUser: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -786,7 +786,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPRequestFriend: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -794,7 +794,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O error in sendGSPRequestFriend: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -822,7 +822,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPJoinedRoom: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -830,7 +830,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O error in sendGSPJoinedRoom: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -860,7 +860,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPXP: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -868,7 +868,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O error in sendGSPXP: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -950,7 +950,7 @@ public class GarenaInterface {
 				buf.put(remainder); //values in byte arrays default to zero
 			}
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Error: " + e.getLocalizedMessage() + "; ignoring room password");
+			Main.println("[GInterface] Error in sendGCRPMeJoin: " + e.getLocalizedMessage() + "; ignoring room password");
 
 			buf.putInt(0);
 			buf.putInt(0);
@@ -964,7 +964,7 @@ public class GarenaInterface {
 		try {
 			byte[] password_bytes = password_hash.getBytes("UTF-8");
 			if(password_bytes.length > 33) {
-				Main.println("[GInterface] Fatal error: password hash is much too long!");
+				Main.println("[GInterface] Fatal error in sendGCRPMeJoin: password hash is much too long!");
 				System.exit(-1);
 			}
 
@@ -973,7 +973,7 @@ public class GarenaInterface {
 
 			buf.put(password_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Fatal error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Fatal error in sendGCRPMeJoin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -983,7 +983,7 @@ public class GarenaInterface {
 			rout.write(buf.array(), buf.arrayOffset(), buf.position());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O error in sendGCRPMeJoin: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -1164,7 +1164,7 @@ public class GarenaInterface {
 		try {
 			member.externalIP = InetAddress.getByAddress(external_bytes);
 		} catch(UnknownHostException e) {
-			Main.println("[GInterface] Error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Error in readMemberInfo: " + e.getLocalizedMessage());
 			return member;
 		}
 
@@ -1176,7 +1176,7 @@ public class GarenaInterface {
 		try {
 			member.internalIP = InetAddress.getByAddress(internal_bytes);
 		} catch(UnknownHostException e) {
-			Main.println("[GInterface] Error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Error in readMemberInfo: " + e.getLocalizedMessage());
 			return member;
 		}
 
@@ -1371,7 +1371,7 @@ public class GarenaInterface {
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPChat: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1389,7 +1389,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error in chat: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPChat: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -1403,7 +1403,7 @@ public class GarenaInterface {
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Error in announce: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPAnnounce: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1419,7 +1419,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPAnnounce: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -1492,7 +1492,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in kick: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -1510,7 +1510,7 @@ public class GarenaInterface {
 		try {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in startPlaying: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 		}
 	}
@@ -1527,7 +1527,7 @@ public class GarenaInterface {
 		try {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in stopPlaying: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 		}
 	}
@@ -1540,7 +1540,7 @@ public class GarenaInterface {
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPWhisper: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1557,7 +1557,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] Error in sendGCRPWhisper: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM);
 			return false;
 		}
@@ -1719,7 +1719,7 @@ public class GarenaInterface {
 					Main.println("[GInterface] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
 				}
 			} catch(IOException ioe) {
-				Main.println("[GInterface] Error: " + ioe.getLocalizedMessage());
+				Main.println("[GInterface] PeerLoop: error: " + ioe.getLocalizedMessage());
 				return;
 			}
 		}
