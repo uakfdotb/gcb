@@ -369,14 +369,14 @@ public class GarenaInterface {
 			lbuf.putShort((short) 0x00AD);
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPSessionInit: " + e.getLocalizedMessage());
 		}
 
 		try {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in sendGSPSessionInit: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -442,7 +442,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPSessionHello: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -450,7 +450,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in sendGSPSessionHello: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -516,7 +516,7 @@ public class GarenaInterface {
 			System.arraycopy(username_bytes, 0, username_buf, 0, username_bytes.length);
 			block.put(username_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Fatal error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Fatal error in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -532,7 +532,7 @@ public class GarenaInterface {
 		try {
 			byte[] password_bytes = password_hash.getBytes("UTF-8");
 			if(password_bytes.length > 33) {
-				Main.println("[GInterface] Fatal error: password hash is much too long!");
+				Main.println("[GInterface] Fatal error in sendGSPSessionLogin: password hash is much too long!");
 				System.exit(-1);
 			}
 
@@ -540,7 +540,7 @@ public class GarenaInterface {
 			System.arraycopy(password_bytes, 0, password_buf, 0, password_bytes.length);
 			block.put(password_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface] Fatal error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Fatal error(2) in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -568,7 +568,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface] Encryption error: " + e.getLocalizedMessage());
+			Main.println("[GInterface] Encryption error in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -576,7 +576,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface] I/O Error: " + ioe.getLocalizedMessage());
+			Main.println("[GInterface] I/O Error in sendGSPSessionLogin: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN);
 			return false;
 		}
@@ -702,7 +702,7 @@ public class GarenaInterface {
 					e.printStackTrace();
 				}
 
-				Main.println("[GInterface] GSLoop: error: " + e.getLocalizedMessage());
+				Main.println("[GInterface] GSPLoop: error: " + e.getLocalizedMessage());
 			}
 		}
 	}
