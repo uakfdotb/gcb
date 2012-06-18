@@ -161,6 +161,8 @@ public class Main {
 	}
 	
 	public void initPeer() {
+		garena.initPeer();
+		
 		if(loadPL) {
 			//startup GP2PP system
 			GarenaThread pl = new GarenaThread(garena, wc3i, GarenaThread.PEER_LOOP);

@@ -164,7 +164,20 @@ public class GarenaInterface {
 			disconnected(GARENA_MAIN);
 			return false;
 		}
+		
+		//try init reverse host
+		if(reverseEnabled) {
+			reverseHost = new GCBReverseHost(this);
+			reverseHost.init();
+			reverseHost.start();
+		}
 
+		return true;
+	}
+	
+	public boolean initPeer() {
+		Main.println("[GInterface] Initializing peer socket...");
+		
 		//init GP2PP socket
 		try {
 			//determine bind address from configuration
@@ -195,13 +208,6 @@ public class GarenaInterface {
 			return false;
 		}
 		
-		//try init reverse host
-		if(reverseEnabled) {
-			reverseHost = new GCBReverseHost(this);
-			reverseHost.init();
-			reverseHost.start();
-		}
-
 		return true;
 	}
 
@@ -1858,7 +1864,7 @@ public class GarenaInterface {
 
 			if(target.userID == this.user_id) continue;
 			if(!target.playing) continue; //don't broadcast if they don't have WC3 open
-		
+
 			if(target.correctIP == null) {
 				//send on both external and internal
 				sendUDPEncap(target.externalIP, target.externalPort, source, destination, data, offset, length);
