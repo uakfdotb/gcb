@@ -280,7 +280,6 @@ public class Main {
 	}
 
 	public void helloLoop() {
-		
 		int playCounter = 0;
 		int reconnectCounter = 0;
 		int xpCounter = 0;

@@ -1115,6 +1115,10 @@ public class GarenaInterface {
 
 		int num_members = lbuf.getInt(4);
 		Main.println("[GInterface] There are " + num_members + " members in this room");
+		
+		//in case we are reconnecting after a disconnect
+		// we don't want to keep the old member list
+		members.clear();
 
 		for(int i = 0; i < num_members; i++) {
 			readMemberInfo(64, lbuf);
