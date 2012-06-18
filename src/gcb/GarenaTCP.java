@@ -518,7 +518,7 @@ public class GarenaTCP extends Thread {
 				packet.data = data;
 
 				synchronized(packets) {
-					while(packets.size() > 20) { //let's wait a while before sending more
+					while(packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
 						try {
 							packets.wait();
 						} catch(InterruptedException e) {}
