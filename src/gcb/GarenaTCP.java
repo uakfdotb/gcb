@@ -50,6 +50,10 @@ public class GarenaTCP extends Thread {
 
 	boolean tcpDebug;
 	boolean localBuffered;
+	
+	//connection properties
+	int maximumBufferedPackets;
+	int standardDelay;
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
@@ -99,6 +103,10 @@ public class GarenaTCP extends Thread {
 		}
 		
 		localBuffered = GCBConfig.configuration.getBoolean("gcb_tcp_localbuffer", true);
+		
+		//connection properties
+		maximumBufferedPackets = GCBConfig.configuration.getInt("gcb_tcp_maxbufferedpackets", 100);
+		standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 2000);
 	}
 
 	public boolean isValidPort(int port) {
@@ -241,7 +249,6 @@ public class GarenaTCP extends Thread {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
 
-				int standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 2000);
 				if(curr.send_time < System.currentTimeMillis() - standardDelay) { //todo: set timeout to a more appropriate value
 					curr.send_time = System.currentTimeMillis();
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
