@@ -56,15 +56,15 @@ class GarenaReconnectThread extends Thread {
 		GarenaInterface garena = main.garena;
 
 		//TODO:make this work...
-		if(garena.socket.isClosed()) {
+		if(garena.socket != null && garena.socket.isClosed()) {
 			main.initGarena(true);
 		}
 
-		if(garena.room_socket.isClosed()) {
+		if(garena.room_socket != null && garena.room_socket.isClosed()) {
 			main.initRoom(true);
 		}
 
-		if(garena.peer_socket.isClosed()) {
+		if(garena.peer_socket != null && garena.peer_socket.isClosed()) {
 			main.initPeer();
 		}
 	}
