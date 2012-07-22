@@ -5,6 +5,7 @@
 
 package gcb.plugin;
 
+import gcb.GarenaInterface;
 import gcb.GarenaListener;
 import gcb.MemberInfo;
 
@@ -47,10 +48,10 @@ public class Plugin implements GarenaListener {
 	}
 
 	//GarenaListener functions
-	public void chatReceived(MemberInfo player, String text, boolean whisper) {}
-	public void playerJoined(MemberInfo player) {}
-	public void playerLeft(MemberInfo player) {}
-	public void playerStarted(MemberInfo player) {}
-	public void playerStopped(MemberInfo player) {}
-	public void disconnected(int type) {}
+	public void chatReceived(GarenaInterface source, MemberInfo player, String text, boolean whisper) {}
+	public void playerJoined(GarenaInterface source, MemberInfo player) {}
+	public void playerLeft(GarenaInterface source, MemberInfo player) {}
+	public void playerStarted(GarenaInterface source, MemberInfo player) {}
+	public void playerStopped(GarenaInterface source, MemberInfo player) {}
+	public void disconnected(GarenaInterface source, int type) {}
 }

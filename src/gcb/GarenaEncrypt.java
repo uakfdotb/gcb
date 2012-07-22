@@ -26,11 +26,13 @@ import java.util.Random;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 
@@ -382,11 +384,11 @@ public class GarenaEncrypt {
 	}
 	
 	private static InetAddress getFirstNonLoopbackAddress(boolean preferIpv4, boolean preferIPv6) throws SocketException {
-		Enumeration en = NetworkInterface.getNetworkInterfaces();
+		Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
 		while (en.hasMoreElements()) {
-			NetworkInterface i = (NetworkInterface) en.nextElement();
-			for (Enumeration en2 = i.getInetAddresses(); en2.hasMoreElements();) {
-				InetAddress addr = (InetAddress) en2.nextElement();
+			NetworkInterface i = en.nextElement();
+			for (Enumeration<InetAddress> en2 = i.getInetAddresses(); en2.hasMoreElements();) {
+				InetAddress addr = en2.nextElement();
 				if (!addr.isLoopbackAddress()) {
 					if (addr instanceof Inet4Address) {
 						if (preferIPv6) {

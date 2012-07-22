@@ -41,5 +41,12 @@ public class GarenaThread extends Thread {
 		else return;
 
 		terminated = true;
+		
+		try {
+			Thread.sleep(10000);
+		} catch(InterruptedException e) {}
+		
+		GarenaThread thread = new GarenaThread(garenaInterface, wc3Interface, type);
+		thread.start();
 	}
 }

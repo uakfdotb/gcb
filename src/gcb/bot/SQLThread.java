@@ -9,14 +9,17 @@ import gcb.GCBConfig;
 import gcb.GChatBot;
 import gcb.Main;
 import gcb.UserInfo;
+
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSet;
-import java.math.*;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -38,12 +41,12 @@ public class SQLThread extends Thread {
 	int dbtype;
 	int bannedWordDetectType;
 	int dbRefreshRate; //how often to synchronize database with bot
-	GChatBot bot;
+	Map<Integer, GChatBot> bots;
 	boolean initial;
 	boolean channelAdmin;
 
-	public SQLThread(GChatBot bot) {
-		this.bot = bot;
+	public SQLThread(Map<Integer, GChatBot> bots) {
+		this.bots = bots;
 		initial = true;
 
 		//configuration
@@ -715,7 +718,6 @@ public class SQLThread extends Thread {
 		double avgTowerKills = 0;
 		double avgRaxKills = 0;
 		double avgCourierKills = 0;
-		double winRate = 0;
 		
 		try {
 			Connection connection = connection();
@@ -853,45 +855,103 @@ public class SQLThread extends Thread {
 				//refresh admin list
 				PreparedStatement statement = connection.prepareStatement("SELECT username, properUsername, uid, rank, ipaddress, lastseen, promotedby, unbannedby FROM users");
 				ResultSet result = statement.executeQuery();
-				bot.userDB.clear();
+				
+				synchronized(bots) {
+					Iterator<GChatBot> it = bots.values().iterator();
+					
+					while(it.hasNext()) {
+						it.next().userDB.clear();
+					}
+				}
+				
 				while(result.next()) {
 					UserInfo user = new UserInfo();
 					user.username = result.getString("username");
 					user.properUsername = result.getString("properUsername");
 					user.userID = result.getInt("uid");
 					int rank = result.getInt("rank");
-					if(rank == bot.LEVEL_ROOT_ADMIN) {
-						rank = bot.LEVEL_ADMIN;
+					
+					if(rank == GChatBot.LEVEL_ROOT_ADMIN) {
+						rank = GChatBot.LEVEL_ADMIN;
 					}
+					
 					user.rank = rank;
 					user.ipAddress = result.getString("ipaddress");
 					user.lastSeen = result.getString("lastseen");
 					user.promotedBy = result.getString("promotedby");
 					user.unbannedBy = result.getString("unbannedby");
-					bot.userDB.add(user);
+					
+					synchronized(bots) {
+						Iterator<GChatBot> it = bots.values().iterator();
+						
+						while(it.hasNext()) {
+							it.next().userDB.add(user);
+						}
+					}
 				}
 				
 				if(channelAdmin) {
 					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='automessage'");
-					bot.autoAnn.clear();
+					
+					synchronized(bots) {
+						Iterator<GChatBot> it = bots.values().iterator();
+						
+						while(it.hasNext()) {
+							it.next().autoAnn.clear();
+						}
+					}
+					
 					while(result.next()) {
-						bot.autoAnn.add(result.getString("phrase"));
+						synchronized(bots) {
+							Iterator<GChatBot> it = bots.values().iterator();
+							
+							while(it.hasNext()) {
+								it.next().autoAnn.add(result.getString("phrase"));
+							}
+						}
 					}
 				}
 				
 				if(bannedWordDetectType > 0) {
 					result = statement.executeQuery("SELECT phrase FROM phrases WHERE type='bannedword'");
-					bot.bannedWords.clear();
+					
+					synchronized(bots) {
+						Iterator<GChatBot> it = bots.values().iterator();
+						
+						while(it.hasNext()) {
+							it.next().bannedWords.clear();
+						}
+					}
+					
 					while(result.next()) {
-						bot.bannedWords.add(result.getString("phrase"));
+						synchronized(bots) {
+							Iterator<GChatBot> it = bots.values().iterator();
+							
+							while(it.hasNext()) {
+								it.next().bannedWords.add(result.getString("phrase"));
+							}
+						}
 					}
 				}
 				
 				if(initial) {
-					Main.println("[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
-					Main.println("[SQLThread] Initial refresh: found " + bot.autoAnn.size() + " Auto Announcements");
-					if(bannedWordDetectType > 0) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");
+					GChatBot bot = null;
+					
+					synchronized(bots) {
+						if(!bots.isEmpty()) {
+							bot = bots.values().iterator().next();
+						}
+					}
+					
+					if(bot != null) {
+						Main.println("[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
+						Main.println("[SQLThread] Initial refresh: found " + bot.autoAnn.size() + " Auto Announcements");
+						
+						if(bannedWordDetectType > 0) {
+							Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");
+						}
+					} else {
+						Main.println("[SQLThread] Initial refresh: no bot found to store into");
 					}
 				}
 			} catch(SQLException e) {
@@ -906,8 +966,18 @@ public class SQLThread extends Thread {
 			if(initial) {
 				initial = false;
 			}
-			bot.addRoomList();
-			bot.addRoot();
+			
+
+			synchronized(bots) {
+				Iterator<GChatBot> it = bots.values().iterator();
+				
+				while(it.hasNext()) {
+					GChatBot bot = it.next();
+					bot.addRoomList();
+					bot.addRoot();
+				}
+			}
+			
 			try {
 				Thread.sleep(dbRefreshRate*1000);
 			} catch(InterruptedException e) {

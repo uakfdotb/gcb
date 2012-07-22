@@ -258,7 +258,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				} else {
 					rotateAnn = 0;
 				}
-				chatthread.queueChat(autoAnn.get(rotateAnn), ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, autoAnn.get(rotateAnn), ANNOUNCEMENT);
 				announce = false;
 			}
 		} else if(e.getSource() == startUp_timer) {
@@ -303,7 +303,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 		
 		if(muteList.contains(member.username)) {
-			chatthread.queueChat("You are muted! An examiner must unmute you to allow you to use commands again", member.userID);
+			chatthread.queueChat(garena.room_id, "You are muted! An examiner must unmute you to allow you to use commands again", member.userID);
 			return null;
 		}
 
@@ -313,7 +313,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				exit();
 			} else if(command.equals("addadmin")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addadmin", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addadmin", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -326,7 +326,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_ADMIN;
 						return "Success! <" + targetUser.properUsername + "> is now an Admin!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -343,13 +343,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now an Admin!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
 			} else if(command.equals("deleteuser")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "deleterank <username>. For further help use " + trigger + "help deleterank", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "deleterank <username>. For further help use " + trigger + "help deleterank", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -368,7 +368,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					return "Success! " + targetUser.username + " no longer has a rank";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("room")) {
@@ -376,11 +376,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 				String[] parts = payload.split(" ", 2);
 				if(!payload.equals("")) {
 					if(!GarenaEncrypt.isInteger(parts[0])) {
-						chatthread.queueChat(invalidFormat, member.userID);
+						chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 						return null;
 					}
 					if(!validIP(parts[1])) {
-						chatthread.queueChat(invalidFormat, member.userID);
+						chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 						return null;
 					}
 				}
@@ -395,7 +395,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					GCBConfig.configuration.setProperty("gcb_roomhost", parts[1]);
 				}
 				garena.disconnectRoom();
-				main.initRoom(true);
+				main.initRoom(garena, true);
 				return null;
 			}
 		}
@@ -404,7 +404,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			//ADMIN COMMANDS
 			if(command.equals("addexaminer")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addexaminer", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addexaminer", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -422,7 +422,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_EXAMINER;
 						return "Success! <" + targetUser.properUsername + "> is now an Examiner!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -439,13 +439,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now an Examiner!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
 			} else if(command.equals("addvip")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addvip", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addvip", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -458,7 +458,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! <" + targetUser.properUsername + "> is now a V.I.P!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -475,14 +475,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now a V.I.P!";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
 			} else if(command.equals("ban")) {
 				String[] parts = payload.split(" ", 3);
 				if(parts.length < 3 || !GarenaEncrypt.isInteger(parts[1])) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "ban <username> <length_in_hours> <reason>. For further help use " + trigger + "help ban", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "ban <username> <length_in_hours> <reason>. For further help use " + trigger + "help ban", member.userID);
 					return null;
 				}
 				String target = trimUsername(parts[0]).toLowerCase();
@@ -508,7 +508,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				if(sqlthread.ban(target, ipAddress, currentDate, member.username, reason, expireDate)) {
 					if(roomBan && channelAdmin) {
-						chatthread.queueChat("Success! " + target + " can no longer access this room. For information about this ban use " + trigger + "baninfo " + target, ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Success! " + target + " can no longer access this room. For information about this ban use " + trigger + "baninfo " + target, ANNOUNCEMENT);
 						try {
 							Thread.sleep(1000);
 						} catch(InterruptedException e) {
@@ -528,11 +528,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("unban")) {
 				payload = removeSpaces(trimUsername(payload));
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "unban <username>. For further help use " + trigger + "help unban", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "unban <username>. For further help use " + trigger + "help unban", member.userID);
 					return null;
 				}
 				if(!sqlthread.doesBanExist(payload.toLowerCase())) {
-					chatthread.queueChat("Failed. " + payload + " was not banned by this bot!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. " + payload + " was not banned by this bot!", ANNOUNCEMENT);
 					return null;
 				}
 				if(payload.equalsIgnoreCase(member.username)) {
@@ -540,7 +540,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 				if(sqlthread.unban(payload.toLowerCase()) && sqlthread.setUnbannedBy(payload, member.username)) {
 					if(roomUnban && channelAdmin) {
-						chatthread.queueChat("Success! " + payload + " is no longer banned from this room and GCB", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Success! " + payload + " is no longer banned from this room and GCB", ANNOUNCEMENT);
 						UserInfo user = userFromName(payload.toLowerCase());
 						if(user != null) {
 							user.unbannedBy = member.username;
@@ -560,7 +560,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("kick")) {
 				String[] parts = payload.split(" ", 2);
 				if(parts.length < 2) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "kick <username> <reason>. For further help use " + trigger + "help kick", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "kick <username> <reason>. For further help use " + trigger + "help kick", member.userID);
 					return null;
 				}
 				String target = trimUsername(parts[0]);
@@ -589,16 +589,16 @@ public class GChatBot implements GarenaListener, ActionListener {
 						}
 						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
-					chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "For information about this kick use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
 					return null;
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("quickkick")) {
 				String[] parts = payload.split(" ", 2);
 				if(parts.length < 2) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "quickkick <username> <reason>. For further help use " + trigger + "help quickkick", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "quickkick <username> <reason>. For further help use " + trigger + "help quickkick", member.userID);
 					return null;
 				}
 				String target = trimUsername(parts[0]);
@@ -628,15 +628,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
 					garena.unban(victim.username);
-					chatthread.queueChat("For information about this kick, use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "For information about this kick, use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
 					return null;
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("addautoannounce")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "addautoannounce <message>. For further help use " + trigger + "help addautoannounce", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "addautoannounce <message>. For further help use " + trigger + "help addautoannounce", member.userID);
 					return null;
 				}
 				if(sqlthread.addAutoAnnounce(payload)) {
@@ -646,12 +646,12 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					return "Success! Your message has been added to the auto announcement list";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("delautoannounce")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "delautoannounce <message>. For further help use " + trigger + "help delautoannounce", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "delautoannounce <message>. For further help use " + trigger + "help delautoannounce", member.userID);
 					return null;
 				}
 				int currentSize = autoAnn.size();
@@ -667,13 +667,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed. No such message found! Tip: message is case sensitive";
 					}
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("setautoannounceinterval")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("") || !GarenaEncrypt.isInteger(payload)) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "setautoannounceinterval <time_in_seconds>. For further help use " + trigger + "help setautoannounceinterval", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "setautoannounceinterval <time_in_seconds>. For further help use " + trigger + "help setautoannounceinterval", member.userID);
 					return null;
 				}
 				int milliseconds = Integer.parseInt(payload)*1000;
@@ -681,7 +681,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				return "Success! Auto messages will now be sent every " + milliseconds/1000 + " seconds";
 			} else if(command.equals("promote")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "promote <username>. For further help use " + trigger + "help promote", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "promote <username>. For further help use " + trigger + "help promote", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -702,7 +702,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							targetUser.rank = LEVEL_ADMIN;
 							return "Success! " + target + " is now an Admin";
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return null;
 						}
 					} else {
@@ -713,7 +713,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_EXAMINER;
 						return "Success! " + target + " is now an Examiner";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_SAFELIST) {
@@ -721,7 +721,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! " + target + " is now a V.I.P";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_PUBLIC) {
@@ -729,14 +729,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					}
 				} else {
 					return "Failed";
 				}
 			} else if(command.equals("demote")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "demote <username>. For further help use " + trigger + "help demote", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "demote <username>. For further help use " + trigger + "help demote", member.userID);
 				}
 				String target = trimUsername(removeSpaces(payload));
 				if(target.equalsIgnoreCase(member.username)) {
@@ -747,7 +747,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Failed. " + target + " is an unknown user! For further help use " + trigger + "help promote";
 				}
 				if(targetUser.rank == LEVEL_ROOT_ADMIN) {
-					chatthread.queueChat("Failed. " + target + " is a Root Admin!", MAIN_CHAT);
+					chatthread.queueChat(garena.room_id, "Failed. " + target + " is a Root Admin!", MAIN_CHAT);
 					return null;
 				} else if(targetUser.rank == LEVEL_ADMIN) {
 					if(memberRank == LEVEL_ROOT_ADMIN) {
@@ -755,7 +755,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 							targetUser.rank = LEVEL_EXAMINER;
 							return "Success! " + target + " is now an Examiner";
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return null;
 						}
 					} else {
@@ -766,7 +766,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_VIP;
 						return "Success! " + target + " is now a V.I.P.";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_VIP) {
@@ -774,7 +774,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else if(targetUser.rank == LEVEL_SAFELIST) {
@@ -782,7 +782,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_PUBLIC;
 						return "Success! " + target + " is now unvouched";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -797,19 +797,19 @@ public class GChatBot implements GarenaListener, ActionListener {
 				return null;
 			} else if(command.equals("banword")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "banword <word>. For further help use " + trigger + "help banword", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "banword <word>. For further help use " + trigger + "help banword", member.userID);
 					return null;
 				}
 				if(sqlthread.banWord(payload.toLowerCase())) {
 					bannedWords.add(payload.toLowerCase());
 					return "Success! Specified word is now banned";
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("unbanword")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "unbanword <word>. For further help use " + trigger + "help unbanword", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "unbanword <word>. For further help use " + trigger + "help unbanword", member.userID);
 					return null;
 				}
 				if(sqlthread.unbanWord(payload.toLowerCase())) {
@@ -821,7 +821,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						return "Failed. Specified word is not banned";
 					}
 				} else {
-					chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
 				}
 			} else if(command.equals("bot")) {
@@ -835,7 +835,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				String[] parts = payload.split(" ", 3);
 				String usernames[] = parts[0].split(",");
 				if(parts.length < 3 || GarenaEncrypt.isInteger(parts[1])) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "multiban <username1>,<username2>,<username_X> <length_in_hours> <reason>. For further help use " + trigger + "help multiban", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "multiban <username1>,<username2>,<username_X> <length_in_hours> <reason>. For further help use " + trigger + "help multiban", member.userID);
 				}
 				int banLength = Integer.parseInt(parts[1]);
 				String reason = parts[2];
@@ -861,7 +861,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					if(sqlthread.ban(usernames[i], ipAddress, currentDate, member.username, reason, expireDate)) {
 						if(roomBan && channelAdmin) {
-							chatthread.queueChat("Success! " + usernames[i] + " can no longer access this room. For information about this ban use " + trigger + "baninfo " + usernames[i], ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Success! " + usernames[i] + " can no longer access this room. For information about this ban use " + trigger + "baninfo " + usernames[i], ANNOUNCEMENT);
 							try {
 								Thread.sleep(1000);
 							} catch(InterruptedException e) {
@@ -886,22 +886,22 @@ public class GChatBot implements GarenaListener, ActionListener {
 			//EXAMINER COMMANDS
 			if(command.equals("announce")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "announce <message>. For further help use " + trigger + "help announce", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "announce <message>. For further help use " + trigger + "help announce", member.userID);
 					return null;
 				}
-				chatthread.queueChat(payload, ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, payload, ANNOUNCEMENT);
 				return null;
 			} else if(command.equals("say")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "say <message>. For further help use " + trigger + "help say", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "say <message>. For further help use " + trigger + "help say", member.userID);
 					return null;
 				}
-				chatthread.queueChat(payload, MAIN_CHAT);
+				chatthread.queueChat(garena.room_id, payload, MAIN_CHAT);
 				return null;
 			} else if(command.equals("whisper")) {
 				String[] parts = payload.split(" ", 2);
 				if(parts.length < 2) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "whisper <username> <message>. For further help use " + trigger + "help whisper", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "whisper <username> <message>. For further help use " + trigger + "help whisper", member.userID);
 					return null;
 				}
 				String username = trimUsername(parts[1]);
@@ -910,7 +910,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return "Failed. Unable to find " + target + " in room";
 				}
 				String message = parts[1];
-				chatthread.queueChat(message, target.userID);
+				chatthread.queueChat(garena.room_id, message, target.userID);
 				return null;
 			} else if(command.equals("clear")) {
 				chatthread.clearQueue();
@@ -918,12 +918,12 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("findip")) {
 				String invalidFormat = "Invalid format detected. Correct format is " + trigger + "findip <ip_address>. For further help use " + trigger + "help findip";
 				if(payload.equals("")) {
-					chatthread.queueChat(invalidFormat, member.userID);
+					chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 					return null;
 				}
 				payload = removeSpaces(payload);
 				if(!validIP(payload)) {
-					chatthread.queueChat(invalidFormat, member.userID);
+					chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 					return null;
 				}
 				if(payload.charAt(0) != '/') {
@@ -942,7 +942,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 			} else if(command.equals("mute")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "mute <username>. For further help use " + trigger + "help mute", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "mute <username>. For further help use " + trigger + "help mute", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -966,7 +966,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				return "Success! " + victim.username + " is now muted and can not use any commands";
 			} else if(command.equals("unmute")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "unmute <username>. For further help use " + trigger + "help unmute", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "unmute <username>. For further help use " + trigger + "help unmute", member.userID);
 					return null;
 				}
 				String target = removeSpaces(trimUsername(payload));
@@ -979,7 +979,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				}
 			} else if(command.equals("traceuser")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "traceuser <username>. For further help use " + trigger + "help traceuser", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "traceuser <username>. For further help use " + trigger + "help traceuser", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -990,23 +990,23 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(targetUser.ipAddress.equals("unknown")) {
 					return "Failed. " + target + " has never entered this room and has no known IP address! For further help use " + trigger + "help traceuser";
 				}
-				chatthread.queueChat("http://www.dnsstuff.com/tools/whois/?ip=" + targetUser.ipAddress + " or http://www.ip-adress.com/ip_tracer/" + targetUser.ipAddress, member.userID);
+				chatthread.queueChat(garena.room_id, "http://www.dnsstuff.com/tools/whois/?ip=" + targetUser.ipAddress + " or http://www.ip-adress.com/ip_tracer/" + targetUser.ipAddress, member.userID);
 				return null;
 			} else if(command.equals("traceip")) {
 				String invalidFormat = "Invalid format detected. Correct format is " + trigger + "traceip <ip_address>. For further help use " + trigger + "help traceip";
 				if(payload.equals("")) {
-					chatthread.queueChat(invalidFormat, member.userID);
+					chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 				}
 				payload = removeSpaces(payload);
 				if(!validIP(payload)) {
-					chatthread.queueChat(invalidFormat, member.userID);
+					chatthread.queueChat(garena.room_id, invalidFormat, member.userID);
 					return null;
 				}
-				chatthread.queueChat("http://www.dnsstuff.com/tools/whois/?ip=" + payload + " or http://www.ip-adress.com/ip_tracer/" + payload, member.userID);
+				chatthread.queueChat(garena.room_id, "http://www.dnsstuff.com/tools/whois/?ip=" + payload + " or http://www.ip-adress.com/ip_tracer/" + payload, member.userID);
 				return null;
 			} else if(command.equals("checkuserip")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "checkuserip <username>. For further help use " + trigger + "help checkuserip", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "checkuserip <username>. For further help use " + trigger + "help checkuserip", member.userID);
 					return null;
 				}
 				payload = removeSpaces(trimUsername(payload));
@@ -1035,7 +1035,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			//VIP COMMANDS
 			if(command.equals("addsafelist")) {
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addsafelist", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "addadmin <username>. For further help use " + trigger + "help addsafelist", member.userID);
 					return null;
 				}
 				String target = trimUsername(removeSpaces(payload));
@@ -1057,7 +1057,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						targetUser.rank = LEVEL_SAFELIST;
 						return "Success! <" + targetUser.properUsername + "> is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				} else {
@@ -1074,14 +1074,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 						userDB.add(user);
 						return "Success! " + target + " is now safelisted";
 					} else {
-						chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 						return null;
 					}
 				}
 			} else if(command.equals("getpromote")) {
 				String target = trimUsername(removeSpaces(payload));
 				if(target.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "getpromote <username>. For further help use " + trigger + "help getpromote", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "getpromote <username>. For further help use " + trigger + "help getpromote", member.userID);
 					return null;
 				}
 				UserInfo targetUser = userFromName(target.toLowerCase());
@@ -1184,7 +1184,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(rootAdmins.equals("")) {
 					rootAdmins = " None";
 				}
-				chatthread.queueChat(owner + " staff team:\nRoot Admins:" + rootAdmins + "\nAdmins: " + admins + "\nExaminers:" + examiners, ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, owner + " staff team:\nRoot Admins:" + rootAdmins + "\nAdmins: " + admins + "\nExaminers:" + examiners, ANNOUNCEMENT);
 				return null;
 			} else if(command.equals("staff")) {
 				String examiners = "";
@@ -1226,7 +1226,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				if(rootAdmins.equals("")) {
 					rootAdmins = " None";
 				}
-				chatthread.queueChat(owner + " staff team currently in room:\nRoot Admins:" + rootAdmins + "\nAdmins: " + admins + "\nExaminers:" + examiners, ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, owner + " staff team currently in room:\nRoot Admins:" + rootAdmins + "\nAdmins: " + admins + "\nExaminers:" + examiners, ANNOUNCEMENT);
 				return null;
 			} else if(command.equals("roomstats")) {
 				int numPlaying = 0;
@@ -1244,14 +1244,14 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("whois")) {
 				String target = trimUsername(removeSpaces(payload));
 				if(target.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "whois <username>. For further help use " + trigger + "help whois", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "whois <username>. For further help use " + trigger + "help whois", member.userID);
 					return null;
 				}
 				return whois(target);
 			} else if(command.equals("whoisuid")) {
 				String target = removeSpaces(payload);
 				if(target.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "whoisuid <uid>. For further help use " + trigger + "help whoisuid", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "whoisuid <uid>. For further help use " + trigger + "help whoisuid", member.userID);
 					return null;
 				}
 				if(GarenaEncrypt.isInteger(payload)) {
@@ -1262,7 +1262,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					}
 					return whois(targetUser.username);
 				}
-				chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "whoisuid <uid>. For further help use " + trigger + "help whoisuid", member.userID);
+				chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "whoisuid <uid>. For further help use " + trigger + "help whoisuid", member.userID);
 				return null;
 			} else if(command.equals("status")) {
 				int databaseSize = userDB.size();
@@ -1282,7 +1282,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 					ann_plural = "";
 					ann_grammar = "is ";
 				}
-				chatthread.queueChat("Online since: " + startTime + ". There are " + databaseSize + " users stored in the database. " + numBanned + " players have been banned by this bot. " + numKicked + " players have been kicked by this bot. There " + muted_grammar + numMuted + " player" + muted_plural + " currently muted. There " + ann_grammar + numAnnouncement + " announcement" + ann_plural + " currently being sent.", ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, "Online since: " + startTime + ". There are " + databaseSize + " users stored in the database. " + numBanned + " players have been banned by this bot. " + numKicked + " players have been kicked by this bot. There " + muted_grammar + numMuted + " player" + muted_plural + " currently muted. There " + ann_grammar + numAnnouncement + " announcement" + ann_plural + " currently being sent.", ANNOUNCEMENT);
 				return null;
 			}
 		}
@@ -1308,7 +1308,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("voteleaver")) {
 				payload = trimUsername(removeSpaces(payload));
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "voteleaver <username>. For further help use " + trigger + "help baninfo", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "voteleaver <username>. For further help use " + trigger + "help baninfo", member.userID);
 					return null;
 				}
 				
@@ -1334,7 +1334,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("baninfo")) {
 				payload = trimUsername(removeSpaces(payload));
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "baninfo <username>. For further help use " + trigger + "help baninfo", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "baninfo <username>. For further help use " + trigger + "help baninfo", member.userID);
 					return null;
 				}
 				if(sqlthread.doesBanExist(payload.toLowerCase())) {
@@ -1345,7 +1345,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("kickinfo")) {
 				payload = trimUsername(removeSpaces(payload));
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "kickinfo <username>. For further help use " + trigger + "help kickinfo", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "kickinfo <username>. For further help use " + trigger + "help kickinfo", member.userID);
 					return null;
 				}
 				if(!sqlthread.doesKickExist(payload)) {
@@ -1357,7 +1357,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 			} else if(command.equals("alias")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("")) {
-					chatthread.queueChat("Invalid format detected. Correct format is " + trigger + "alias <command>. For further help use " + trigger + "help alias", member.userID);
+					chatthread.queueChat(garena.room_id, "Invalid format detected. Correct format is " + trigger + "alias <command>. For further help use " + trigger + "help alias", member.userID);
 					return null;
 				}
 				String cmd_check = processAlias(payload);
@@ -1879,19 +1879,19 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 	}
 
-	public void chatReceived(MemberInfo player, String chat, boolean whisper) {
+	public void chatReceived(GarenaInterface source, MemberInfo player, String chat, boolean whisper) {
 		int memberRank = getUserRank(player.username.toLowerCase());
 		if(bannedWordDetectType > 1 && memberRank == LEVEL_PUBLIC) {
 			for(int i = 0; i < bannedWords.size(); i++) {
 				if(chat.toLowerCase().indexOf(bannedWords.get(i)) > -1) {
 					if(bannedWordDetectType == 1) {
-						chatthread.queueChat("Warning! <" + player.username + "> " + banned_word_detect_message, MAIN_CHAT);
+						chatthread.queueChat(garena.room_id, "Warning! <" + player.username + "> " + banned_word_detect_message, MAIN_CHAT);
 					} else if(bannedWordDetectType == 2) {
 						if(sqlthread.ban(player.username, player.externalIP.toString().substring(1), time(), "Auto detection", "Banned word detected", "kick")) {
 							garena.kick(player, banned_word_detect_message);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					} else if(bannedWordDetectType == 3) {
@@ -1905,10 +1905,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 								}
 								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
-							chatthread.queueChat(player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					}
@@ -1932,10 +1932,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 								}
 								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
-							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					} else if(memberRank == LEVEL_PUBLIC) {
@@ -1943,10 +1943,10 @@ public class GChatBot implements GarenaListener, ActionListener {
 						String expireDate = time(8760);
 						String ipAddress = player.externalIP.toString().substring(1);
 						if(sqlthread.ban(player.username, ipAddress, currentDate, "Auto detection", "Bypassing flood protection", expireDate)) {
-							chatthread.queueChat("Successfully banned <" + player.username + "> for 1 year from joining GCB. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, MAIN_CHAT);
+							chatthread.queueChat(garena.room_id, "Successfully banned <" + player.username + "> for 1 year from joining GCB. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, MAIN_CHAT);
 							return;
 						} else {
-							chatthread.queueChat("Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
+							chatthread.queueChat(garena.room_id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 							return;
 						}
 					}
@@ -1981,7 +1981,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 						}
 						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
-					chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 					return;
 				}
 			} else if(numNewLines > spamWarnLines) {
@@ -1998,17 +1998,17 @@ public class GChatBot implements GarenaListener, ActionListener {
 							}
 							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 						}
-						chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 						return;
 					}
 				} else if(player.numWarnings == spamKick) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). FINAL WARNING!!!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). FINAL WARNING!!!", ANNOUNCEMENT);
 					return;
 				} else if(player.numWarnings == spamKick-1) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). Second warning!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked! (use less new lines). Second warning!", ANNOUNCEMENT);
 					return;
 				} else if(player.numWarnings == spamKick-2) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked. (use less new lines). First warning!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked. (use less new lines). First warning!", ANNOUNCEMENT);
 					return;
 				}
 			} else if(numEqualitySigns > spamWarnEquality) {
@@ -2025,17 +2025,17 @@ public class GChatBot implements GarenaListener, ActionListener {
 							}
 							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 						}
-						chatthread.queueChat("For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
+						chatthread.queueChat(garena.room_id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 						return;
 					}
 				} else if(player.numWarnings == spamKick) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). FINAL WARNING!!!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). FINAL WARNING!!!", ANNOUNCEMENT);
 					return;
 				} else if(player.numWarnings == spamKick-1) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). Second warning!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked! (use less equality symbols). Second warning!", ANNOUNCEMENT);
 					return;
 				} else if(player.numWarnings == spamKick-2) {
-					chatthread.queueChat("<" + player.username + ">: stop spamming or you will be kicked. (use less equality symbols). First warning!", ANNOUNCEMENT);
+					chatthread.queueChat(garena.room_id, "<" + player.username + ">: stop spamming or you will be kicked. (use less equality symbols). First warning!", ANNOUNCEMENT);
 					return;
 				}
 			} else {
@@ -2046,9 +2046,9 @@ public class GChatBot implements GarenaListener, ActionListener {
 			String trigger_msg = "Trigger: " + trigger;
 
 			if(whisper) {
-				chatthread.queueChat(trigger_msg, player.userID);
+				chatthread.queueChat(garena.room_id, trigger_msg, player.userID);
 			} else {
-				chatthread.queueChat(trigger_msg, MAIN_CHAT);
+				chatthread.queueChat(garena.room_id, trigger_msg, MAIN_CHAT);
 			}
 		}
 
@@ -2067,15 +2067,15 @@ public class GChatBot implements GarenaListener, ActionListener {
 			
 			if(response != null) {
 				if(whisper) {
-					chatthread.queueChat(response, player.userID);
+					chatthread.queueChat(garena.room_id, response, player.userID);
 				} else {
-					chatthread.queueChat(response, MAIN_CHAT);
+					chatthread.queueChat(garena.room_id, response, MAIN_CHAT);
 				}
 			}
 		}
 	}
 
-	public void playerJoined(MemberInfo player) {
+	public void playerJoined(GarenaInterface source, MemberInfo player) {
 		UserInfo user = userFromName(player.username.toLowerCase());
 		if(entryLevel) {
 			if(user != null) {
@@ -2131,33 +2131,33 @@ public class GChatBot implements GarenaListener, ActionListener {
 		}
 		if(userJoinAnnouncement) {
 			if(userRank == LEVEL_ROOT_ADMIN) {
-				chatthread.queueChat("Root Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, "Root Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(userRank == LEVEL_ADMIN) {
-				chatthread.queueChat("Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, "Administrator <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(userRank == LEVEL_EXAMINER) {
-				chatthread.queueChat("Examiner <" + player.username + "> has entered the room", ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, "Examiner <" + player.username + "> has entered the room", ANNOUNCEMENT);
 			} else if(userRank == LEVEL_VIP) {
-				chatthread.queueChat("V.I.P < " + player.username + "> has entered the room", ANNOUNCEMENT);
+				chatthread.queueChat(garena.room_id, "V.I.P < " + player.username + "> has entered the room", ANNOUNCEMENT);
 			}
 		}
 		if(publicUserMessage && userRank <= LEVEL_SAFELIST) {
-			chatthread.queueChat(welcome_message, player.userID);
+			chatthread.queueChat(garena.room_id, welcome_message, player.userID);
 		}
 	}
 
-	public void playerLeft(MemberInfo player) {
+	public void playerLeft(GarenaInterface source, MemberInfo player) {
 
 	}
 
-	public void playerStopped(MemberInfo player) {
+	public void playerStopped(GarenaInterface source, MemberInfo player) {
 
 	}
 
-	public void playerStarted(MemberInfo player) {
+	public void playerStarted(GarenaInterface source, MemberInfo player) {
 
 	}
 
-	public void disconnected(int x) {
+	public void disconnected(GarenaInterface source, int x) {
 		//try to reconnect
 
 	}

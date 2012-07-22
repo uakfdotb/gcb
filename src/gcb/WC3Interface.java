@@ -14,7 +14,9 @@ import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -27,7 +29,7 @@ public class WC3Interface {
 	int broadcast_port;
 	DatagramSocket socket;
 	byte[] buf;
-	GarenaInterface garena;
+	Map<Integer, GarenaInterface> garenaConnections;
 
 	int[] rebroadcastPorts;
 
@@ -46,8 +48,8 @@ public class WC3Interface {
 	//this random is used to generate entry keys for Garena
 	Random random;
 
-	public WC3Interface(GarenaInterface garena) {
-		this.garena = garena;
+	public WC3Interface(Map<Integer, GarenaInterface> garenaConnections) {
+		this.garenaConnections = garenaConnections;
 		buf = new byte[65536];
 
 		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
@@ -92,7 +94,7 @@ public class WC3Interface {
 				tcpPorts = new int[] {};
 			}
 
-			Main.debug("[WC3Interface] Detected " + tcpPorts.length + "");
+			Main.debug("[WC3Interface] Detected " + tcpPorts.length + " TCP ports");
 
 			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
 				try {
@@ -231,7 +233,13 @@ public class WC3Interface {
 
 			if(filterSuccess) {
 				//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
-				garena.broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
+				synchronized(garenaConnections) {
+					Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+					
+					while(it.hasNext()) {
+						it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
+					}
+				}
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
 				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");

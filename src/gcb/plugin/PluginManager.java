@@ -7,18 +7,21 @@ package gcb.plugin;
 
 import gcb.GCBConfig;
 import gcb.GarenaInterface;
-import gcb.GarenaThread;
 import gcb.Main;
 import gcb.MemberInfo;
 import gcb.WC3Interface;
 import gcb.bot.ChatThread;
 import gcb.bot.SQLThread;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -33,12 +36,8 @@ public class PluginManager {
 	Hashtable<String, ArrayList<Plugin>> register; //function to plugin list
 	Hashtable<String, Plugin> plugins; //class name to plugin
 
-	GarenaInterface garena;
+	Map<Integer, GarenaInterface> garenaConnections;
 	WC3Interface wc3i;
-	GarenaThread gsp_thread;
-	GarenaThread gcrp_thread;
-	GarenaThread pl_thread;
-	GarenaThread wc3_thread;
 	SQLThread sqlthread;
 	ChatThread chatthread;
 
@@ -50,13 +49,9 @@ public class PluginManager {
 		pluginPath = GCBConfig.configuration.getString("gcb_plugin_path", "plugin/");
 	}
 
-	public void setGarena(GarenaInterface garena, WC3Interface wc3i, GarenaThread gsp_thread, GarenaThread gcrp_thread, GarenaThread pl_thread, GarenaThread wc3_thread, SQLThread sqlthread, ChatThread chatthread) {
-		this.garena = garena;
+	public void setGarena(Map<Integer, GarenaInterface> garenaConnections, WC3Interface wc3i, SQLThread sqlthread, ChatThread chatthread) {
+		this.garenaConnections = garenaConnections;
 		this.wc3i = wc3i;
-		this.gsp_thread = gsp_thread;
-		this.gcrp_thread = gcrp_thread;
-		this.pl_thread = pl_thread;
-		this.wc3_thread = wc3_thread;
 		this.sqlthread = sqlthread;
 		this.chatthread = chatthread;
 	}
@@ -105,9 +100,8 @@ public class PluginManager {
 				File pluginFile = new File(pluginConfig.getString("pluginfile"));
 
 				try {
-					Class cls = loader.loadClass(fullyQualifiedName);
 					//add loaded plugin to plugin list
-					Plugin plugin = (Plugin) cls.newInstance();
+					Plugin plugin = (Plugin) loader.loadClass(fullyQualifiedName).newInstance();
 					pluginList.add(plugin);
 					plugins.put(fullyQualifiedName, plugin);
 				} catch(Exception e) {
@@ -136,11 +130,15 @@ public class PluginManager {
 		}
 	}
 
-	public void say(String s) {
+	public void say(int room, String s) {
 		if(chatthread != null) {
-			chatthread.queueChat(s, ChatThread.MAIN_CHAT);
+			chatthread.queueChat(room, s, ChatThread.MAIN_CHAT);
 		} else {
-			garena.sendGCRPChat(s);
+			synchronized(garenaConnections) {
+				if(garenaConnections.containsKey(room)) {
+					garenaConnections.get(room).sendGCRPChat(s);
+				}
+			}
 		}
 	}
 
@@ -169,11 +167,23 @@ public class PluginManager {
 	}
 
 	public void registerListener(Plugin p) {
-		garena.registerListener(p);
+		synchronized(garenaConnections) {
+			Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+			
+			while(it.hasNext()) {
+				it.next().registerListener(p);
+			}
+		}
 	}
 
 	public void deregisterListener(Plugin p) {
-		garena.deregisterListener(p);
+		synchronized(garenaConnections) {
+			Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+			
+			while(it.hasNext()) {
+				it.next().deregisterListener(p);
+			}
+		}
 	}
 
 	public void loadPlugins() {
@@ -264,28 +274,12 @@ public class PluginManager {
 		return chatthread;
 	}
 
-	public GarenaInterface getGarena() {
-		return garena;
-	}
-
-	public GarenaThread getGCRPThread() {
-		return gcrp_thread;
-	}
-
-	public GarenaThread getGSPThread() {
-		return gsp_thread;
-	}
-
-	public GarenaThread getPLThread() {
-		return pl_thread;
+	public Map<Integer, GarenaInterface> getGarena() {
+		return garenaConnections;
 	}
 
 	public SQLThread getSQLThread() {
 		return sqlthread;
-	}
-
-	public GarenaThread getWC3Thread() {
-		return wc3_thread;
 	}
 
 	public WC3Interface getWC3i() {

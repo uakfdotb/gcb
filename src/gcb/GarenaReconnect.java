@@ -16,12 +16,12 @@ public class GarenaReconnect implements GarenaListener {
 		this.main = main;
 	}
 
-	public void chatReceived(MemberInfo member, String chat, boolean whisper) {}
-	public void playerLeft(MemberInfo member) {}
-	public void playerJoined(MemberInfo member) {}
-	public void playerStarted(MemberInfo member) {} //player started playing (started VPN)
-	public void playerStopped(MemberInfo member) {} //player stopped playing
-	public void disconnected(int x) {
+	public void chatReceived(GarenaInterface source, MemberInfo member, String chat, boolean whisper) {}
+	public void playerLeft(GarenaInterface source, MemberInfo member) {}
+	public void playerJoined(GarenaInterface source, MemberInfo member) {}
+	public void playerStarted(GarenaInterface source, MemberInfo member) {} //player started playing (started VPN)
+	public void playerStopped(GarenaInterface source, MemberInfo member) {} //player stopped playing
+	public void disconnected(GarenaInterface source, int x) {
 		if(x == GarenaInterface.GARENA_MAIN) {
 			Main.println("[GarenaReconnect] GARENA_MAIN disconnected; reconnecting shortly...");
 		} else if(x == GarenaInterface.GARENA_PEER) {
@@ -33,16 +33,18 @@ public class GarenaReconnect implements GarenaListener {
 			return;
 		}
 
-		GarenaReconnectThread rt = new GarenaReconnectThread(main, x);
+		GarenaReconnectThread rt = new GarenaReconnectThread(source, main, x);
 		rt.start();
 	}
 }
 
 class GarenaReconnectThread extends Thread {
+	GarenaInterface garena;
 	Main main;
 	int x;
 
-	public GarenaReconnectThread(Main main, int x) {
+	public GarenaReconnectThread(GarenaInterface garena, Main main, int x) {
+		this.garena = garena;
 		this.main = main;
 		this.x = x;
 	}
@@ -53,19 +55,18 @@ class GarenaReconnectThread extends Thread {
 		} catch(InterruptedException e) {
 
 		}
-		GarenaInterface garena = main.garena;
 
 		//TODO:make this work...
-		if(garena.socket != null && garena.socket.isClosed()) {
-			main.initGarena(true);
+		if(garena.socket == null || garena.socket.isClosed()) {
+			main.initGarena(garena, true);
 		}
 
-		if(garena.room_socket != null && garena.room_socket.isClosed()) {
-			main.initRoom(true);
+		if(garena.room_socket == null || garena.room_socket.isClosed()) {
+			main.initRoom(garena, true);
 		}
 
-		if(garena.peer_socket != null && garena.peer_socket.isClosed()) {
-			main.initPeer();
+		if(garena.peer_socket == null || garena.peer_socket.isClosed()) {
+			main.initPeer(garena);
 		}
 	}
 }

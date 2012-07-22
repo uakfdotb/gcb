@@ -8,14 +8,18 @@ package gcb;
 import gcb.bot.ChatThread;
 import gcb.bot.SQLThread;
 import gcb.plugin.PluginManager;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -35,17 +39,13 @@ public class Main {
 	static PrintWriter log_out;
 	static PrintWriter log_cmd_out;
 	
-	GChatBot bot;
+	Map<Integer, GChatBot> bots;
 
 	PluginManager plugins;
-	GarenaInterface garena;
+	Map<Integer, GarenaInterface> garenaConnections;
 	WC3Interface wc3i;
-	GarenaThread gsp_thread;
-	GarenaThread gcrp_thread;
-	GarenaThread pl_thread;
-	GarenaThread wc3_thread;
-	SQLThread sqlthread;
 	ChatThread chatthread;
+	SQLThread sqlthread;
 	GarenaReconnect reconnect;
 
 	//determine what will be loaded, what won't be loaded
@@ -90,6 +90,9 @@ public class Main {
 		}
 		
 		lastLog = System.currentTimeMillis();
+		
+		bots = new HashMap<Integer, GChatBot>();
+		garenaConnections = new HashMap<Integer, GarenaInterface>();
 	}
 
 	public void initPlugins() {
@@ -100,58 +103,50 @@ public class Main {
 
 	public void loadPlugins() {
 		if(loadPlugins) {
-			plugins.setGarena(garena, wc3i, gsp_thread, gcrp_thread, pl_thread, wc3_thread, sqlthread, chatthread);
+			plugins.setGarena(garenaConnections, wc3i, sqlthread, chatthread);
 			plugins.initPlugins();
 			plugins.loadPlugins();
 		}
 	}
 
-	public boolean initGarena(boolean restart) {
-		//connect to garena
-		if(!restart) {
-			garena = new GarenaInterface(plugins);
-			reconnect = new GarenaReconnect(this);
-			garena.registerListener(reconnect);
-		}
-
-		if(!garena.init()) {
-			return false;
-		}
-
+	//garena is null when first starting
+	public boolean initGarenaAll(boolean restart) {
 		if(loadWC3 && !restart) {
 			//setup wc3 broadcast reader
-			wc3i = new WC3Interface(garena);
-			garena.setWC3Interface(wc3i);
+			wc3i = new WC3Interface(garenaConnections);
 
 			if(!wc3i.init()) {
 				return false;
 			}
 		}
+		
+		//connect to garena
+		if(!restart) {
+			reconnect = new GarenaReconnect(this);
 
-		initPeer();
-
-		if(loadWC3 && (!restart || wc3_thread.terminated)) {
-			//start receiving and broadcasting wc3 packets
-			wc3_thread = new GarenaThread(garena, wc3i, GarenaThread.WC3_BROADCAST);
-			wc3_thread.start();
+			//initiate each connetion
+			for(int i = 1; i < 30; i++) {
+				if(GCBConfig.configuration.containsKey("garena" + i + "_roomid") ||
+						GCBConfig.configuration.containsKey("garena" + i + "_roomname")) {
+					GarenaInterface garena = new GarenaInterface(plugins, i);
+					garena.registerListener(reconnect);
+					
+					initGarena(garena, false);
+					
+					garenaConnections.put(garena.room_id, garena);
+				}
+			}
 		}
-
-		//authenticate with login server
-		if(!garena.sendGSPSessionInit()) return false;
-		if(!garena.readGSPSessionInitReply()) return false;
-		if(!garena.sendGSPSessionHello()) return false;
-		if(!garena.readGSPSessionHelloReply()) return false;
-		if(!garena.sendGSPSessionLogin()) return false;
-		if(!garena.readGSPSessionLoginReply()) return false;
-
-		if(!restart || gsp_thread.terminated) {
-			gsp_thread = new GarenaThread(garena, wc3i, GarenaThread.GSP_LOOP);
-			gsp_thread.start();
-		}
-
+		
 		if(loadChat && !restart) {
-			chatthread = new ChatThread(garena);
+			chatthread = new ChatThread(garenaConnections);
 			chatthread.start();
+		}
+		
+		if(loadWC3 && !restart) {
+			//start receiving and broadcasting wc3 packets
+			GarenaThread wc3_thread = new GarenaThread(null, wc3i, GarenaThread.WC3_BROADCAST);
+			wc3_thread.start();
 		}
 
 		//make sure we get correct external ip/port; do on restart in case they changed
@@ -160,40 +155,77 @@ public class Main {
 		return true;
 	}
 	
-	public void initPeer() {
-		garena.initPeer();
+	public boolean initGarena(GarenaInterface garena, boolean restart) {
+		garena.clear();
+		if(!garena.init()) return false;
+		
+		if(loadWC3) {
+			garena.setWC3Interface(wc3i);
+		}
+		
+		if(!initPeer(garena)) return false;
+		
+		//authenticate with login server
+		if(!garena.sendGSPSessionInit()) return false;
+		if(!garena.readGSPSessionInitReply()) return false;
+		if(!garena.sendGSPSessionHello()) return false;
+		if(!garena.readGSPSessionHelloReply()) return false;
+		if(!garena.sendGSPSessionLogin()) return false;
+		if(!garena.readGSPSessionLoginReply()) return false;
+		
+		if(!restart) {
+			GarenaThread gsp_thread = new GarenaThread(garena, null, GarenaThread.GSP_LOOP);
+			gsp_thread.start();
+		}
+
+		if(!restart) {
+			//make sure we get correct external ip/port; do on restart in case they changed
+			//if this is initial load, this will be done elsewhere
+			lookup();
+		}
+		
+		return true;
+	}
+	
+	public boolean initPeer(GarenaInterface garena) {
+		if(!garena.initPeer()) return false;
 		
 		if(loadPL) {
 			//startup GP2PP system
 			GarenaThread pl = new GarenaThread(garena, wc3i, GarenaThread.PEER_LOOP);
 			pl.start();
 		}
+		
+		return true;
 	}
 
 	public void lookup() {
-		if(loadPL) {
-			//lookup
-			garena.sendPeerLookup();
-
-			Main.println("[Main] Waiting for lookup response...");
-			while(garena.iExternal == null) {
-				try {
-					Thread.sleep(100);
-				} catch(InterruptedException e) {}
+		synchronized(garenaConnections) {
+			if(loadPL && !garenaConnections.isEmpty()) {
+				GarenaInterface garena = garenaConnections.values().iterator().next();
+				//lookup
+				garena.sendPeerLookup();
+	
+				Main.println("[Main] Waiting for lookup response...");
+				while(garena.iExternal == null) {
+					try {
+						Thread.sleep(100);
+					} catch(InterruptedException e) {}
+				}
+	
+				Main.println("[Main] Received lookup response!");
 			}
-
-			Main.println("[Main] Received lookup response!");
 		}
 	}
 
 	//returns whether init succeeded; restart=true indicates this isn't the first time we're calling
-	public boolean initRoom(boolean restart) {
+	public boolean initRoom(GarenaInterface garena, boolean restart) {
 		//connect to room
 		if(!garena.initRoom()) return false;
 		if(!garena.sendGCRPMeJoin()) return false;
 
-		if(!restart || gcrp_thread.terminated) {
-			gcrp_thread = new GarenaThread(garena, wc3i, GarenaThread.GCRP_LOOP);
+		if(!restart) {
+			GarenaThread gcrp_thread = new GarenaThread(garena, wc3i, GarenaThread.GCRP_LOOP);
 			gcrp_thread.start();
 		}
 		
@@ -205,26 +237,42 @@ public class Main {
 
 	public void initBot() {
 		if(loadBot) {
-			bot = new GChatBot(this);
-			bot.init();
-			
-			bot.garena = garena;
-			bot.plugins = plugins;
-			bot.sqlthread = sqlthread;
-			bot.chatthread = chatthread;
-
-			garena.registerListener(bot);
+			synchronized(garenaConnections) {
+				Iterator<Integer> roomIds = garenaConnections.keySet().iterator();
+				
+				while(roomIds.hasNext()) {
+					int roomId = roomIds.next();
+					
+					GarenaInterface garena = garenaConnections.get(roomId);
+					GChatBot bot = new GChatBot(this);
+					bot.init();
+					
+					bot.garena = garena;
+					bot.plugins = plugins;
+					bot.sqlthread = sqlthread;
+					bot.chatthread = chatthread;
+		
+					garena.registerListener(bot);
+					bots.put(roomId, bot);
+				}
+			}
 		}
 		
 		if(loadSQL) {
 			//initiate mysql thread
-			sqlthread = new SQLThread(bot);
+			sqlthread = new SQLThread(bots);
 			sqlthread.init();
 			sqlthread.start();
 		}
 		
 		if(loadBot) {
-			bot.sqlthread = sqlthread;
+			synchronized(bots) {
+				Iterator<GChatBot> it = bots.values().iterator();
+				
+				while(it.hasNext()) {
+					it.next().sqlthread = sqlthread;
+				}
+			}
 		}
 
 	}
@@ -281,7 +329,7 @@ public class Main {
 		}
 	}
 
-	public void helloLoop() {
+	public void helloLoop(GarenaInterface garena) {
 		int playCounter = 0;
 		int reconnectCounter = 0;
 		int xpCounter = 0;
@@ -329,7 +377,7 @@ public class Main {
 						Thread.sleep(1000);
 					} catch(InterruptedException e) {}
 
-					initRoom(true);
+					initRoom(garena, true);
 				}
 
 				//handle xp interval
@@ -355,7 +403,6 @@ public class Main {
 			//send start playing so that we don't disconnect from the room
 			
 			while(true) {
-				
 				garena.sendPeerHello();
 				
 				playCounter++;
@@ -453,11 +500,28 @@ public class Main {
 		DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
 
 		main.initPlugins();
-		if(!main.initGarena(false)) return;
-		if(!main.initRoom(false)) return;
+		if(!main.initGarenaAll(false)) return;
+		
+		synchronized(main.garenaConnections) {
+			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
+			
+			while(it.hasNext()) {
+				if(!main.initRoom(it.next(), false)) return;
+			}
+		}
+		
 		main.initBot();
 		main.loadPlugins();
-		main.helloLoop();
+		
+		synchronized(main.garenaConnections) {
+			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
+			
+			while(it.hasNext()) {
+				HelloThread helloThread = new HelloThread(it.next(), main);
+				new Thread(helloThread).start();
+			}
+		}
+		
 		main.newLogLoop();
 	}
 
@@ -506,4 +570,18 @@ public class Main {
 		return data;
 	}
 
+}
+
+class HelloThread implements Runnable {
+	GarenaInterface garena;
+	Main main;
+	
+	public HelloThread(GarenaInterface garena, Main main) {
+		this.garena = garena;
+		this.main = main;
+	}
+	
+	public void run() {
+		main.helloLoop(garena);
+	}
 }
