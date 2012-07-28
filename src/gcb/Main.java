@@ -133,7 +133,9 @@ public class Main {
 					
 					initGarena(garena, false);
 					
-					garenaConnections.put(garena.room_id, garena);
+					synchronized(garenaConnections) {
+						garenaConnections.put(garena.room_id, garena);
+					}
 				}
 			}
 		}
