@@ -569,9 +569,10 @@ public class GarenaInterface {
 		byte[] addr = GarenaEncrypt.internalAddress();
 		block.put(addr);
 
-		//external peer port; don't change from 1513
-		block.put((byte) 5);
-		block.put((byte) -23);
+		//external peer port
+		block.order(ByteOrder.BIG_ENDIAN);
+		block.putShort((short) peer_port);
+		block.order(ByteOrder.LITTLE_ENDIAN);
 
 		byte[] array = block.array();
 
