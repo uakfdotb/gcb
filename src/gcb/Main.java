@@ -134,7 +134,7 @@ public class Main {
 					initGarena(garena, false);
 					
 					synchronized(garenaConnections) {
-						garenaConnections.put(garena.room_id, garena);
+						garenaConnections.put(i, garena);
 					}
 				}
 			}
@@ -240,12 +240,12 @@ public class Main {
 	public void initBot() {
 		if(loadBot) {
 			synchronized(garenaConnections) {
-				Iterator<Integer> roomIds = garenaConnections.keySet().iterator();
+				Iterator<Integer> garenaIds = garenaConnections.keySet().iterator();
 				
-				while(roomIds.hasNext()) {
-					int roomId = roomIds.next();
+				while(garenaIds.hasNext()) {
+					int garenaId = garenaIds.next();
 					
-					GarenaInterface garena = garenaConnections.get(roomId);
+					GarenaInterface garena = garenaConnections.get(garenaId);
 					GChatBot bot = new GChatBot(this);
 					bot.init();
 					
@@ -255,7 +255,7 @@ public class Main {
 					bot.chatthread = chatthread;
 		
 					garena.registerListener(bot);
-					bots.put(roomId, bot);
+					bots.put(garenaId, bot);
 				}
 			}
 		}

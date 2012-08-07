@@ -33,14 +33,14 @@ public class ChatThread extends Thread {
 		delay = GCBConfig.configuration.getInt("gcb_bot_delay", 2000);
 	}
 
-	public void queueChat(int roomId, String message, int target_user) {
+	public void queueChat(int garenaId, String message, int target_user) {
 		GarenaInterface garena;
 		
 		synchronized(garenaConnections) {
-			if(garenaConnections.containsKey(roomId)) {
-				garena = garenaConnections.get(roomId);
+			if(garenaConnections.containsKey(garenaId)) {
+				garena = garenaConnections.get(garenaId);
 			} else {
-				Main.println("[ChatThread] Warning: unable to find Garena interface for roomid=" + roomId);
+				Main.println("[ChatThread] Warning: unable to find Garena interface for id=" + garenaId);
 				return;
 			}
 		}

@@ -130,13 +130,13 @@ public class PluginManager {
 		}
 	}
 
-	public void say(int room, String s) {
+	public void say(int id, String s) {
 		if(chatthread != null) {
-			chatthread.queueChat(room, s, ChatThread.MAIN_CHAT);
+			chatthread.queueChat(id, s, ChatThread.MAIN_CHAT);
 		} else {
 			synchronized(garenaConnections) {
-				if(garenaConnections.containsKey(room)) {
-					garenaConnections.get(room).sendGCRPChat(s);
+				if(garenaConnections.containsKey(id)) {
+					garenaConnections.get(id).sendGCRPChat(s);
 				}
 			}
 		}
