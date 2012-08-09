@@ -1700,7 +1700,7 @@ public class GarenaInterface {
 						int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 8);
 
 						if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
-							Main.println("[GInterface " + id + "] Warning: CONN packet received from user " +
+							Main.debug("[GInterface " + id + "] Warning: CONN packet received from user " +
 									remote_id + " at " + packet.getAddress() +
 									", but connection " + conn_id + " not started with user");
 							continue;
