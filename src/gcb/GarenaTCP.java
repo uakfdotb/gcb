@@ -531,6 +531,8 @@ public class GarenaTCP extends Thread {
 				if(!rttMade) {
 					smoothedRTT = roundTripTime;
 					rttVariation = roundTripTime / 2;
+					
+					rttMade = true;
 				} else {
 					rttVariation = (1 - srttBeta) * rttVariation + srttBeta * Math.abs(smoothedRTT - roundTripTime);
 					smoothedRTT = (1 - srttAlpha) * smoothedRTT + srttAlpha * roundTripTime;
