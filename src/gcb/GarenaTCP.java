@@ -26,8 +26,6 @@ public class GarenaTCP extends Thread {
 	int conn_id; //this virtual TCP connection identifier
 	long last_time; //last time in milliseconds that a packet was sent
 	long last_received; //last time in milliseconds that a packet was received from GHost++
-	Integer seq; //our current sequence number
-	Integer ack; //our current acknowledgement number
 
 	String local_hostname; //local server hostname
 	int[] local_ports; //port on local server we are connected to
@@ -52,10 +50,25 @@ public class GarenaTCP extends Thread {
 	boolean tcpDebug;
 	boolean localBuffered;
 	
-	//connection properties
+	//dynamic connection properties
+	Integer seq; //our current sequence number
+	Integer ack; //our current acknowledgement number
+	
+	boolean rttMade; //whether we have made a round trip time measurement
+	double smoothedRTT; //smoothed round trip time
+	double rttVariation; //round-trip time variation
+	int retransmissionTimeout; //current retransmission timeout; at first set to standardDelay
+	
+	//static connection properties
 	int maximumBufferedPackets; //max number of packets to buffer before stopping transmission
 	int standardDelay; //delay until packets are retransmitted
 	int soTimeout; //timeout before doing standard retransmission instead of reading
+	double srttAlpha; //alpha value, see rfc2988
+	double srttBeta; //beta value, see rfc2988
+	double srttLower; //minimum round trip time
+	double srttUpper; //maximum round trip time
+	double srttClockGranularity; //clock granularity, default to 1 ms
+	int srttK; //no idea, but RFC2988 says it is 4
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
@@ -107,9 +120,18 @@ public class GarenaTCP extends Thread {
 		localBuffered = GCBConfig.configuration.getBoolean("gcb_tcp_localbuffer", true);
 		
 		//connection properties
-		maximumBufferedPackets = GCBConfig.configuration.getInt("gcb_tcp_maxbufferedpackets", 20);
-		standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 2000);
-		soTimeout = GCBConfig.configuration.getInt("gcb_tcp_sotimeout", 1500);
+		maximumBufferedPackets = GCBConfig.configuration.getInt("gcb_tcp_maxbufferedpackets", 0);
+		standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 3000);
+		soTimeout = GCBConfig.configuration.getInt("gcb_tcp_sotimeout", 1000);
+		srttAlpha = GCBConfig.configuration.getDouble("gcb_tcp_srttalpha", 0.125);
+		srttBeta = GCBConfig.configuration.getDouble("gcb_tcp_srttbeta", 0.25);
+		srttLower = GCBConfig.configuration.getDouble("gcb_tcp_srttlower", 10);
+		srttUpper = GCBConfig.configuration.getDouble("gcb_tcp_srttupper", 60000);
+		srttClockGranularity = GCBConfig.configuration.getDouble("gcb_tcp_srttg", 1);
+		srttK = GCBConfig.configuration.getInt("gcb_tcp_srttk", 4);
+		
+		rttMade = false;
+		retransmissionTimeout = standardDelay;
 	}
 
 	public boolean isValidPort(int port) {
@@ -220,7 +242,7 @@ public class GarenaTCP extends Thread {
 		if(terminated) return;
 
 		if(tcpDebug) {
-			Main.println("[GarenaTCP] debug@connack: received acknowledge for " + seq + ", remote ack=" + ack + " in connection " + conn_id);
+			Main.println("[GarenaTCP] debug@connack@" + System.currentTimeMillis() + ": received acknowledge for " + seq + ", remote ack=" + ack + " in connection " + conn_id);
 		}
 
 		//acknowledge packets =seq or <ack
@@ -228,26 +250,25 @@ public class GarenaTCP extends Thread {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
 				if(curr.seq < ack || curr.seq == seq) {
-					packets.remove(i);
-					packets.notifyAll();
-					i--;
+					acknowledgePacket(i);
 				}
 			}
 		}
 
 		//fast retransmission: resend packets from ack to seq-1
-		if(ack < seq + 1) {
+		if(ack < seq) {
 			synchronized(packets) {
 				for(int i = 0; i < packets.size(); i++) {
 					GarenaTCPPacket curr = packets.get(i);
 					if(!curr.fastRetransmitted && curr.seq >= ack && curr.seq <= seq - 1) {
 						curr.send_time = System.currentTimeMillis();
 						curr.fastRetransmitted = true;
+						curr.timesSent++;
 
 						garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 
 						if(tcpDebug) {
-							Main.println("[GarenaTCP] debug@connack: fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
+							Main.println("[GarenaTCP] debug@connack@" + System.currentTimeMillis() + ": fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
 						}
 					}
 				}
@@ -262,7 +283,7 @@ public class GarenaTCP extends Thread {
 		if(terminated) return;
 
 		if(tcpDebug) {
-			Main.println("[GarenaTCP] debug@data: received SEQ=" + seq + "; remote ACK=" + ack + " in connection " + conn_id);
+			Main.println("[GarenaTCP] debug@data@" + System.currentTimeMillis() + ": received SEQ=" + seq + "; remote ACK=" + ack + "; len=" + length + " in connection " + conn_id);
 		}
 
 		//acknowledge packets
@@ -270,9 +291,7 @@ public class GarenaTCP extends Thread {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
 				if(curr.seq < ack) {
-					packets.remove(i);
-					packets.notifyAll();
-					i--;
+					acknowledgePacket(i);
 				}
 			}
 		}
@@ -299,7 +318,7 @@ public class GarenaTCP extends Thread {
 					}
 
 					if(tcpDebug) {
-						Main.println("[GarenaTCP] debug@data: sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
+						Main.println("[GarenaTCP] debug@data@" + System.currentTimeMillis() + ": sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
 					}
 
 					writeOutData(packet.data, false);
@@ -316,7 +335,7 @@ public class GarenaTCP extends Thread {
 			packet.data = copy;
 
 			if(tcpDebug) {
-				Main.println("[GarenaTCP] debug@data: storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack + " in connection " + conn_id);
+				Main.println("[GarenaTCP] debug@data@" + System.currentTimeMillis() + ": storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 			}
 
 			synchronized(out_packets) {
@@ -325,13 +344,13 @@ public class GarenaTCP extends Thread {
 		} else {
 			//ignore packet if seq is less than our ack
 			if(tcpDebug) {
-				Main.println("[GarenaTCP] debug@data: ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
+				Main.println("[GarenaTCP] debug@data@" + System.currentTimeMillis() + ": ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 			}
 		}
 
 		//send conn ack
 		if(tcpDebug) {
-			Main.println("[GarenaTCP] debug@data: acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
+			Main.println("[GarenaTCP] debug@data@" + System.currentTimeMillis() + ": acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 		}
 		
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
@@ -344,6 +363,10 @@ public class GarenaTCP extends Thread {
 				//validate header
 				if(header == Constants.W3GS_HEADER_CONSTANT) {
 					int oLength = GarenaEncrypt.unsignedShort(out_buffer.getShort(2));
+					
+					if(tcpDebug) {
+						Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id + " out buffered header=" + header + ", length=" + oLength);
+					}
 
 					//validate length; minimum packet legnth is 4
 					if(oLength >= 4) {
@@ -467,13 +490,56 @@ public class GarenaTCP extends Thread {
 			for(int i = 0; i < packets.size(); i++) {
 				GarenaTCPPacket curr = packets.get(i);
 
-				if(curr.send_time < System.currentTimeMillis() - standardDelay) { //todo: set timeout to a more appropriate value
+				if(curr.send_time < System.currentTimeMillis() - retransmissionTimeout) {
 					curr.send_time = System.currentTimeMillis();
+					curr.timesSent++;
+					
+					//double the retransmission timeout
+					retransmissionTimeout *= 2;
+					
+					//don't fast retransmit this packet since we standard retranmsitted it
+					curr.fastRetransmitted = true;
+					
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 
 					if(tcpDebug) {
-						Main.println("[GarenaTCP] debug: standard retransmitting in connection " + conn_id);
+						Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": standard retransmitting in connection " + conn_id);
 					}
+				}
+			}
+		}
+	}
+	
+	public void acknowledgePacket(int x) {
+		//acknowledge a single packet
+		synchronized(packets) {
+			GarenaTCPPacket packet = packets.remove(x);
+			packets.notifyAll();
+			x--;
+			
+			if(packet.timesSent == 1) {
+				//update standard retransmission timeout
+				double roundTripTime = System.currentTimeMillis() - packet.send_time;
+
+				//impose limitations on round trip time
+				if(roundTripTime < srttLower) {
+					roundTripTime = srttLower;
+				} else if(roundTripTime > srttUpper) {
+					roundTripTime = srttUpper;
+				}
+
+				if(!rttMade) {
+					smoothedRTT = roundTripTime;
+					rttVariation = roundTripTime / 2;
+				} else {
+					rttVariation = (1 - srttBeta) * rttVariation + srttBeta * Math.abs(smoothedRTT - roundTripTime);
+					smoothedRTT = (1 - srttAlpha) * smoothedRTT + srttAlpha * roundTripTime;
+				}
+
+				retransmissionTimeout = (int) Math.ceil(smoothedRTT + Math.max(srttClockGranularity, srttK * rttVariation));
+
+				if(tcpDebug) {
+					Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id + " setting retransmission timeout to " + retransmissionTimeout);
 				}
 			}
 		}
@@ -489,7 +555,7 @@ public class GarenaTCP extends Thread {
 			//not a major problem, this is only necessary in special circumstances
 			
 			if(tcpDebug) {
-				Main.println("[GarenaTCP] debug: setting soTimeout failed, but continuing");
+				Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": setting soTimeout failed, but continuing");
 			}
 		}
 
@@ -526,17 +592,24 @@ public class GarenaTCP extends Thread {
 
 				byte[] data = new byte[len];
 				System.arraycopy(rbuf, 0, data, 0, len);
+				
+				if(tcpDebug) {
+					Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id + " new packet from local: " + seq + " (len=" + len + ")");
+				}
 
 				//save packet in case it doesn't go through
 				GarenaTCPPacket packet = new GarenaTCPPacket();
 				packet.seq = seq;
-				packet.send_time = System.currentTimeMillis();
 				packet.data = data;
 
 				synchronized(packets) {
-					while(packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
+					while(maximumBufferedPackets != 0 && packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
+						if(tcpDebug) {
+							Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
+						}
+						
 						try {
-							packets.wait(soTimeout);
+							packets.wait(100);
 						} catch(InterruptedException e) {}
 						
 						//continue to standard retransmit packets
@@ -629,11 +702,15 @@ public class GarenaTCP extends Thread {
 
 class GarenaTCPPacket {
 	int seq; //this packet's sequence number
-	long send_time; //time that this packet was last sent (for standard retransmission)
+	long send_time; //time that this packet was last sent (including both retransmission)
 	byte[] data;
 	boolean fastRetransmitted; //only fast retransmit packets once
+	int timesSent; //how many times this packet was sent, including both retransmission
 
 	public GarenaTCPPacket() {
 		fastRetransmitted = false;
+		timesSent = 1;
+		
+		send_time = System.currentTimeMillis();
 	}
 }
