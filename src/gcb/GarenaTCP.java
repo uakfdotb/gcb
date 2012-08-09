@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -36,7 +37,7 @@ public class GarenaTCP extends Thread {
 	int remote_port;
 
 	//not thread safe objects
-	ArrayList<GarenaTCPPacket> packets; //to transmit to Garena
+	List<GarenaTCPPacket> packets; //to transmit to Garena
 	HashMap<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet; to transmit to GHost++
 	ByteBuffer out_buffer; //if buffered output is use, only full packets will be sent and packets will be dissected to correct information
 	String[] reservedNames;
@@ -258,8 +259,7 @@ public class GarenaTCP extends Thread {
 		//fast retransmission: resend packets from ack to seq-1
 		if(ack < seq) {
 			synchronized(packets) {
-				for(int i = 0; i < packets.size(); i++) {
-					GarenaTCPPacket curr = packets.get(i);
+				for(GarenaTCPPacket curr : packets) {
 					if(!curr.fastRetransmitted && curr.seq >= ack && curr.seq <= seq - 1) {
 						curr.send_time = System.currentTimeMillis();
 						curr.fastRetransmitted = true;
@@ -487,9 +487,7 @@ public class GarenaTCP extends Thread {
 	public void standardRetransmission() {
 		//standard retransmission: resend old packets
 		synchronized(packets) {
-			for(int i = 0; i < packets.size(); i++) {
-				GarenaTCPPacket curr = packets.get(i);
-
+			for(GarenaTCPPacket curr : packets) {
 				if(curr.send_time < System.currentTimeMillis() - retransmissionTimeout) {
 					curr.send_time = System.currentTimeMillis();
 					curr.timesSent++;
@@ -541,7 +539,9 @@ public class GarenaTCP extends Thread {
 				retransmissionTimeout = (int) Math.ceil(smoothedRTT + Math.max(srttClockGranularity, srttK * rttVariation));
 
 				if(tcpDebug) {
-					Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id + " setting retransmission timeout to " + retransmissionTimeout);
+					Main.println("[GarenaTCP] debug@" + System.currentTimeMillis() + ": " + conn_id +
+							" setting retransmission timeout to " + retransmissionTimeout +
+							" (last rtt=" + roundTripTime + ", srtt = " + smoothedRTT + ", rttvar = " + rttVariation + ")");
 				}
 			}
 		}
