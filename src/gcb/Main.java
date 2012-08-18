@@ -165,7 +165,7 @@ public class Main {
 			garena.setWC3Interface(wc3i);
 		}
 		
-		if(!initPeer(garena)) return false;
+		if(!restart && !initPeer(garena)) return false;
 		
 		//authenticate with login server
 		if(!garena.sendGSPSessionInit()) return false;
@@ -180,7 +180,7 @@ public class Main {
 			gsp_thread.start();
 		}
 
-		if(!restart) {
+		if(restart) {
 			//make sure we get correct external ip/port; do on restart in case they changed
 			//if this is initial load, this will be done elsewhere
 			lookup();
@@ -209,10 +209,18 @@ public class Main {
 				garena.sendPeerLookup();
 	
 				Main.println("[Main] Waiting for lookup response...");
+				
+				int counter = 0; //resend lookup every second
+				
 				while(garena.iExternal == null) {
 					try {
 						Thread.sleep(100);
 					} catch(InterruptedException e) {}
+					
+					counter++;
+					if(counter % 10 == 0) {
+						garena.sendPeerLookup();
+					}
 				}
 	
 				Main.println("[Main] Received lookup response!");
