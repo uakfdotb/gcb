@@ -66,7 +66,7 @@ class GarenaReconnectThread extends Thread {
 		}
 
 		if(garena.peer_socket == null || garena.peer_socket.isClosed()) {
-			main.initPeer(garena);
+			main.initPeer(garena, true);
 		}
 	}
 }

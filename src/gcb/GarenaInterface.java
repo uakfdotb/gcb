@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 import java.util.zip.CRC32;
 
 /**
@@ -118,11 +117,22 @@ public class GarenaInterface {
 
 		timer = new Timer();
 		timer.schedule(new RetransmitTask(), 20000, 50);
+		timer.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
+		timer.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
+		timer.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
 		
 		//configuration
 		room_id = GCBConfig.configuration.getInt("garena" + id + "_roomid", 590633);
 		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 1513);
 		reverseEnabled = GCBConfig.configuration.getBoolean("garena" + id + "_reverse", false);
+		
+		//configuration: reconnect
+		int reconnectInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
+		
+		if(reconnectInterval > 0) {
+			//reconnect every now and then if desired
+			timer.schedule(new ReconnectTask(), 60000 * reconnectInterval, 60000 * reconnectInterval);
+		}
 	}
 	
 	public void clear() {
@@ -1806,6 +1816,7 @@ public class GarenaInterface {
 		try {
 			peer_socket.send(packet);
 		} catch(IOException ioe) {
+			Main.println("[GInterface " + id + "] Failed to send lookup: " + ioe.getLocalizedMessage());
 			ioe.printStackTrace();
 		}
 	}
@@ -1823,6 +1834,7 @@ public class GarenaInterface {
 		try {
 			peer_socket.send(packet);
 		} catch(IOException ioe) {
+			Main.println("[GInterface " + id + "] Failed to room usage check: " + ioe.getLocalizedMessage());
 			ioe.printStackTrace();
 		}
 	}
@@ -1841,6 +1853,7 @@ public class GarenaInterface {
 							target.correctIP = InetAddress.getByName(GCBConfig.configuration.getString("gcb_lanfix_ip", "192.168.1.2"));
 							target.correctPort = GCBConfig.configuration.getInt("gcb_lanfix_port", 1513);
 						} catch(IOException ioe) {
+							Main.println("[GInterface " + id + "] LAN FIX error: " + ioe.getLocalizedMessage());
 							ioe.printStackTrace();
 						}
 					}
@@ -1973,6 +1986,7 @@ public class GarenaInterface {
 			byte[] loopbackBytes = InetAddress.getLocalHost().getAddress();
 			tbuf.put(loopbackBytes);
 		} catch(UnknownHostException uhe) {
+			Main.println("[GInterface " + id + "] Failed to identify local host at sendTCPInit: " + uhe.getLocalizedMessage());
 			uhe.printStackTrace();
 		}
 
@@ -2152,6 +2166,49 @@ public class GarenaInterface {
 					connection_it.next().standardRetransmission();
 				}
 			}
+		}
+	}
+	
+	class HelloTask extends TimerTask {
+		public void run() {
+			if(peer_socket != null && peer_socket.isBound()) {
+				//in case of exception, don't print anything
+				try {
+					sendPeerHello();
+				} catch(Exception e) {}
+			}
+		}
+	}
+	
+	class PlayTask extends TimerTask {
+		public void run() {
+			if(room_socket != null && room_socket.isConnected()) {
+				//in case of exception, don't print anything
+				try {
+					startPlaying();
+				} catch(Exception e) {}
+			}
+		}
+	}
+	
+	class ExperienceTask extends TimerTask {
+		public void run() {
+			if(socket != null && socket.isConnected()) {
+				//in case of exception, don't print anything
+				try {
+					sendGSPXP(user_id, 100, 1001);
+				} catch(Exception e) {}
+			}
+		}
+	}
+	
+	class ReconnectTask extends TimerTask {
+		public void run() {
+			//reconnect to Garena room
+			Main.println("[GInterface " + id + "] Reconnecting to Garena room");
+			disconnectRoom();
+
+			//room loop should take care of actual reconnection
 		}
 	}
 }

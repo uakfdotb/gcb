@@ -165,7 +165,7 @@ public class Main {
 			garena.setWC3Interface(wc3i);
 		}
 		
-		if(!restart && !initPeer(garena)) return false;
+		if(!restart && !initPeer(garena, restart)) return false;
 		
 		//authenticate with login server
 		if(!garena.sendGSPSessionInit()) return false;
@@ -189,10 +189,10 @@ public class Main {
 		return true;
 	}
 	
-	public boolean initPeer(GarenaInterface garena) {
+	public boolean initPeer(GarenaInterface garena, boolean restart) {
 		if(!garena.initPeer()) return false;
 		
-		if(loadPL) {
+		if(loadPL && !restart) {
 			//startup GP2PP system
 			GarenaThread pl = new GarenaThread(garena, wc3i, GarenaThread.PEER_LOOP);
 			pl.start();
@@ -204,26 +204,32 @@ public class Main {
 	public void lookup() {
 		synchronized(garenaConnections) {
 			if(loadPL && !garenaConnections.isEmpty()) {
-				GarenaInterface garena = garenaConnections.values().iterator().next();
-				//lookup
-				garena.sendPeerLookup();
-	
-				Main.println("[Main] Waiting for lookup response...");
+				Iterator<GarenaInterface> it = garenaConnections.values().iterator();
 				
-				int counter = 0; //resend lookup every second
-				
-				while(garena.iExternal == null) {
-					try {
-						Thread.sleep(100);
-					} catch(InterruptedException e) {}
-					
-					counter++;
-					if(counter % 10 == 0) {
-						garena.sendPeerLookup();
+				while(it.hasNext()) {
+					GarenaInterface garena = it.next();
+
+					//lookup
+					garena.sendPeerLookup();
+
+					Main.println("[Main] Waiting for lookup response on connection " + garena.id + "...");
+
+					int counter = 0; //resend lookup every second
+
+					while(garena.iExternal == null) {
+						try {
+							Thread.sleep(100);
+						} catch(InterruptedException e) {}
+
+						counter++;
+						if(counter % 10 == 0) {
+							Main.println("[Main] Resending lookup on connection " + garena.id);
+							garena.sendPeerLookup();
+						}
 					}
+
+					Main.println("[Main] Received lookup response!");
 				}
-	
-				Main.println("[Main] Received lookup response!");
 			}
 		}
 	}
@@ -339,113 +345,6 @@ public class Main {
 		}
 	}
 
-	public void helloLoop(GarenaInterface garena) {
-		int playCounter = 0;
-		int reconnectCounter = 0;
-		int xpCounter = 0;
-		
-		//see how often to reconnect
-		int reconnectMinuteInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
-		//divide by six to get interval measured for 10 second delays
-		int reconnectInterval = -1;
-
-		if(reconnectMinuteInterval > 0) {
-			reconnectInterval = reconnectMinuteInterval * 6;
-		}
-
-		//see how often to send XP packet; every 15 minutes
-		int xpInterval = 90; //15 * 60 / 10
-		
-		if(loadPL) {
-			while(true) {
-				try {
-					garena.displayMemberInfo();
-				} catch(IOException ioe) {
-					ioe.printStackTrace();
-				}
-
-				garena.sendPeerHello();
-
-				playCounter++;
-				reconnectCounter++;
-				xpCounter++;
-
-				//handle player interval
-				if(playCounter > 360000) { //1 hour
-					playCounter = 0;
-					garena.startPlaying(); //make sure we're actually playing
-				}
-
-				//handle reconnection interval
-				if(reconnectInterval != -1 && reconnectCounter >= reconnectInterval) {
-					reconnectCounter = 0;
-					//reconnect to Garena room
-					Main.println("[Main] Reconnecting to Garena room");
-					garena.disconnectRoom();
-
-					try {
-						Thread.sleep(1000);
-					} catch(InterruptedException e) {}
-
-					initRoom(garena, true);
-				}
-
-				//handle xp interval
-				if(xpCounter >= xpInterval) {
-					xpCounter = 0;
-
-					//send GSP XP packet only if connected to room
-					if(garena.room_socket.isConnected()) {
-						//xp rate = 100 (doesn't matter what they actually are, server determines amount of exp gained)
-						//gametype = 1001 for warcraft/dota
-						garena.sendGSPXP(garena.user_id, 100, 1001);
-						if(DEBUG) {
-							println("[Main] Sent exp packet to Garena");
-						}
-					}
-				}
-
-				try {
-					Thread.sleep(10000);
-				} catch(InterruptedException e) {}
-			}
-		} else {
-			//send start playing so that we don't disconnect from the room
-			
-			while(true) {
-				garena.sendPeerHello();
-				
-				playCounter++;
-				xpCounter++;
-				
-				//handle player interval
-				if(playCounter > 360000) { //1 hour
-					playCounter = 0;
-					garena.startPlaying();
-				}
-				
-				//handle xp interval
-				if(xpCounter >= xpInterval) {
-					xpCounter = 0;
-					
-					//send GSP XP packet only if connected to room
-					if(garena.room_socket.isConnected()) {
-						//xp rate = 100 (doesn't matter what they actually are, server determines amount of exp gained)
-						//gametype = 1001 for warcraft/dota
-						garena.sendGSPXP(garena.user_id, 100, 1001);
-						if(DEBUG) {
-							println("[Main] Sent exp packet to Garena");
-						}
-					}
-				}
-
-				try {
-					Thread.sleep(10000);
-				} catch(InterruptedException e) {}
-			}
-		}
-	}
-
 	/**
 	 * @param args the command line arguments
 	 */
@@ -523,15 +422,6 @@ public class Main {
 		main.initBot();
 		main.loadPlugins();
 		
-		synchronized(main.garenaConnections) {
-			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
-			
-			while(it.hasNext()) {
-				HelloThread helloThread = new HelloThread(it.next(), main);
-				new Thread(helloThread).start();
-			}
-		}
-		
 		main.newLogLoop();
 	}
 
@@ -580,18 +470,4 @@ public class Main {
 		return data;
 	}
 
-}
-
-class HelloThread implements Runnable {
-	GarenaInterface garena;
-	Main main;
-	
-	public HelloThread(GarenaInterface garena, Main main) {
-		this.garena = garena;
-		this.main = main;
-	}
-	
-	public void run() {
-		main.helloLoop(garena);
-	}
 }
