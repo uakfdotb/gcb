@@ -116,7 +116,7 @@ public class GarenaInterface {
 		tcp_connections = new HashMap<Integer, GarenaTCP>();
 
 		timer = new Timer();
-		timer.schedule(new RetransmitTask(), 20000, 50);
+		timer.schedule(new RetransmitTask(), 20000, 20);
 		timer.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
 		timer.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
 		timer.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes

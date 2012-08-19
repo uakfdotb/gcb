@@ -16,6 +16,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.PriorityQueue;
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -38,6 +39,7 @@ public class GarenaTCP extends Thread {
 
 	//not thread safe objects
 	List<GarenaTCPPacket> packets; //to transmit to Garena
+	PriorityQueue<GarenaTCPPacket> packetRetransmitQueue; //standard retransmission queue
 	HashMap<Integer, GarenaTCPPacket> out_packets; //sequence number -> packet; to transmit to GHost++
 	ByteBuffer out_buffer; //if buffered output is use, only full packets will be sent and packets will be dissected to correct information
 	String[] reservedNames;
@@ -68,13 +70,14 @@ public class GarenaTCP extends Thread {
 	double srttBeta; //beta value, see rfc2988
 	double srttLower; //minimum round trip time
 	double srttUpper; //maximum round trip time
-	double srttClockGranularity; //clock granularity, default to 1 ms
+	double srttClockGranularity; //clock granularity, default to 20 ms
 	int srttK; //no idea, but RFC2988 says it is 4
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
 		buf = ByteBuffer.allocate(65536);
 		packets = new ArrayList<GarenaTCPPacket>();
+		packetRetransmitQueue = new PriorityQueue<GarenaTCPPacket>();
 		out_packets = new HashMap<Integer, GarenaTCPPacket>();
 
 		terminated = false;
@@ -121,14 +124,14 @@ public class GarenaTCP extends Thread {
 		localBuffered = GCBConfig.configuration.getBoolean("gcb_tcp_localbuffer", true);
 		
 		//connection properties
-		maximumBufferedPackets = GCBConfig.configuration.getInt("gcb_tcp_maxbufferedpackets", 0);
+		maximumBufferedPackets = GCBConfig.configuration.getInt("gcb_tcp_maxbufferedpackets", 20);
 		standardDelay = GCBConfig.configuration.getInt("gcb_tcp_standarddelay", 3000);
 		soTimeout = GCBConfig.configuration.getInt("gcb_tcp_sotimeout", 1000);
 		srttAlpha = GCBConfig.configuration.getDouble("gcb_tcp_srttalpha", 0.125);
 		srttBeta = GCBConfig.configuration.getDouble("gcb_tcp_srttbeta", 0.25);
 		srttLower = GCBConfig.configuration.getDouble("gcb_tcp_srttlower", 10);
 		srttUpper = GCBConfig.configuration.getDouble("gcb_tcp_srttupper", 60000);
-		srttClockGranularity = GCBConfig.configuration.getDouble("gcb_tcp_srttg", 1);
+		srttClockGranularity = GCBConfig.configuration.getDouble("gcb_tcp_srttg", 20);
 		srttK = GCBConfig.configuration.getInt("gcb_tcp_srttk", 4);
 		
 		rttMade = false;
@@ -486,7 +489,9 @@ public class GarenaTCP extends Thread {
 	public void standardRetransmission() {
 		//standard retransmission: resend old packets
 		synchronized(packets) {
-			for(GarenaTCPPacket curr : packets) {
+			GarenaTCPPacket curr;
+			
+			while((curr = packetRetransmitQueue.peek()) != null) {
 				if(curr.send_time < System.currentTimeMillis() - retransmissionTimeout) {
 					curr.send_time = System.currentTimeMillis();
 					curr.timesSent++;
@@ -502,6 +507,13 @@ public class GarenaTCP extends Thread {
 					if(tcpDebug) {
 						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": standard retransmitting in connection " + conn_id);
 					}
+					
+					//update the retransmission queue, since the time of this element changed
+					packetRetransmitQueue.poll();
+					packetRetransmitQueue.add(curr);
+				} else {
+					//since our minimum doesn't need to be retransmitted, neither does any other element
+					break;
 				}
 			}
 		}
@@ -513,6 +525,8 @@ public class GarenaTCP extends Thread {
 			GarenaTCPPacket packet = packets.remove(x);
 			packets.notifyAll();
 			x--;
+			
+			packetRetransmitQueue.remove(packet);
 			
 			if(packet.timesSent == 1) {
 				//update standard retransmission timeout
@@ -618,6 +632,9 @@ public class GarenaTCP extends Thread {
 					}
 
 					packets.add(packet);
+					
+					//also update the packet retransmit queue here
+					packetRetransmitQueue.add(packet);
 				}
 
 				//don't use buf here so there isn't thread problems
@@ -701,7 +718,7 @@ public class GarenaTCP extends Thread {
 	}
 }
 
-class GarenaTCPPacket {
+class GarenaTCPPacket implements Comparable {
 	int seq; //this packet's sequence number
 	long send_time; //time that this packet was last sent (including both retransmission)
 	byte[] data;
@@ -713,5 +730,18 @@ class GarenaTCPPacket {
 		timesSent = 1;
 		
 		send_time = System.currentTimeMillis();
+	}
+	
+	public int compareTo(Object o) {
+		if(o instanceof GarenaTCPPacket) {
+			GarenaTCPPacket packet = (GarenaTCPPacket) o;
+			
+			long this_time = send_time + (fastRetransmitted ? 100000 : 0);
+			long that_time = packet.send_time + (packet.fastRetransmitted ? 100000 : 0);
+			
+			return (int) (this_time - that_time);
+		} else {
+			throw new IllegalArgumentException("Excepted GarenaTCPPacket");
+		}
 	}
 }
