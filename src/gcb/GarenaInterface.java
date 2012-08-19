@@ -357,7 +357,10 @@ public class GarenaInterface {
 		}
 
 		//notify main server that we joined the room
-		sendGSPJoinedRoom(user_id, room_id);
+		if(!sendGSPJoinedRoom(user_id, room_id)) {
+			disconnected(GARENA_ROOM);
+			return false;
+		}
 
 		return true;
 	}

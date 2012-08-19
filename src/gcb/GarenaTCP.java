@@ -309,9 +309,8 @@ public class GarenaTCP extends Thread {
 			
 			//send any other packets that we have stored
 			synchronized(out_packets) {
-				GarenaTCPPacket packet = out_packets.get(this.ack);
-				while(packet != null) {
-					out_packets.remove(this.ack);
+				while(out_packets.containsKey(this.ack)) {
+					GarenaTCPPacket packet = out_packets.remove(this.ack);
 
 					synchronized(this.ack) {
 						this.ack++;
