@@ -718,7 +718,7 @@ public class GarenaTCP extends Thread {
 	}
 }
 
-class GarenaTCPPacket implements Comparable {
+class GarenaTCPPacket implements Comparable<GarenaTCPPacket> {
 	int seq; //this packet's sequence number
 	long send_time; //time that this packet was last sent (including both retransmission)
 	byte[] data;
@@ -732,16 +732,10 @@ class GarenaTCPPacket implements Comparable {
 		send_time = System.currentTimeMillis();
 	}
 	
-	public int compareTo(Object o) {
-		if(o instanceof GarenaTCPPacket) {
-			GarenaTCPPacket packet = (GarenaTCPPacket) o;
-			
-			long this_time = send_time + (fastRetransmitted ? 100000 : 0);
-			long that_time = packet.send_time + (packet.fastRetransmitted ? 100000 : 0);
-			
-			return (int) (this_time - that_time);
-		} else {
-			throw new IllegalArgumentException("Excepted GarenaTCPPacket");
-		}
+	public int compareTo(GarenaTCPPacket packet) {
+		long this_time = send_time + (fastRetransmitted ? 100000 : 0);
+		long that_time = packet.send_time + (packet.fastRetransmitted ? 100000 : 0);
+		
+		return (int) (this_time - that_time);
 	}
 }
