@@ -50,23 +50,36 @@ class GarenaReconnectThread extends Thread {
 	}
 
 	public void run() {
-		try {
-			Thread.sleep(10000);
-		} catch(InterruptedException e) {
-
-		}
-
-		//TODO:make this work...
-		if(garena.socket == null || garena.socket.isClosed()) {
-			main.initGarena(garena, true);
-		}
-
-		if(garena.room_socket == null || garena.room_socket.isClosed()) {
-			main.initRoom(garena, true);
-		}
-
-		if(garena.peer_socket == null || garena.peer_socket.isClosed()) {
-			main.initPeer(garena, true);
+		synchronized(garena) {
+			if(garena.socket == null || garena.socket.isClosed()) {
+				try {
+					Thread.sleep(10000);
+				} catch(InterruptedException e) {
+		
+				}
+				
+				main.initGarena(garena, true);
+			}
+	
+			if(garena.room_socket == null || garena.room_socket.isClosed()) {
+				try {
+					Thread.sleep(10000);
+				} catch(InterruptedException e) {
+		
+				}
+				
+				main.initRoom(garena, true);
+			}
+	
+			if(garena.peer_socket == null || garena.peer_socket.isClosed()) {
+				try {
+					Thread.sleep(10000);
+				} catch(InterruptedException e) {
+		
+				}
+				
+				main.initPeer(garena, true);
+			}
 		}
 	}
 }
