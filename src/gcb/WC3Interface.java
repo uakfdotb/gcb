@@ -56,6 +56,11 @@ public class WC3Interface {
 			random = new SecureRandom();
 			entryKeys = new HashMap<WC3GameIdentifier, Integer>();
 			games = new HashMap<Integer, WC3GameIdentifier>();
+		} else if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_cache", true)) {
+			//for some reason, caching the game packets is enabled even though
+			// entry key rewriting is disabled
+			//this combination does not work, so we print a warning message
+			Main.debug("Warning: gcb_broadcastfilter_cache has been disabled; gcb_broadcastfilter_key must be on for caching to work properly!");
 		}
 
 		//config
@@ -132,9 +137,35 @@ public class WC3Interface {
 
 		return false;
 	}
+	
+	public void receivedUDP(GarenaInterface garena, ByteBuffer lbuf, InetAddress address, int port, int senderId) {
+		Main.debug("[WC3Interface] Received UDP packet (Garena) from " + address);
+		
+		if(GarenaEncrypt.unsignedByte(lbuf.get()) == 247 //247 is W3GS header constant
+				&& GarenaEncrypt.unsignedByte(lbuf.get()) == 47) { //if packet is W3GS_SEARCHGAME; 47 is packet id
+			Main.debug("[WC3Interface] Sending games to " + address);
+			
+			//ok, then I guess we should send all cached packets to the client
+			synchronized(games) {
+				Iterator<WC3GameIdentifier> it = games.values().iterator();
+				
+				while(it.hasNext()) {
+					byte[] data = it.next().rawPacket;
+					
+					//Warcraft clients always listen on BROADCAST_PORT
+					garena.sendUDPEncap(address, port, BROADCAST_PORT, BROADCAST_PORT, data, 0, data.length);
+				}
+			}
+		}
+	}
 
 	public void readBroadcast() {
+		//we want to process a broadcast here, specifically looking for GAMEINFO
+		// then we do various things with it depending on our configuration
+		//this is called in a loop from GarenaThread
+		
 		try {
+			//receive the packet
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
 			socket.receive(packet);
 
@@ -149,7 +180,16 @@ public class WC3Interface {
 
 			Main.debug("[WC3Interface] Received UDP packet from " + packet.getAddress());
 
+			//this will be false if we want to filter the packet
 			boolean filterSuccess = true;
+			
+			//with default configuration, we will wait until a user specifically requests a
+			// game through SEARCHGAME packet until sending the GAMEINFO packet
+			//however, with certain configuration this is not possible (either broadcast
+			// filter is disabled completely, or caching is specifically disabled)
+			//we also always broadcast immediately when a new game is hosted!
+			boolean broadcastImmediately = !GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)
+					|| !GCBConfig.configuration.getBoolean("gcb_broadcastfilter_cache", true);
 
 			//if gcb_broadcastfilter is disabled, filterSuccess will already be set to true
 			//so if filter succeeds, ignore; only if it fails, set filtersuccess to false
@@ -160,7 +200,9 @@ public class WC3Interface {
 					buf.position(0);
 					buf.order(ByteOrder.LITTLE_ENDIAN);
 
+					//check header constant
 					if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_HEADER_CONSTANT) {
+						//check packet type
 						if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_GAMEINFO) {
 							buf.position(buf.position() + 18); //skip to gamename
 							String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
@@ -170,6 +212,7 @@ public class WC3Interface {
 							//read port in _little_ endian
 							int port = GarenaEncrypt.unsignedShort(buf.getShort());
 
+							//check port
 							if(!isValidPort(port)) {
 								Main.debug("[WC3Interface] Filter fail: invalid port " + port);
 								filterSuccess = false;
@@ -177,6 +220,10 @@ public class WC3Interface {
 								//if we let Garena users know the LAN entry key, they can spoof joining through LAN directly (without gcb)
 								//if they do this, then they can spoof owner names and other bad stuff, avoiding gcb filter
 								//so, we broadcast a different entry key to Garena so that they can only connect through gcb
+								
+								//note that gcb_broadcastfilter_cache will not work if gcb_broadcastfilter_key is
+								// disabled because we use the same classes to store information
+								// this is the reason for the sanity check in constructor
 								
 								if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
 									if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
@@ -205,14 +252,19 @@ public class WC3Interface {
 										synchronized(entryKeys) {
 											entryKeys.put(game, garenaEntryKey);
 										}
-									} else {
-										//update the existing WC3GameIdentifier so it doesn't get deleted
-										games.get(garenaEntryKey).update();
+										
+										//always broadcast game immediately if it was just hosted
+										broadcastImmediately = true;
 									}
 
 									//replace packet's entry key from GHost with our generated one
 									//replacing in bytebuffer will cause modifications to data (wrapped)
 									buf.putInt(16, garenaEntryKey);
+										
+									//update the existing WC3GameIdentifier so it doesn't get deleted
+									//we must do this after rewriting the packet (above) or else we will
+									// cache the unrewritten packet!
+									games.get(garenaEntryKey).update(data, offset, length);
 
 									removeOldGames();
 								}
@@ -232,14 +284,20 @@ public class WC3Interface {
 			}
 
 			if(filterSuccess) {
-				//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
-				synchronized(garenaConnections) {
-					Iterator<GarenaInterface> it = garenaConnections.values().iterator();
-					
-					while(it.hasNext()) {
-						it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
+				//if broadcast filter is disabled, we have to forward the packet to client immediately
+				//otherwise, we can cache packet and send to client when we receive SEARCHGAME
+				// from them (we cached packet already in code above)
+
+				if(broadcastImmediately) {
+					synchronized(garenaConnections) {
+						Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+						
+						while(it.hasNext()) {
+							//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
+							it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
+						}
 					}
-				}
+				} //otherwise don't do anything, already cached packet
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
 				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
@@ -314,21 +372,29 @@ class WC3GameIdentifier {
 	int ghostEntryKey; //LAN entry key to join GHost++
 	int gameport;
 	Integer garenaEntryKey; //null if gcb_broadcastfilter_key is off
+	
+	byte[] rawPacket; //packet to easily forward to clients
 
 	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey) {
 		this(gamename, gameport, ghostEntryKey, null);
 	}
 
 	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, Integer garenaEntryKey) {
-		this.timeReceived = System.currentTimeMillis();
 		this.gamename = gamename;
 		this.gameport = gameport;
 		this.ghostEntryKey = ghostEntryKey;
 		this.garenaEntryKey = garenaEntryKey;
+
+		//update with a default array
+		update(new byte[] {}, 0, 0);
 	}
 
-	public void update() {
+	public void update(byte[] rawPacket, int offset, int length) {
 		timeReceived = System.currentTimeMillis();
+		
+		//make a copy of the packet in case the contents change
+		this.rawPacket = new byte[length];
+		System.arraycopy(rawPacket, offset, this.rawPacket, 0, length);
 	}
 
 	public boolean check(String name, int port, int key) {

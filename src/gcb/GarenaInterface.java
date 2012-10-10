@@ -1792,8 +1792,17 @@ public class GarenaInterface {
 
 					lbuf.position(16);
 
+					//if we are using reverse, we simply forward the UDP packet to
+					// the Warcraft client
 					if(reverseEnabled) {
 						reverseHost.receivedUDP(lbuf, packet.getAddress(), packet.getPort(), senderId);
+					}
+					
+					//otherwise, we want to check if this is a SEARCHGAME packet and
+					// then send all of our cached GAMEINFO packets to the client
+					// (depending on gcb configuration)
+					else {
+						wc3i.receivedUDP(this, lbuf, packet.getAddress(), packet.getPort(), senderId);
 					}
 				} else {
 					Main.println("[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
