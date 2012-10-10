@@ -1,5 +1,19 @@
 0g
+* multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
+  this replaces the rebroadcast feature, although rebroadcast is still supporetd
+* several improvements to the virtual TCP connection
+ - improved virtual TCP by buffering local packets, so that one TCP packet is sent as one UDP packet over the virtual connection
+ - standard retransmission now uses a priority queue for efficiency and is checked every 20 milliseconds
+ - implemented smooth round trip time to determine standard retransmission timeout per RFC 2988
+* clients are notified of games only when they request through STARTGAME packet, unless a game was just hosted
+* de-support: gcb_bot is no longer supported; use garena_room_control instead
+* other minor changes are listed below
+- MySQL reconnection implemented
+- if the first address lookup fails, gcb will continue to lookup until a response is received
 - fix: concurrent exceptions should be fixed
+- fix: various bug fixes in gcb_bot
+- fix: peer reconnect works properly now
+- fix: null pointer exception on reconnects
 
 0f
 - Plugin system improved, trivia plugin available for download
