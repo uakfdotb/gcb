@@ -267,6 +267,9 @@ public class WC3Interface {
 									games.get(garenaEntryKey).update(data, offset, length);
 
 									removeOldGames();
+								} else {
+									//we must broadcast immediately if we didn't cache the packet
+									broadcastImmediately = true;
 								}
 							}
 						} else {
