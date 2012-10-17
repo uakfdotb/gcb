@@ -72,6 +72,7 @@ public class GarenaTCP extends Thread {
 	double srttUpper; //maximum round trip time
 	double srttClockGranularity; //clock granularity, default to 20 ms
 	int srttK; //no idea, but RFC2988 says it is 4
+	int maxPacketSize; //limits the size of the packet
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
@@ -133,6 +134,11 @@ public class GarenaTCP extends Thread {
 		srttUpper = GCBConfig.configuration.getDouble("gcb_tcp_srttupper", 60000);
 		srttClockGranularity = GCBConfig.configuration.getDouble("gcb_tcp_srttg", 20);
 		srttK = GCBConfig.configuration.getInt("gcb_tcp_srttk", 4);
+		maxPacketSize = GCBConfig.configuration.getInt("gcb_tcp_maxpacketsize", 512);
+		
+		if(maxPacketSize == 0) {
+			maxPacketSize = 512;
+		}
 		
 		rttMade = false;
 		retransmissionTimeout = standardDelay;
@@ -304,7 +310,7 @@ public class GarenaTCP extends Thread {
 		//pass data on to local server
 
 		if(seq == this.ack) {
-			synchronized(this.ack) {
+			synchronized(this) {
 				this.ack++;
 			}
 
@@ -315,7 +321,7 @@ public class GarenaTCP extends Thread {
 				while(out_packets.containsKey(this.ack)) {
 					GarenaTCPPacket packet = out_packets.remove(this.ack);
 
-					synchronized(this.ack) {
+					synchronized(this) {
 						this.ack++;
 					}
 
@@ -612,38 +618,7 @@ public class GarenaTCP extends Thread {
 					Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " new packet from local: " + seq + " (len=" + len + ")");
 				}
 
-				//save packet in case it doesn't go through
-				GarenaTCPPacket packet = new GarenaTCPPacket();
-				packet.seq = seq;
-				packet.data = data;
-
-				synchronized(packets) {
-					while(maximumBufferedPackets != 0 && packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
-						if(tcpDebug) {
-							Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
-						}
-						
-						try {
-							packets.wait(100);
-						} catch(InterruptedException e) {}
-						
-						//continue to standard retransmit packets
-						standardRetransmission();
-					}
-
-					packets.add(packet);
-					
-					//also update the packet retransmit queue here
-					packetRetransmitQueue.add(packet);
-				}
-
-				//don't use buf here so there isn't thread problems
-				garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, data, len, lbuf);
-
-				//increment sequence number
-				synchronized(seq) {
-					seq++;
-				}
+				handleLocalPacket(data, lbuf);
 			} catch(SocketTimeoutException e) {
 				//continue loop with standard retransmission
 			} catch(IOException ioe) {
@@ -654,6 +629,47 @@ public class GarenaTCP extends Thread {
 				}
 				
 				break;
+			}
+		}
+	}
+	
+	private void handleLocalPacket(byte[] data, ByteBuffer lbuf) {
+		for(int i = 0; i < data.length; i += maxPacketSize) {
+			int currentLength = Math.min(maxPacketSize, data.length - i);
+			byte[] currentData = new byte[currentLength];
+			System.arraycopy(data, i, currentData, 0, currentLength);
+			
+			//save packet in case it doesn't go through
+			GarenaTCPPacket packet = new GarenaTCPPacket();
+			packet.seq = seq;
+			packet.data = currentData;
+	
+			synchronized(packets) {
+				while(maximumBufferedPackets != 0 && packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
+					if(tcpDebug) {
+						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
+					}
+					
+					try {
+						packets.wait(100);
+					} catch(InterruptedException e) {}
+					
+					//continue to standard retransmit packets
+					standardRetransmission();
+				}
+	
+				packets.add(packet);
+				
+				//also update the packet retransmit queue here
+				packetRetransmitQueue.add(packet);
+			}
+	
+			//don't use buf here so there isn't thread problems
+			garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, currentData, currentLength, lbuf);
+		
+			//increment sequence number
+			synchronized(this) {
+				seq++;
 			}
 		}
 	}
