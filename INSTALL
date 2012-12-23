@@ -1,0 +1,62 @@
+INSTALLATION GUIDE
+
+This is only for people who got stuck on any installation steps, or need a better explanation of certain steps.
+
+STEP ONE - Installing Java(TM) Cryptography Extension (JCE)
+
+	Go to the "jce" folder and follow the README.txt instructions. If for whatever reason you do not understand the instructions, follow these instructions:
+
+		1. Navigate to your Java install path. As an example, my install path is C:\Program Files\Java\jre6\. Your path may be slightly different, it would depend on how you installed Java.
+		2. Go to lib, then security
+		3. Create a backup of local_policy.jar and US_export_policy.jar. I did this by creating a folder called "Backup" and moving these 2 files into it.
+		4. Copy the local_policy.jar and US_export_policy.jar files from the gcb0e\jce folder into the lib\security folder
+	
+STEP TWO - Installing MySQL
+
+	If you already have a MySQL database set up, you can skip this step.
+	
+	1. I recommend using Wamp Server, which can be downloaded here: http://www.wampserver.com/en/download.php
+	2. Once you have installed Wamp Server, run it when prompted. You should get an icon in your taskbar which will start off as orange, then turn green.
+	3. Left click the green icon, and select phpMyAdmin. This should open up a webpage the address localhost\phpmyadmin
+	4. Near the right, find Create new database. Just put whatever name you want, then press create
+	5. Click Import, near the top, and import the file "blank_database.sql"
+	
+STEP THREE - Configuring gcb
+
+	1. Open up gcb.cfg, which can be found in gcb0e\bin
+	2. Some things you won't be using like REVERSE SETTINGS, LAN FIX SETTINGS
+	3. If you imported blank_database.sql,your database type is "ghostone"
+	4. To find "gcb_roomid" and "gcb_roomhost", open rooms.txt and search for the room name you are looking for (for example: USA DotA Room 01). Then, write the id on that line for "gcb_roomid" and the server for "gcb_roomhost"
+	5. If for whatever reason you can't find your room, or it is not working, scroll down to "ID from RoomEN.dat" section on how to retrive roomid and roomhost manually. Garena sometimes changes their IP address of rooms.
+	
+STEP FOUR - Running gcb
+	
+	1. Gcb runs in command prompt (or terminal if you're linux). Open up command prompt, and navigate to the place you have your gcb.jar file. I saved everything to my desktop, so I used:
+		cd *\desktop\gcb0e\bin
+	2. Run gcb using this command:
+		java -jar gcb.jar
+	3. It is possible to specifiy a .cfg file when running gcb, instead use this command:
+		java -jar gcb.jar myconfigfile.cfg
+	
+	
+ID from RoomEN.dat
+------------------
+RoomEN.dat in your Garena installation is actually an sqlite database. This can be opened with an sqlite client, such as the Firefox SQLite Manager, available at https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/.
+
+To retrieve the ID, you can either manually use an sqlite client like the one above, or you can use gcb_list. Instruction for gcb_list are available at gcb_list/README. To manually retrieve:
+
+The Room ID and Server ID can be found by searching the table named "RoomTab". For example:
+
+SELECT RoomID, ServerId FROM RoomTab WHERE RoomName=' WC3 ROC USA Room'
+        
+Note the space preceeding the room name. The Room ID should be recorded as "gcb_roomid".
+
+To find the Room IP address, execute:
+
+SELECT IP FROM RoomServerTab WHERE ServerId=<server_id>
+        
+Were <server_id> is the Server ID you found earlier.
+
+The IP address is stored as an integer. It can be converted into an actual address: it is the integer representation of the IP address stored in little endian. This tool may help you: http://www.silisoftware.com/tools/ipconverter.php. To use it with the integer from the SQLite database, type the integer in for "Integer IP". You will receive the four parts under "Decimal IP". Reverse these parts (1.2.3.4 -> 4.3.2.1) to retrieve the original IP address.
+
+Set "gcb_roomhost" to the original IP address.
