@@ -26,7 +26,7 @@ import java.util.Map;
  * @author wizardus
  */
 public class Main {
-	public static String VERSION = "gcb 0f";
+	public static String VERSION = "gcb 0g";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	static boolean log;
