@@ -7,23 +7,21 @@ package gcb;
 
 import gcb.bot.SQLThread;
 import gcb.bot.ChatThread;
+import gcb.bot.AnnounceThread;
 import gcb.plugin.PluginManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.ArrayList;
-import javax.swing.Timer;
 import org.apache.commons.configuration.ConversionException;
 
 /**
  *
  * @author wizardus
  */
-public class GChatBot implements GarenaListener, ActionListener {
+public class GChatBot implements GarenaListener {
 	public static final int LEVEL_PUBLIC = 0;
 	public static final int LEVEL_SAFELIST = 1;
 	public static final int LEVEL_VIP = 2;
@@ -49,6 +47,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 	PluginManager plugins;
 	SQLThread sqlthread;
 	ChatThread chatthread;
+	public AnnounceThread announceThread;
 	ArrayList<String> channelAdminCommands;
 	ArrayList<String> muteList;
 	ArrayList<String> voteLeaver;
@@ -81,14 +80,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 	boolean checkSameMessage; //whether to check if players are bypassing flood protection
 	boolean triviaPluginAlias;
 	boolean checkSpam; //whether to check if a user is spamming
-	private Timer autoAnn_timer;
-	private Timer startUp_timer;
 	String root_admin; //root admin for this bot; null if root is disabled
 	
 	//thread safe objects
 	public Vector<UserInfo> userDB; //contains all users to ever enter the room, may be quite large
 	public Vector<String> bannedWords;
-	public Vector<String> autoAnn; //contains the auto announcements
 
 	HashMap<String, String> aliasToCommand; //maps aliases to the command they alias
 	HashMap<String, String[]> commandToAlias; //maps commands to all of the command's aliases
@@ -110,7 +106,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 		vipCommands = new Vector<String>();
 		safelistCommands = new Vector<String>();
 		publicCommands = new Vector<String>();
-		autoAnn = new Vector<String>();
 		bannedWords = new Vector<String>();
 		userDB = new Vector<UserInfo>();
 		aliasToCommand = new HashMap<String, String>();
@@ -146,9 +141,6 @@ public class GChatBot implements GarenaListener, ActionListener {
 		banned_word_detect_message = GCBConfig.configuration.getString("gcb_bot_detect_announcement", "Banned word/phrase detected");
 		owner = GCBConfig.getString("gcb_bot_owner");
 		commandline = GCBConfig.configuration.getBoolean("gcb_bot_commandline", false);
-		autoAnn_timer = new Timer(GCBConfig.configuration.getInt("gcb_bot_auto_ann_interval", 600)*1000, this);
-		startUp_timer = new Timer(1000, this);
-		startUp_timer.start();
 		
 		//spam configuration settings
 		checkSpam = GCBConfig.configuration.getBoolean("gcb_bot_check_spam", false);
@@ -247,25 +239,13 @@ public class GChatBot implements GarenaListener, ActionListener {
 			CommandInputThread commandThread = new CommandInputThread(this);
 			commandThread.start();
 		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource() == autoAnn_timer) {
-			boolean announce = true;
-			while(announce) {
-				if(rotateAnn < autoAnn.size()-1) {
-					rotateAnn++;
-				} else {
-					rotateAnn = 0;
-				}
-				chatthread.queueChat(garena.id, autoAnn.get(rotateAnn), ANNOUNCEMENT);
-				announce = false;
-			}
-		} else if(e.getSource() == startUp_timer) {
-			if(autoAnn.size() != 0) {
-				autoAnn_timer.start();
-			}
-			startUp_timer.stop();
+		
+		//start announce thread
+		//check if setting is non-zero; 0 = disabled
+		int announceInterval = GCBConfig.configuration.getInt("gcb_bot_auto_ann_interval", 0);
+		if(announceInterval != 0) { //interval is non-zero, start announce thread
+			announceThread = new AnnounceThread(garena, this, chatthread);
+			announceThread.start();
 		}
 	}
 
@@ -640,11 +620,11 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return null;
 				}
 				if(sqlthread.addAutoAnnounce(payload)) {
-					autoAnn.add(payload);
-					if(!autoAnn_timer.isRunning()) {
-						autoAnn_timer.start();
+					if(announceThread.addMessage(payload)) {
+						return "Success! Your message has been added to the auto announcement list";
+					} else {
+						return "Failed. Your message was not added";
 					}
-					return "Success! Your message has been added to the auto announcement list";
 				} else {
 					chatthread.queueChat(garena.id, "Failed. There was an error with your database. Please inform GG.Dragon", ANNOUNCEMENT);
 					return null;
@@ -654,14 +634,8 @@ public class GChatBot implements GarenaListener, ActionListener {
 					chatthread.queueChat(garena.id, "Invalid format detected. Correct format is " + trigger + "delautoannounce <message>. For further help use " + trigger + "help delautoannounce", member.userID);
 					return null;
 				}
-				int currentSize = autoAnn.size();
 				if(sqlthread.delAutoAnnounce(payload)) {
-					autoAnn.remove(payload);
-					int newSize = autoAnn.size();
-					if(newSize < currentSize) {
-						if(autoAnn.size() ==0) {
-							autoAnn_timer.stop();
-						}
+					if(announceThread.removeMessage(payload)) {
 						return "Success! Your message has been deleted from the auto announcement list";
 					} else {
 						return "Failed. No such message found! Tip: message is case sensitive";
@@ -677,8 +651,8 @@ public class GChatBot implements GarenaListener, ActionListener {
 					return null;
 				}
 				int milliseconds = Integer.parseInt(payload)*1000;
-				autoAnn_timer.setDelay(milliseconds);
-				return "Success! Auto messages will now be sent every " + milliseconds/1000 + " seconds";
+				announceThread.setInterval(milliseconds);
+				return "Success! Auto messages will now be sent every " + announceThread.getInterval()/1000 + " seconds";
 			} else if(command.equals("promote")) {
 				if(payload.equals("")) {
 					chatthread.queueChat(garena.id, "Invalid format detected. Correct format is " + trigger + "promote <username>. For further help use " + trigger + "help promote", member.userID);
@@ -1269,7 +1243,7 @@ public class GChatBot implements GarenaListener, ActionListener {
 				int numBanned = sqlthread.countBans();
 				int numKicked = sqlthread.countKicks();
 				int numMuted = muteList.size();
-				int numAnnouncement = autoAnn.size();
+				int numAnnouncement = announceThread.getMessageSize();
 				String muted_plural = "s";
 				String muted_grammar = "are ";
 				if(numMuted == 1) {

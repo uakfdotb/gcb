@@ -92,6 +92,7 @@ public class GarenaEncrypt {
 		try {
 			PEMReader pemreader = new PEMReader(new FileReader("gkey.pem"));
 			rsaKey = (KeyPair) pemreader.readObject();
+			pemreader.close();
 		} catch(IOException ioe) {
 			ioe.printStackTrace();
 		}

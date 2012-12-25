@@ -897,7 +897,7 @@ public class SQLThread extends Thread {
 						Iterator<GChatBot> it = bots.values().iterator();
 						
 						while(it.hasNext()) {
-							it.next().autoAnn.clear();
+							it.next().announceThread.clear();
 						}
 					}
 					
@@ -906,7 +906,7 @@ public class SQLThread extends Thread {
 							Iterator<GChatBot> it = bots.values().iterator();
 							
 							while(it.hasNext()) {
-								it.next().autoAnn.add(result.getString("phrase"));
+								it.next().announceThread.addMessage(result.getString("phrase"));
 							}
 						}
 					}
@@ -945,7 +945,7 @@ public class SQLThread extends Thread {
 					
 					if(bot != null) {
 						Main.println("[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
-						Main.println("[SQLThread] Initial refresh: found " + bot.autoAnn.size() + " Auto Announcements");
+						Main.println("[SQLThread] Initial refresh: found " + bot.announceThread.getMessageSize() + " Auto Announcements");
 						
 						if(bannedWordDetectType > 0) {
 							Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");

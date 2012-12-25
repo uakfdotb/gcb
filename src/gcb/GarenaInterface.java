@@ -44,7 +44,7 @@ public class GarenaInterface {
 	public static final String TIME_FORMAT = "HH:mm:ss";
 
 	//id in configuration
-	int id;
+	public int id; //TODO change this to private
 	
 	//cryptography class
 	GarenaEncrypt crypt;
@@ -296,6 +296,8 @@ public class GarenaInterface {
 						break;
 					}
 				}
+				
+				in.close();
 
 				if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
 					Main.println("[GInterface " + id + "] Error: no matches found; exiting...");
