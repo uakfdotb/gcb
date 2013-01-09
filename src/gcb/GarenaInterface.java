@@ -746,7 +746,7 @@ public class GarenaInterface {
 				if(data[0] == 68) {
 					processQueryResponse(data);
 				} else {
-					Main.println("[GInterface " + id + "] GSPLoop: unknown type received: " + data[0]);
+					Main.debug("[GInterface " + id + "] GSPLoop: unknown type received: " + data[0]);
 				}
 			} catch(IOException ioe) {
 				Main.println("[GInterface " + id + "] GSPLoop: error: " + ioe.getLocalizedMessage());
@@ -1113,7 +1113,7 @@ public class GarenaInterface {
 						return;
 					}
 
-					Main.println("[GInterface " + id + "] GCRPLoop: unknown type received: " + type + "; size is: " + size);
+					Main.debug("[GInterface " + id + "] GCRPLoop: unknown type received: " + type + "; size is: " + size);
 
 					//make sure we read it all anyway
 					if(size < 1000000000 && size >= 2) {
@@ -1782,7 +1782,7 @@ public class GarenaInterface {
 						// tcp_connections.remove(conn_id);
 						tcp_connection.end();
 					} else {
-						Main.println("[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
+						Main.debug("[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
 					}
 				} else if(buf_array[0] == 0x01) {
 					int senderId = lbuf.getInt(4);
@@ -1807,7 +1807,7 @@ public class GarenaInterface {
 						wc3i.receivedUDP(this, lbuf, packet.getAddress(), packet.getPort(), senderId);
 					}
 				} else {
-					Main.println("[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
+					Main.debug("[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
 				}
 			} catch(IOException ioe) {
 				Main.println("[GInterface " + id + "] PeerLoop: error: " + ioe.getLocalizedMessage());
