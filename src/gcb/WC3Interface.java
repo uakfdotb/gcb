@@ -144,6 +144,7 @@ public class WC3Interface {
 		if(GarenaEncrypt.unsignedByte(lbuf.get()) == 247 //247 is W3GS header constant
 				&& GarenaEncrypt.unsignedByte(lbuf.get()) == 47) { //if packet is W3GS_SEARCHGAME; 47 is packet id
 			Main.debug("[WC3Interface] Sending games to " + address);
+			removeOldGames();
 			
 			//ok, then I guess we should send all cached packets to the client
 			synchronized(games) {
