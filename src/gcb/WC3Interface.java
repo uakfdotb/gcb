@@ -209,7 +209,10 @@ public class WC3Interface {
 							String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
 							buf.get(); //skip game password
 							GarenaEncrypt.getTerminatedString(buf); //skip statstring
-							buf.position(buf.position() + 20); //skip to port
+							buf.position(buf.position() + 12); //skip to slots available
+							//read slots available for the REFRESHGAME packet
+							int slotsAvailable = buf.getInt();
+							buf.position(buf.position() + 4); //skip to port
 							//read port in _little_ endian
 							int port = GarenaEncrypt.unsignedShort(buf.getShort());
 
@@ -232,16 +235,18 @@ public class WC3Interface {
 									}
 
 									//return to entry key
-									buf.position(16);
+									buf.position(12);
+									int ghostHostCounter = buf.getInt();
 									int ghostEntryKey = buf.getInt();
 
 									//check if we have received this game already
 									Integer garenaEntryKey = getGameExists(gamename, port, ghostEntryKey);
+									WC3GameIdentifier game;
 
 									if(garenaEntryKey == null) {
 										//generate a new entry key and put into hashmap
 										garenaEntryKey = random.nextInt();
-										WC3GameIdentifier game = new WC3GameIdentifier(gamename, port, ghostEntryKey, garenaEntryKey);
+										game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey);
 
 										Main.println("[WC3Interface] Detected new game with name " + gamename +
 												"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
@@ -256,6 +261,8 @@ public class WC3Interface {
 										
 										//always broadcast game immediately if it was just hosted
 										broadcastImmediately = true;
+									} else {
+										game = games.get(garenaEntryKey);
 									}
 
 									//replace packet's entry key from GHost with our generated one
@@ -265,9 +272,28 @@ public class WC3Interface {
 									//update the existing WC3GameIdentifier so it doesn't get deleted
 									//we must do this after rewriting the packet (above) or else we will
 									// cache the unrewritten packet!
-									games.get(garenaEntryKey).update(data, offset, length);
+									game.update(data, offset, length);
 
 									removeOldGames();
+									
+									//create and broadcast the W3GS_REFRESHGAME packet
+									ByteBuffer refreshPacket = ByteBuffer.allocate(16);
+									refreshPacket.order(ByteOrder.LITTLE_ENDIAN);
+									refreshPacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
+									refreshPacket.put((byte) Constants.W3GS_REFRESHGAME);
+									refreshPacket.putShort((short) 16);
+									refreshPacket.putInt(game.hostCounter);
+									refreshPacket.putInt(game.garenaEntryKey);
+									refreshPacket.putInt(slotsAvailable);
+				
+									synchronized(garenaConnections) {
+										Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+					
+										while(it.hasNext()) {
+											//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
+											it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, refreshPacket.array(), 0, 8);
+										}
+									}
 								} else {
 									//we must broadcast immediately if we didn't cache the packet
 									broadcastImmediately = true;
@@ -291,6 +317,7 @@ public class WC3Interface {
 				//if broadcast filter is disabled, we have to forward the packet to client immediately
 				//otherwise, we can cache packet and send to client when we receive SEARCHGAME
 				// from them (we cached packet already in code above)
+				//no matter what, though, we send the W3GS_REFRESHGAME packet (this is done earlier in the method)
 
 				if(broadcastImmediately) {
 					synchronized(garenaConnections) {
@@ -301,7 +328,7 @@ public class WC3Interface {
 							it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, data, offset, length);
 						}
 					}
-				} //otherwise don't do anything, already cached packet
+				}
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
 				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
@@ -359,6 +386,23 @@ public class WC3Interface {
 				if(System.currentTimeMillis() - game.timeReceived > 1000 * 30) {
 					entryKeys.remove(game);
 					
+					//broadcast a UDP packet (W3GS_DECREATEGAME) to destroy the game in the LAN gamelist
+					ByteBuffer decreatePacket = ByteBuffer.allocate(8);
+					decreatePacket.order(ByteOrder.LITTLE_ENDIAN);
+					decreatePacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
+					decreatePacket.put((byte) Constants.W3GS_DECREATEGAME);
+					decreatePacket.putShort((short) 8);
+					decreatePacket.putInt(game.hostCounter);
+					
+					synchronized(garenaConnections) {
+						Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+						
+						while(it.hasNext()) {
+							//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
+							it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, decreatePacket.array(), 0, 8);
+						}
+					}
+					
 					synchronized(games) {
 						games.remove(game.garenaEntryKey);
 					}
@@ -376,17 +420,19 @@ class WC3GameIdentifier {
 	int ghostEntryKey; //LAN entry key to join GHost++
 	int gameport;
 	Integer garenaEntryKey; //null if gcb_broadcastfilter_key is off
+	int hostCounter;
 	
 	byte[] rawPacket; //packet to easily forward to clients
 
-	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey) {
-		this(gamename, gameport, ghostEntryKey, null);
+	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, int hostCounter) {
+		this(gamename, gameport, ghostEntryKey, hostCounter, null);
 	}
 
-	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, Integer garenaEntryKey) {
+	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, int hostCounter, Integer garenaEntryKey) {
 		this.gamename = gamename;
 		this.gameport = gameport;
 		this.ghostEntryKey = ghostEntryKey;
+		this.hostCounter = hostCounter;
 		this.garenaEntryKey = garenaEntryKey;
 
 		//update with a default array
