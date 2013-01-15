@@ -197,114 +197,123 @@ public class WC3Interface {
 			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
 				//first check IP address
 				if(tcpHost == null || packet.getAddress().equals(tcpHost) || (packet.getAddress().isAnyLocalAddress() && tcpHost.isAnyLocalAddress())) {
-					ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
-					buf.position(0);
-					buf.order(ByteOrder.LITTLE_ENDIAN);
+					try {
+						ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
+						buf.position(0);
+						buf.order(ByteOrder.LITTLE_ENDIAN);
 
-					//check header constant
-					if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_HEADER_CONSTANT) {
-						//check packet type
-						if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_GAMEINFO) {
-							buf.position(buf.position() + 18); //skip to gamename
-							String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
-							buf.get(); //skip game password
-							GarenaEncrypt.getTerminatedString(buf); //skip statstring
-							buf.position(buf.position() + 12); //skip to slots available
-							//read slots available for the REFRESHGAME packet
-							int slotsAvailable = buf.getInt();
-							buf.position(buf.position() + 4); //skip to port
-							//read port in _little_ endian
-							int port = GarenaEncrypt.unsignedShort(buf.getShort());
+						//check header constant
+						if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_HEADER_CONSTANT) {
+							//check packet type
+							if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_GAMEINFO) {
+								buf.position(buf.position() + 18); //skip to gamename
+								String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
+								buf.get(); //skip game password
+								GarenaEncrypt.getTerminatedString(buf); //skip statstring
+								buf.position(buf.position() + 12); //skip to slots available
+								//read slots available for the REFRESHGAME packet
+								int slotsAvailable = buf.getInt();
+								buf.position(buf.position() + 4); //skip to port
+								//read port in _little_ endian
+								int port = GarenaEncrypt.unsignedShort(buf.getShort());
 
-							//check port
-							if(!isValidPort(port)) {
-								Main.debug("[WC3Interface] Filter fail: invalid port " + port);
-								filterSuccess = false;
-							} else {
-								//if we let Garena users know the LAN entry key, they can spoof joining through LAN directly (without gcb)
-								//if they do this, then they can spoof owner names and other bad stuff, avoiding gcb filter
-								//so, we broadcast a different entry key to Garena so that they can only connect through gcb
-								
-								//note that gcb_broadcastfilter_cache will not work if gcb_broadcastfilter_key is
-								// disabled because we use the same classes to store information
-								// this is the reason for the sanity check in constructor
-								
-								if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
-									if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
-										Main.println("[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
-									}
-
-									//return to entry key
-									buf.position(12);
-									int ghostHostCounter = buf.getInt();
-									int ghostEntryKey = buf.getInt();
-
-									//check if we have received this game already
-									Integer garenaEntryKey = getGameExists(gamename, port, ghostEntryKey);
-									WC3GameIdentifier game;
-
-									if(garenaEntryKey == null) {
-										//generate a new entry key and put into hashmap
-										garenaEntryKey = random.nextInt();
-										game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey);
-
-										Main.println("[WC3Interface] Detected new game with name " + gamename +
-												"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
-
-										synchronized(games) {
-											games.put(garenaEntryKey, game);
-										}
-
-										synchronized(entryKeys) {
-											entryKeys.put(game, garenaEntryKey);
-										}
-										
-										//always broadcast game immediately if it was just hosted
-										broadcastImmediately = true;
-									} else {
-										game = games.get(garenaEntryKey);
-									}
-
-									//replace packet's entry key from GHost with our generated one
-									//replacing in bytebuffer will cause modifications to data (wrapped)
-									buf.putInt(16, garenaEntryKey);
-										
-									//update the existing WC3GameIdentifier so it doesn't get deleted
-									//we must do this after rewriting the packet (above) or else we will
-									// cache the unrewritten packet!
-									game.update(data, offset, length);
-
-									removeOldGames();
-									
-									//create and broadcast the W3GS_REFRESHGAME packet
-									ByteBuffer refreshPacket = ByteBuffer.allocate(16);
-									refreshPacket.order(ByteOrder.LITTLE_ENDIAN);
-									refreshPacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
-									refreshPacket.put((byte) Constants.W3GS_REFRESHGAME);
-									refreshPacket.putShort((short) 16);
-									refreshPacket.putInt(game.hostCounter);
-									refreshPacket.putInt(game.garenaEntryKey);
-									refreshPacket.putInt(slotsAvailable);
-				
-									synchronized(garenaConnections) {
-										Iterator<GarenaInterface> it = garenaConnections.values().iterator();
-					
-										while(it.hasNext()) {
-											//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
-											it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, refreshPacket.array(), 0, 8);
-										}
-									}
+								//check port
+								if(!isValidPort(port)) {
+									Main.debug("[WC3Interface] Filter fail: invalid port " + port);
+									filterSuccess = false;
 								} else {
-									//we must broadcast immediately if we didn't cache the packet
-									broadcastImmediately = true;
+									//if we let Garena users know the LAN entry key, they can spoof joining through LAN directly (without gcb)
+									//if they do this, then they can spoof owner names and other bad stuff, avoiding gcb filter
+									//so, we broadcast a different entry key to Garena so that they can only connect through gcb
+								
+									//note that gcb_broadcastfilter_cache will not work if gcb_broadcastfilter_key is
+									// disabled because we use the same classes to store information
+									// this is the reason for the sanity check in constructor
+								
+									if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
+										if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
+											Main.println("[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
+										}
+
+										//return to entry key
+										buf.position(12);
+										int ghostHostCounter = buf.getInt();
+										int ghostEntryKey = buf.getInt();
+
+										//check if we have received this game already
+										Integer garenaEntryKey = getGameExists(gamename, port, ghostEntryKey);
+										WC3GameIdentifier game;
+
+										if(garenaEntryKey == null) {
+											//generate a new entry key and put into hashmap
+											garenaEntryKey = random.nextInt();
+											game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey);
+
+											Main.println("[WC3Interface] Detected new game with name " + gamename +
+													"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
+
+											synchronized(games) {
+												games.put(garenaEntryKey, game);
+											}
+
+											synchronized(entryKeys) {
+												entryKeys.put(game, garenaEntryKey);
+											}
+										
+											//always broadcast game immediately if it was just hosted
+											broadcastImmediately = true;
+										} else {
+											game = games.get(garenaEntryKey);
+										}
+
+										//replace packet's entry key from GHost with our generated one
+										//replacing in bytebuffer will cause modifications to data (wrapped)
+										buf.putInt(16, garenaEntryKey);
+										
+										//update the existing WC3GameIdentifier so it doesn't get deleted
+										//we must do this after rewriting the packet (above) or else we will
+										// cache the unrewritten packet!
+										game.update(data, offset, length);
+
+										removeOldGames();
+									
+										//create and broadcast the W3GS_REFRESHGAME packet
+										ByteBuffer refreshPacket = ByteBuffer.allocate(16);
+										refreshPacket.order(ByteOrder.LITTLE_ENDIAN);
+										refreshPacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
+										refreshPacket.put((byte) Constants.W3GS_REFRESHGAME);
+										refreshPacket.putShort((short) 16);
+										refreshPacket.putInt(game.hostCounter);
+										refreshPacket.putInt(game.garenaEntryKey);
+										refreshPacket.putInt(slotsAvailable);
+				
+										synchronized(garenaConnections) {
+											Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+					
+											while(it.hasNext()) {
+												//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
+												it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, refreshPacket.array(), 0, 8);
+											}
+										}
+									} else {
+										//we must broadcast immediately if we didn't cache the packet
+										broadcastImmediately = true;
+									}
 								}
+							} else {
+								Main.debug("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
+								filterSuccess = false;
 							}
 						} else {
-							Main.debug("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
+							Main.debug("[WC3Interface] Filter fail: invalid header constant");
 							filterSuccess = false;
 						}
-					} else {
-						Main.debug("[WC3Interface] Filter fail: invalid header constant");
+					} catch(BufferUnderflowException bue) {
+						if(Main.DEBUG) {
+							bue.printStackTrace();
+						}
+						
+						Main.debug("[WC3Interface] Filter fail: invalid packet format");
 						filterSuccess = false;
 					}
 				} else {
