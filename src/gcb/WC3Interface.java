@@ -142,7 +142,9 @@ public class WC3Interface {
 		Main.debug("[WC3Interface] Received UDP packet (Garena) from " + address);
 		
 		if(GarenaEncrypt.unsignedByte(lbuf.get()) == 247 //247 is W3GS header constant
-				&& GarenaEncrypt.unsignedByte(lbuf.get()) == 47) { //if packet is W3GS_SEARCHGAME; 47 is packet id
+				&& GarenaEncrypt.unsignedByte(lbuf.get()) == 47) //if packet is W3GS_SEARCHGAME; 47 is packet id
+				&& GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)
+				&& GCBConfig.configuration.getBoolean("gcb_broadcastfilter_cache", true)) {
 			Main.debug("[WC3Interface] Sending games to " + address);
 			removeOldGames();
 			
