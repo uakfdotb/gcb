@@ -395,7 +395,7 @@ public class WC3Interface {
 			for(Object o : game_identifiers) {
 				WC3GameIdentifier game = (WC3GameIdentifier) o;
 				
-				if(System.currentTimeMillis() - game.timeReceived > 1000 * 30) {
+				if(System.currentTimeMillis() - game.timeReceived > 1000 * 15) {
 					entryKeys.remove(game);
 					
 					//broadcast a UDP packet (W3GS_DECREATEGAME) to destroy the game in the LAN gamelist
