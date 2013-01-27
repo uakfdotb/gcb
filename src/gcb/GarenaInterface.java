@@ -136,16 +136,8 @@ public class GarenaInterface {
 	}
 	
 	public void clear() {
-		synchronized(members) {
-			members.clear();
-		}
-		
 		synchronized(rooms) {
 			rooms.clear();
-		}
-		
-		synchronized(tcp_connections) {
-			tcp_connections.clear();
 		}
 	}
 
@@ -1653,6 +1645,11 @@ public class GarenaInterface {
 	}
 
 	public void readPeerLoop() {
+		//in case we're restarting peer loop, erase old TCP connections
+		synchronized(tcp_connections) {
+			tcp_connections.clear();
+		}
+		
 		byte[] buf_array = new byte[65536];
 		ByteBuffer lbuf = ByteBuffer.allocate(65536);
 
