@@ -9,7 +9,7 @@ name: AOE: The Rise of Rome ASEAN 1v1 Room      id:65549   sid:1   server:203.11
 name: AOE1: The Rise of Rome Brazil Room        id:65550   sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 01  id:65551   sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
 name: North America Room                        id:65552   sid:1   server:203.117.124.14  gid:1019  game:unknown       ml:1  
-name: Philippines Room                          id:65553   sid:12  server:203.117.124.38  gid:1019  game:unknown       ml:3  
+name: Philippines Room                          id:65553   sid:12  server:203.117.124.13  gid:1019  game:unknown       ml:3  
 name: International Room                        id:65554   sid:1   server:203.117.124.14  gid:1019  game:unknown       ml:5  
 name: Oceania Room                              id:65555   sid:1   server:203.117.124.14  gid:1019  game:unknown       ml:1  
 name: ASEAN Room                                id:65556   sid:1   server:203.117.124.14  gid:1019  game:unknown       ml:1  
@@ -19,7 +19,7 @@ name: Europe Room                               id:65559   sid:1   server:203.11
 name: 1.7 Taiwan Room                           id:65560   sid:6   server:203.117.124.16  gid:1018  game:COD4          ml:1  
 name: 1.7 Malaysia Room 01                      id:65561   sid:1   server:203.117.124.14  gid:1018  game:COD4          ml:5  
 name: 1.7 North America Room                    id:65562   sid:1   server:203.117.124.14  gid:1018  game:COD4          ml:1  
-name: 1.7 Philippines Room                      id:65563   sid:12  server:203.117.124.38  gid:1018  game:COD4          ml:1  
+name: 1.7 Philippines Room                      id:65563   sid:12  server:203.117.124.13  gid:1018  game:COD4          ml:1  
 name: 1.7 Mongolia Room                         id:65564   sid:1   server:203.117.124.14  gid:1018  game:COD4          ml:1  
 name: 1.7 India Room                            id:65565   sid:1   server:203.117.124.14  gid:1018  game:COD4          ml:1  
 name: 1.7 International Room                    id:65566   sid:1   server:203.117.124.14  gid:1018  game:COD4          ml:1  
@@ -92,7 +92,7 @@ name: CS 1.6 Arabia Room                        id:65774   sid:1   server:203.11
 name: CS 1.6 Bulgaria Room                      id:65775   sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: Romania DotA Room 12                      id:65862   sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Romania DotA Room 13                      id:65863   sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Mineski StarCraft Room                    id:65876   sid:12  server:203.117.124.38  gid:1006  game:Starcraft     ml:1  
+name: Mineski StarCraft Room                    id:65876   sid:12  server:203.117.124.13  gid:1006  game:Starcraft     ml:1  
 name: TriniGamers DotA Room 2                   id:65882   sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: TriniGamers DotA Room 1                   id:65884   sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Garena Tournament Room 2                  id:65905   sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
@@ -195,7 +195,7 @@ name: Brazil DotA Room 56                       id:130908  sid:1   server:203.11
 name: Brazil DotA Room 55                       id:130909  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Mongolia DotA Room 14                     id:130910  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Mongolia DotA Room 13                     id:130911  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: 1.7 Philippines Room 02                   id:130912  sid:12  server:203.117.124.38  gid:1018  game:COD4          ml:1  
+name: 1.7 Philippines Room 02                   id:130912  sid:12  server:203.117.124.13  gid:1018  game:COD4          ml:1  
 name: Europe Room 03                            id:130913  sid:1   server:203.117.124.14  gid:1017  game:Red Alert 3   ml:1  
 name: Thailand Room 03                          id:130914  sid:1   server:203.117.124.14  gid:1029  game:Left 4 Dead   ml:1  
 name: Philippines Room 01                       id:130915  sid:1   server:203.117.124.14  gid:1026  game:COD5          ml:1  
@@ -277,7 +277,7 @@ name: Boa Compra DotA Room                      id:131019  sid:1   server:203.11
 name: Brazil Room 01                            id:131020  sid:1   server:203.117.124.14  gid:1031  game:unknown       ml:1  
 name: South America Room 01                     id:131021  sid:1   server:203.117.124.14  gid:1031  game:unknown       ml:1  
 name: Russia Room 01                            id:131022  sid:1   server:203.117.124.14  gid:1031  game:unknown       ml:1  
-name: GCA: Netvolution I-cafe                   id:131026  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Netvolution I-cafe                   id:131026  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: International DotA League Room            id:131027  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
 name: UAE DotA High Level Room 01               id:131029  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:9  
 name: FEARZ eSports Gamers Room                 id:131030  sid:1   server:203.117.124.14  gid:1016  game:CS Source     ml:1  
@@ -293,18 +293,18 @@ name: Japan Room 01                             id:131039  sid:1   server:203.11
 name: Japan Room 01                             id:131040  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: Japan Room 01                             id:131041  sid:1   server:203.117.124.14  gid:1029  game:Left 4 Dead   ml:1  
 name: Georgia DotA Room 04                      id:131044  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Digitel: DotA ROOM 03 (v1.24e) id:131045  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Digitel: DotA ROOM 02 (v1.24e) id:131046  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Digitel: DotA ROOM 03 (v1.24e) id:131045  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Digitel: DotA ROOM 02 (v1.24e) id:131046  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Oceania DotA LoD Room 01                  id:131047  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Turkey DotA Ladder Room                   id:131048  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 07  id:131049  sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
 name: X3M Dota League                           id:131050  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: CWCL NetCom Room                          id:131051  sid:1   server:203.117.124.14  gid:1000  game:WC3/TFT       ml:1  
-name: Philippines Digitel: DotA ROOM 01 (v1.24e) id:131052  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: Shop to Shop DotA Room 03 id:131053  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: Shop to Shop DotA Room 02 id:131054  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Digitel: DotA ROOM 01 (v1.24e) id:131052  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: Shop to Shop DotA Room 03 id:131053  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: Shop to Shop DotA Room 02 id:131054  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Age of Empires II: The Conquerors Taiwan Room 02 id:131055  sid:6   server:203.117.124.16  gid:1021  game:AOE II        ml:1  
-name: Philippines Globe: Shop to Shop DotA Room 01 id:131056  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: Shop to Shop DotA Room 01 id:131056  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 06  id:131057  sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 05  id:131058  sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 04  id:131059  sid:1   server:203.117.124.14  gid:1020  game:AOE I         ml:1  
@@ -487,8 +487,8 @@ name: Singapore Room 02                         id:196528  sid:2   server:203.11
 name: Malaysia Room 02                          id:196529  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: Malaysia Room 01                          id:196530  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: Thailand Room 01                          id:196531  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
-name: Philippines Room 01                       id:196532  sid:12  server:203.117.124.38  gid:1035  game:COD6          ml:1  
-name: Philippines Room 02                       id:196533  sid:12  server:203.117.124.38  gid:1035  game:COD6          ml:1  
+name: Philippines Room 01                       id:196532  sid:12  server:203.117.124.13  gid:1035  game:COD6          ml:1  
+name: Philippines Room 02                       id:196533  sid:12  server:203.117.124.13  gid:1035  game:COD6          ml:1  
 name: ASEAN Room 02                             id:196534  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: ASEAN Room 01                             id:196535  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: 3dmgame.chnren.com NetCom Room 01         id:196536  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
@@ -702,8 +702,7 @@ name: GCA: Netvolution I-cafe                   id:262118  sid:2   server:203.11
 name: Serbian League Room                       id:262119  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
 name: Russia RPG Room 13 (Castle Fight) (1.26a) id:262128  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Kazakhstan Room 01                        id:262133  sid:2   server:203.117.124.15  gid:1036  game:Left 4 Dead 2 ml:1  
-name: Kazakhstan RPG Room 3 (1.26a)             id:262134  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Kazakhstan OMG DotA Room 01 (1.26a)       id:262135  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Kazakhstan RPG Room 2 (1.26a)             id:262134  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine OMG DotA Room 01 (1.26a)          id:262137  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: DotA.by Tournaments Room                  id:262139  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:2  
 name: Russia RPG Room 11 (Naruto) (1.26a)       id:262140  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -800,8 +799,8 @@ name: CS 1.6 Taiwan Room 1                      id:262250  sid:6   server:203.11
 name: CS 1.6 Malaysia Room                      id:262251  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 Canada Room                        id:262252  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 USA Room                           id:262253  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
-name: CS 1.6 Philippines Room                   id:262254  sid:12  server:203.117.124.38  gid:1003  game:CS 1.6        ml:1  
-name: KODE5 CS Tournament Room                  id:262255  sid:12  server:203.117.124.38  gid:1003  game:CS 1.6        ml:1  
+name: CS 1.6 Philippines Room                   id:262254  sid:12  server:203.117.124.13  gid:1003  game:CS 1.6        ml:1  
+name: KODE5 CS Tournament Room                  id:262255  sid:12  server:203.117.124.13  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 Indian High Level Room             id:262256  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:5  
 name: CS 1.6 International Room 01              id:262257  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 International Room 02              id:262258  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
@@ -877,7 +876,7 @@ name: Arabian DotA Room 01                      id:262389  sid:1   server:203.11
 name: Malaysia DotA ROOM 32 (v1.24e)            id:262390  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Malaysia DotA ROOM 31 (v1.24e)            id:262391  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Malaysia DotA ROOM 30 (v1.24e)            id:262392  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Kazakhstan RPG Room (1.26a)               id:262393  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Kazakhstan RPG High Level Room (1.26a)    id:262393  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: India DotA Room 06                        id:262395  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Malaysia DotA ROOM 29 (v1.24e)            id:262396  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Malaysia DotA ROOM 28 (v1.24e)            id:262397  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
@@ -939,12 +938,12 @@ name: Ukraine DotA High Level Room 03 (1.26a)   id:327642  sid:3   server:203.11
 name: Bosnia and Herzegovina DotA Room 01 [Moderated] id:327644  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:2  
 name: Taiwan ESM Room 04                        id:327645  sid:6   server:203.117.124.16  gid:1029  game:Left 4 Dead   ml:1  
 name: Russia Room 08                            id:327646  sid:3   server:203.117.124.12  gid:1000  game:WC3/TFT       ml:1  
-name: GCA: Shiawase Internet Cafe               id:327647  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Shiawase Internet Cafe               id:327647  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Cyberstar Room                            id:327648  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:5  
 name: Denmark DotA Room 01                      id:327649  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine RPG High Level Room 01 (1.26a)    id:327650  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
 name: Argentina Room 01                         id:327651  sid:1   server:203.117.124.14  gid:1029  game:Left 4 Dead   ml:1  
-name: GCA: MFF Computer Shop                    id:327652  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: MFF Computer Shop                    id:327652  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Bosnia and Herzegovina DotA Room 02 [Moderated] id:327653  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:10 
 name: Castle Fight room                         id:327656  sid:1   server:203.117.124.14  gid:1000  game:WC3/TFT       ml:1  
 name: New Zealand DotA Room 02                  id:327662  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
@@ -1312,7 +1311,7 @@ name: Argentina DotA Room 01 [Moderada]         id:459115  sid:2   server:203.11
 name: Arabian DotA Room 02                      id:459116  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:5  
 name: Judgement Room                            id:524128  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: DotA Ladder by DotA Mania BR              id:524131  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:11 
-name: Competitive Nations DotA League           id:524134  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
+name: Competitive Nations DotA League           id:524134  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
 name: Cambodia DotA Room 02                     id:524135  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Hi-Gaming League Room                     id:524136  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
 name: Nemesis Dota League Room                  id:524140  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
@@ -1531,7 +1530,7 @@ name: Dawn Of War International Room            id:589862  sid:1   server:203.11
 name: Dawn Of War ASEAN Room                    id:589863  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
 name: Dawn Of War South America Room            id:589864  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
 name: Garena Dawn Of War Tournament Room        id:589865  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
-name: Philippines Starcraft Room                id:589866  sid:12  server:203.117.124.38  gid:1006  game:Starcraft     ml:1  
+name: Philippines Starcraft Room                id:589866  sid:12  server:203.117.124.13  gid:1006  game:Starcraft     ml:1  
 name: Hangar Network BroodWar Room              id:589867  sid:1   server:203.117.124.14  gid:1006  game:Starcraft     ml:1  
 name: Garena Broodwar Tournament Room           id:589868  sid:1   server:203.117.124.14  gid:1006  game:Starcraft     ml:0  
 name: Asean Room                                id:589869  sid:1   server:203.117.124.14  gid:1004  game:CS 1.5        ml:1  
@@ -1850,301 +1849,301 @@ name: Taiwan ESM SanGuo 3.7 XD 08               id:786424  sid:6   server:203.11
 name: Taiwan ESM SanGuo 3.7 XD 07               id:786425  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
 name: Taiwan ESM SanGuo 3.7 06                  id:786426  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
 name: Taiwan ESM SanGuo 3.7 XD 06               id:786431  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 01 (v1.26a) id:786442  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 02 (v1.26a) id:786443  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 03 (v1.26a) id:786444  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 04 (v1.26a) id:786445  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 05 (v1.26a) id:786446  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 06 (v1.26a) id:786447  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 07 (v1.26a) id:786448  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 08 (v1.26a) id:786449  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 09 (v1.26a) id:786450  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 10 (v1.26a) id:786451  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 11 (v1.26a) id:786452  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 12 (v1.26a) id:786453  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Castle Fight Room 1      id:786454  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Fufu Ninja All-Stars Room 1 id:786455  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Fufu Ninja All-Stars Room 2 id:786456  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Gold Rush Room 1         id:786457  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Gold Rush Room 2         id:786458  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: RPG Room 01              id:786459  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: RPG Room 02              id:786460  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: RPG Room 03              id:786461  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Tree Tag Room 01         id:786464  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:2  
-name: War3 Custom Map: Tree Tag Room 02         id:786465  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: Tree Tag Room 03         id:786466  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: War of Philippines Heroes 1 id:786467  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: War of Philippines Heroes 2 id:786468  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 021 (v1.26a)  id:786469  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 022 (v1.26a)  id:786470  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 023 (v1.26a)  id:786471  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 024 (v1.26a)  id:786472  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 025 (v1.26a)  id:786473  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 026 (v1.26a)  id:786474  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 027 (v1.26a)  id:786475  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 028 (v1.26a)  id:786476  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 029 (v1.26a)  id:786477  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 030 (v1.26a)  id:786478  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 031 (v1.26a)  id:786479  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 032 (v1.26a)  id:786480  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 033 (v1.26a)  id:786481  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 034 (v1.26a)  id:786482  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 035 (v1.26a)  id:786483  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 036 (v1.26a)  id:786484  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 037 (v1.26a)  id:786485  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 038 (v1.26a)  id:786486  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 039 (v1.26a)  id:786487  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 040 (v1.26a)  id:786488  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 041 (v1.24e)  id:786489  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 042 (v1.24e)  id:786490  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 043 (v1.24e)  id:786491  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 044 (v1.24e)  id:786492  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 045 (v1.24e)  id:786493  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 046 (v1.24e)  id:786494  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 047 (v1.24e)  id:786495  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 048 (v1.24e)  id:786496  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 049 (v1.24e)  id:786497  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 050 (v1.24e)  id:786498  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 051 (v1.24e)  id:786499  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 052 (v1.24e)  id:786500  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 053 (v1.24e)  id:786501  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 053 (v1.24e)  id:786502  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 055 (v1.24e)  id:786503  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 056 (v1.24e)  id:786504  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 057 (v1.24e)  id:786505  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 058 (v1.24e)  id:786506  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 059 (v1.24e)  id:786507  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 06 (v1.26a) id:786508  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 07 (v1.26a) id:786509  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 08 (v1.26a) id:786510  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 09 (v1.26a) id:786511  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 10 (v1.26a) id:786512  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 11 (v1.26a) id:786513  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 12 (v1.26a) id:786514  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 13 (v1.26a) id:786515  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 14 (v1.26a) id:786516  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 15 (v1.26a) id:786517  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 16 (v1.24e) id:786518  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 17 (v1.24e) id:786519  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 18 (v1.24e) id:786520  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 19 (v1.24e) id:786521  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 20 (v1.24e) id:786522  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 21 (v1.24e) id:786523  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 22 (v1.24e) id:786524  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 23 (v1.24e) id:786525  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 24 (v1.24e) id:786526  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 25 (v1.24e) id:786527  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: BayanTel Fufu All Stars Room 01 id:786533  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: BayanTel RPG Room 01     id:786534  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: BayanTel RPG Room 02     id:786535  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: Shop to Shop DotA Room 01 id:786536  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: Shop to Shop DotA Room 02 id:786537  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: War3 Custom Map: BayanTel Tree Tag Room 01 id:786538  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA High Level ROOM 01 (v1.26a) id:786539  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:12 
-name: Philippines Globe: DotA High Level ROOM 02 (v1.26a) id:786540  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:10 
-name: Philippines Globe: DotA High Level ROOM 03 (v1.26a) id:786541  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:8  
-name: Philippines Globe: DotA ROOM 01 (v1.26a)  id:786542  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 02 (v1.26a)  id:786543  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 03 (v1.26a)  id:786544  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 04 (v1.26a)  id:786545  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 05 (v1.26a)  id:786546  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 06 (v1.26a)  id:786547  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 07 (v1.26a)  id:786548  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 08 (v1.26a)  id:786549  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 09 (v1.26a)  id:786550  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:2  
-name: Philippines Globe: DotA ROOM 10 (v1.26a)  id:786551  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 11 (v1.26a)  id:786552  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Local Tambayan: Dagupan ROOM (v1.24e)     id:786553  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Iloilo ROOM (v1.24e)      id:786556  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Laguna ROOM (v1.24e)      id:786557  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Metro Manila ROOM (v1.24e) id:786558  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Pampanga ROOM (v1.24e)    id:786559  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Tarlac ROOM (v1.24e)      id:786560  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Zamboanga ROOM (v1.24e)   id:786561  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Partners: DotA Strategy Community Room    id:786562  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:3  
-name: Partners: DotAPH.com DotA Room            id:786563  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Partners: Mineski Infinity ROOM 02 (v1.26a) id:786564  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Partners: Mineski Grounds ROOM (v1.26a)   id:786565  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:3  
-name: Partners: Mineski Infinity ROOM (v1.26a)  id:786566  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:7  
-name: Partners: Mineski Infinity High Level ROOM (v1.26a) id:786567  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:15 
-name: Partners: PinoyGG DotA Carnage Room       id:786568  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Partners: PinoyGG Clan War Room           id:786569  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:3  
-name: Philippines BayanTel: DotA High Level ROOM 01 (v1.26a) id:786570  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Philippines BayanTel: DotA ROOM 01 (v1.26a) id:786571  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 02 (v1.26a) id:786572  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 03 (v1.26a) id:786573  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 04 (v1.26a) id:786574  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 05 (v1.26a) id:786575  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Pacific eSports - Ichill Room             id:851910  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Pacific eSports - LiveandWired Room       id:851911  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Battle Station Internet Cafe         id:851912  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Manjo Republic                       id:851913  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: [del] A* Sweetopia Dota Rage -cm (www.sweetopia.ph) id:851914  sid:12  server:203.117.124.38  gid:1028  game:unknown       ml:2  
-name: GCA: CXG Legarda                          id:851915  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 01 (v1.26a) id:786442  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 02 (v1.26a) id:786443  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 03 (v1.26a) id:786444  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 04 (v1.26a) id:786445  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 05 (v1.26a) id:786446  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 06 (v1.26a) id:786447  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 07 (v1.26a) id:786448  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 08 (v1.26a) id:786449  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 09 (v1.26a) id:786450  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 10 (v1.26a) id:786451  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 11 (v1.26a) id:786452  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 12 (v1.26a) id:786453  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Castle Fight Room 1      id:786454  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Fufu Ninja All-Stars Room 1 id:786455  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Fufu Ninja All-Stars Room 2 id:786456  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Gold Rush Room 1         id:786457  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Gold Rush Room 2         id:786458  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: RPG Room 01              id:786459  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: RPG Room 02              id:786460  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: RPG Room 03              id:786461  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Tree Tag Room 01         id:786464  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:2  
+name: War3 Custom Map: Tree Tag Room 02         id:786465  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: Tree Tag Room 03         id:786466  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: War of Philippines Heroes 1 id:786467  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: War of Philippines Heroes 2 id:786468  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 021 (v1.26a)  id:786469  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 022 (v1.26a)  id:786470  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 023 (v1.26a)  id:786471  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 024 (v1.26a)  id:786472  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 025 (v1.26a)  id:786473  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 026 (v1.26a)  id:786474  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 027 (v1.26a)  id:786475  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 028 (v1.26a)  id:786476  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 029 (v1.26a)  id:786477  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 030 (v1.26a)  id:786478  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 031 (v1.26a)  id:786479  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 032 (v1.26a)  id:786480  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 033 (v1.26a)  id:786481  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 034 (v1.26a)  id:786482  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 035 (v1.26a)  id:786483  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 036 (v1.26a)  id:786484  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 037 (v1.26a)  id:786485  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 038 (v1.26a)  id:786486  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 039 (v1.26a)  id:786487  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 040 (v1.26a)  id:786488  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 041 (v1.24e)  id:786489  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 042 (v1.24e)  id:786490  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 043 (v1.24e)  id:786491  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 044 (v1.24e)  id:786492  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 045 (v1.24e)  id:786493  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 046 (v1.24e)  id:786494  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 047 (v1.24e)  id:786495  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 048 (v1.24e)  id:786496  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 049 (v1.24e)  id:786497  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 050 (v1.24e)  id:786498  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 051 (v1.24e)  id:786499  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 052 (v1.24e)  id:786500  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 053 (v1.24e)  id:786501  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 053 (v1.24e)  id:786502  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 055 (v1.24e)  id:786503  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 056 (v1.24e)  id:786504  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 057 (v1.24e)  id:786505  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 058 (v1.24e)  id:786506  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 059 (v1.24e)  id:786507  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 06 (v1.26a) id:786508  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 07 (v1.26a) id:786509  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 08 (v1.26a) id:786510  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 09 (v1.26a) id:786511  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 10 (v1.26a) id:786512  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 11 (v1.26a) id:786513  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 12 (v1.26a) id:786514  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 13 (v1.26a) id:786515  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 14 (v1.26a) id:786516  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 15 (v1.26a) id:786517  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 16 (v1.24e) id:786518  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 17 (v1.24e) id:786519  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 18 (v1.24e) id:786520  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 19 (v1.24e) id:786521  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 20 (v1.24e) id:786522  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 21 (v1.24e) id:786523  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 22 (v1.24e) id:786524  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 23 (v1.24e) id:786525  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 24 (v1.24e) id:786526  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 25 (v1.24e) id:786527  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: BayanTel Fufu All Stars Room 01 id:786533  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: BayanTel RPG Room 01     id:786534  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: BayanTel RPG Room 02     id:786535  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: Shop to Shop DotA Room 01 id:786536  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: Shop to Shop DotA Room 02 id:786537  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: War3 Custom Map: BayanTel Tree Tag Room 01 id:786538  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA High Level ROOM 01 (v1.26a) id:786539  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:12 
+name: Philippines Globe: DotA High Level ROOM 02 (v1.26a) id:786540  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:10 
+name: Philippines Globe: DotA High Level ROOM 03 (v1.26a) id:786541  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:8  
+name: Philippines Globe: DotA ROOM 01 (v1.26a)  id:786542  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 02 (v1.26a)  id:786543  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 03 (v1.26a)  id:786544  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 04 (v1.26a)  id:786545  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 05 (v1.26a)  id:786546  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 06 (v1.26a)  id:786547  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 07 (v1.26a)  id:786548  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 08 (v1.26a)  id:786549  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 09 (v1.26a)  id:786550  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:2  
+name: Philippines Globe: DotA ROOM 10 (v1.26a)  id:786551  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 11 (v1.26a)  id:786552  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Local Tambayan: Dagupan ROOM (v1.24e)     id:786553  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Iloilo ROOM (v1.24e)      id:786556  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Laguna ROOM (v1.24e)      id:786557  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Metro Manila ROOM (v1.24e) id:786558  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Pampanga ROOM (v1.24e)    id:786559  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Tarlac ROOM (v1.24e)      id:786560  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Zamboanga ROOM (v1.24e)   id:786561  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Partners: DotA Strategy Community Room    id:786562  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
+name: Partners: DotAPH.com DotA Room            id:786563  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Partners: Mineski Infinity Room 02 -cm www.mineski.net id:786564  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Partners: Mineski Grounds CLANWAR -CM     id:786565  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
+name: Partners: Mineski Infinity Room -cm www.mineski.net id:786566  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:7  
+name: Partners: Mineski Infinity High Level Room Pubgame -AP id:786567  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:8  
+name: Partners: PinoyGG DotA Carnage Room       id:786568  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Partners: PinoyGG Clan War Room           id:786569  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
+name: Philippines BayanTel: DotA High Level ROOM 01 (v1.26a) id:786570  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Philippines BayanTel: DotA ROOM 01 (v1.26a) id:786571  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 02 (v1.26a) id:786572  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 03 (v1.26a) id:786573  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 04 (v1.26a) id:786574  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 05 (v1.26a) id:786575  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Pacific eSports - Ichill Room             id:851910  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Pacific eSports - LiveandWired Room       id:851911  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Battle Station Internet Cafe         id:851912  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Manjo Republic                       id:851913  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: [del] A* Sweetopia Dota Rage -cm (www.sweetopia.ph) id:851914  sid:12  server:203.117.124.13  gid:1028  game:unknown       ml:2  
+name: GCA: CXG Legarda                          id:851915  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: del ALL-STARS Sweetopia E-walker High Level ROOM 01 (v1.26a id:851916  sid:0   server:unknown         gid:1012  game:WC3/RPG*      ml:10 
-name: GCA: CXG Cainta                           id:851917  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Gizmo Dojo                           id:851918  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: CXG Cainta                           id:851917  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Gizmo Dojo                           id:851918  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Turkey JFA Room                           id:851919  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 31 (v1.24e) id:851920  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 30 (v1.24e) id:851921  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 29 (v1.24e) id:851922  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 28 (v1.24e) id:851923  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 27 (v1.24e) id:851924  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines BayanTel: DotA ROOM 26 (v1.24e) id:851925  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 105 (v1.24e)  id:851926  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 103 (v1.24e)  id:851927  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 104 (v1.24e)  id:851928  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 102 (v1.24e)  id:851929  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 101 (v1.24e)  id:851930  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 100 (v1.24e)  id:851931  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 099 (v1.24e)  id:851932  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 098 (v1.24e)  id:851933  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 097 (v1.24e)  id:851934  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 096 (v1.24e)  id:851935  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 36 (v1.24e)  id:851936  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 35 (v1.24e)  id:851937  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 34 (v1.24e)  id:851938  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 33 (v1.24e)  id:851939  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 32 (v1.24e)  id:851940  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 31 (v1.24e)  id:851941  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 30 (v1.24e)  id:851942  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 29 (v1.24e)  id:851943  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 22 (v1.24e) id:851944  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 21 (v1.24e) id:851945  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 20 (v1.24e) id:851946  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 19 (v1.24e) id:851947  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 18 (v1.24e) id:851948  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 17 (v1.24e) id:851949  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 16 (v1.24e) id:851950  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 15 (v1.26a) id:851951  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 14 (v1.26a) id:851952  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Shop to Shop DotA ROOM 13 (v1.26a) id:851953  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 095 (v1.24e)  id:851954  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 094 (v1.24e)  id:851955  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 093 (v1.24e)  id:851956  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 092 (v1.24e)  id:851957  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 091 (v1.24e)  id:851958  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 090 (v1.24e)  id:851959  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 28 (v1.24e)  id:851960  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 27 (v1.24e)  id:851961  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 26 (v1.24e)  id:851962  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 25 (v1.24e)  id:851963  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 24 (v1.24e)  id:851964  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 23 (v1.24e)  id:851965  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 22 (v1.24e)  id:851966  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 21 (v1.24e)  id:851967  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 060 (v1.24e)  id:851970  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 061 (v1.24e)  id:851971  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 062 (v1.24e)  id:851972  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 063 (v1.24e)  id:851973  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 064 (v1.24e)  id:851974  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 065 (v1.24e)  id:851975  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 066 (v1.24e)  id:851976  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 067 (v1.24e)  id:851977  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 068 (v1.24e)  id:851978  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 069 (v1.24e)  id:851979  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 070 (v1.24e)  id:851980  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 071 (v1.24e)  id:851981  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 072 (v1.24e)  id:851982  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 073 (v1.24e)  id:851983  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 074 (v1.24e)  id:851984  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 075 (v1.24e)  id:851985  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 076 (v1.24e)  id:851986  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 077 (v1.24e)  id:851987  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 078 (v1.24e)  id:851988  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 079 (v1.24e)  id:851989  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 080 (v1.24e)  id:851990  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 081 (v1.24e)  id:851991  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 082 (v1.24e)  id:851992  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 083 (v1.24e)  id:851993  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 084 (v1.24e)  id:851994  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 085 (v1.24e)  id:851995  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 086 (v1.24e)  id:851996  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 087 (v1.24e)  id:851997  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 088 (v1.24e)  id:851998  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 089 (v1.24e)  id:851999  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 12 (v1.26a)  id:852000  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 13 (v1.26a)  id:852001  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 14 (v1.26a)  id:852002  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 15 (v1.26a)  id:852003  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 16 (v1.26a)  id:852004  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 17 (v1.26a)  id:852005  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 18 (v1.26a)  id:852006  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 19 (v1.26a)  id:852007  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines Globe: DotA ROOM 20 (v1.26a)  id:852008  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: RektaDotA Community ROOM (v1.26a) id:852009  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA High Level ROOM 01 (v1.26a) id:852010  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:30 
-name: Philippines PLDT: DotA High Level ROOM 02 (v1.26a) id:852011  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:26 
-name: Philippines PLDT: DotA High Level ROOM 03 (v1.26a) id:852012  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:23 
-name: Philippines PLDT: DotA High Level ROOM 04 (v1.26a) id:852013  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:20 
-name: Philippines PLDT: DotA High Level ROOM 05 (v1.26a) id:852014  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:18 
-name: Philippines PLDT: DotA High Level ROOM 06 (v1.26a) id:852015  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:16 
-name: Philippines PLDT: DotA High Level ROOM 07 (v1.26a) id:852016  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:14 
-name: Philippines PLDT: DotA High Level ROOM 08 (v1.26a) id:852017  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:12 
-name: Philippines PLDT: DotA High Level ROOM 09 (v1.26a) id:852018  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:10 
-name: Philippines PLDT: DotA High Level ROOM 10 (v1.26a) id:852019  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:8  
-name: Philippines PLDT: DotA ROOM 001 (v1.26a)  id:852020  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 002 (v1.26a)  id:852021  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 003 (v1.26a)  id:852022  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 004 (v1.26a)  id:852023  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 005 (v1.26a)  id:852024  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 006 (v1.26a)  id:852025  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 007 (v1.26a)  id:852026  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 008 (v1.26a)  id:852027  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 009 (v1.26a)  id:852028  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 010 (v1.26a)  id:852029  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 011 (v1.26a)  id:852030  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 012 (v1.26a)  id:852031  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 013 (v1.26a)  id:852032  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 014 (v1.26a)  id:852033  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 015 (v1.26a)  id:852034  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 016 (v1.26a)  id:852035  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 017 (v1.26a)  id:852036  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 018 (v1.26a)  id:852037  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 019 (v1.26a)  id:852038  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Philippines PLDT: DotA ROOM 020 (v1.26a)  id:852039  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: [del] Partners: Philippine Allstars DotA Room id:852041  sid:12  server:203.117.124.38  gid:1028  game:unknown       ml:1  
-name: [del] A* Sweetopia CM PLDT (1.26a) Moderated Room id:852042  sid:12  server:203.117.124.38  gid:1028  game:unknown       ml:2  
-name: Partners: Drop Dead Gorgeous (DDG) VIP Lounge id:852043  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Event Room: DotA Tournament Room 1        id:852044  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: DriveN eSports DotA ROOM        id:852045  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Event Room: DotA Tournament Room 3        id:852046  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Event Room: GCA Tournament                id:852047  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Event Room: Playdota Philippines          id:852048  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Event Room: Philippines Online Staff Room id:852049  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: AKOCDEX-AKOCJUAN DotA Room           id:852050  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Bits&Chips DotA Room                 id:852051  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: G-Master DotA Room                   id:852052  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: HOOKED 168 DotA Room                 id:852053  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Maimai Computers                     id:852055  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Mudhouse Internet Cafe               id:852056  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Netopia DotA Room                    id:852057  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: TheNet.Com Room                      id:852058  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: TK Zone - La Union DotA Room 01      id:852059  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Web iCafe Room                       id:852060  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Local Tambayan: Visayas ROOM (v1.24e)     id:852061  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Local Tambayan: Luzon ROOM (v1.24e)       id:852062  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Local Tambayan: Mindanao ROOM (v1.24e)    id:852063  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Local Tambayan: Cagayan Valley ROOM (v1.24e) id:852064  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
-name: Local Tambayan: Cavite ROOM (v1.24e)      id:852065  sid:12  server:203.117.124.38  gid:1024  game:unknown       ml:1  
+name: Philippines BayanTel: DotA ROOM 31 (v1.24e) id:851920  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 30 (v1.24e) id:851921  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 29 (v1.24e) id:851922  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 28 (v1.24e) id:851923  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 27 (v1.24e) id:851924  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines BayanTel: DotA ROOM 26 (v1.24e) id:851925  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 105 (v1.24e)  id:851926  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 103 (v1.24e)  id:851927  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 104 (v1.24e)  id:851928  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 102 (v1.24e)  id:851929  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 101 (v1.24e)  id:851930  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 100 (v1.24e)  id:851931  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 099 (v1.24e)  id:851932  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 098 (v1.24e)  id:851933  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 097 (v1.24e)  id:851934  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 096 (v1.24e)  id:851935  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 36 (v1.24e)  id:851936  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 35 (v1.24e)  id:851937  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 34 (v1.24e)  id:851938  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 33 (v1.24e)  id:851939  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 32 (v1.24e)  id:851940  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 31 (v1.24e)  id:851941  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 30 (v1.24e)  id:851942  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 29 (v1.24e)  id:851943  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 22 (v1.24e) id:851944  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 21 (v1.24e) id:851945  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 20 (v1.24e) id:851946  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 19 (v1.24e) id:851947  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 18 (v1.24e) id:851948  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 17 (v1.24e) id:851949  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 16 (v1.24e) id:851950  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 15 (v1.26a) id:851951  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 14 (v1.26a) id:851952  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Shop to Shop DotA ROOM 13 (v1.26a) id:851953  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 095 (v1.24e)  id:851954  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 094 (v1.24e)  id:851955  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 093 (v1.24e)  id:851956  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 092 (v1.24e)  id:851957  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 091 (v1.24e)  id:851958  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 090 (v1.24e)  id:851959  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 28 (v1.24e)  id:851960  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 27 (v1.24e)  id:851961  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 26 (v1.24e)  id:851962  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 25 (v1.24e)  id:851963  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 24 (v1.24e)  id:851964  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 23 (v1.24e)  id:851965  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 22 (v1.24e)  id:851966  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 21 (v1.24e)  id:851967  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 060 (v1.24e)  id:851970  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 061 (v1.24e)  id:851971  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 062 (v1.24e)  id:851972  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 063 (v1.24e)  id:851973  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 064 (v1.24e)  id:851974  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 065 (v1.24e)  id:851975  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 066 (v1.24e)  id:851976  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 067 (v1.24e)  id:851977  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 068 (v1.24e)  id:851978  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 069 (v1.24e)  id:851979  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 070 (v1.24e)  id:851980  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 071 (v1.24e)  id:851981  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 072 (v1.24e)  id:851982  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 073 (v1.24e)  id:851983  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 074 (v1.24e)  id:851984  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 075 (v1.24e)  id:851985  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 076 (v1.24e)  id:851986  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 077 (v1.24e)  id:851987  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 078 (v1.24e)  id:851988  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 079 (v1.24e)  id:851989  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 080 (v1.24e)  id:851990  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 081 (v1.24e)  id:851991  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 082 (v1.24e)  id:851992  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 083 (v1.24e)  id:851993  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 084 (v1.24e)  id:851994  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 085 (v1.24e)  id:851995  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 086 (v1.24e)  id:851996  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 087 (v1.24e)  id:851997  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 088 (v1.24e)  id:851998  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 089 (v1.24e)  id:851999  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 12 (v1.26a)  id:852000  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 13 (v1.26a)  id:852001  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 14 (v1.26a)  id:852002  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 15 (v1.26a)  id:852003  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 16 (v1.26a)  id:852004  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 17 (v1.26a)  id:852005  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 18 (v1.26a)  id:852006  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 19 (v1.26a)  id:852007  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines Globe: DotA ROOM 20 (v1.26a)  id:852008  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: RektaDotA Community ROOM (v1.26a) id:852009  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA High Level ROOM 01 (v1.26a) id:852010  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:30 
+name: Philippines PLDT: DotA High Level ROOM 02 (v1.26a) id:852011  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:26 
+name: Philippines PLDT: DotA High Level ROOM 03 (v1.26a) id:852012  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:23 
+name: Philippines PLDT: DotA High Level ROOM 04 (v1.26a) id:852013  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:20 
+name: Philippines PLDT: DotA High Level ROOM 05 (v1.26a) id:852014  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:18 
+name: Philippines PLDT: DotA High Level ROOM 06 (v1.26a) id:852015  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:16 
+name: Philippines PLDT: DotA High Level ROOM 07 (v1.26a) id:852016  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:14 
+name: Philippines PLDT: DotA High Level ROOM 08 (v1.26a) id:852017  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:12 
+name: Philippines PLDT: DotA High Level ROOM 09 (v1.26a) id:852018  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:10 
+name: Philippines PLDT: DotA High Level ROOM 10 (v1.26a) id:852019  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:8  
+name: Philippines PLDT: DotA ROOM 001 (v1.26a)  id:852020  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 002 (v1.26a)  id:852021  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 003 (v1.26a)  id:852022  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 004 (v1.26a)  id:852023  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 005 (v1.26a)  id:852024  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 006 (v1.26a)  id:852025  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 007 (v1.26a)  id:852026  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 008 (v1.26a)  id:852027  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 009 (v1.26a)  id:852028  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 010 (v1.26a)  id:852029  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 011 (v1.26a)  id:852030  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 012 (v1.26a)  id:852031  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 013 (v1.26a)  id:852032  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 014 (v1.26a)  id:852033  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 015 (v1.26a)  id:852034  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 016 (v1.26a)  id:852035  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 017 (v1.26a)  id:852036  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 018 (v1.26a)  id:852037  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 019 (v1.26a)  id:852038  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Philippines PLDT: DotA ROOM 020 (v1.26a)  id:852039  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: [del] Partners: Philippine Allstars DotA Room id:852041  sid:12  server:203.117.124.13  gid:1028  game:unknown       ml:1  
+name: [del] A* Sweetopia CM PLDT (1.26a) Moderated Room id:852042  sid:12  server:203.117.124.13  gid:1028  game:unknown       ml:2  
+name: Partners: Drop Dead Gorgeous (DDG) VIP Lounge id:852043  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Event Room: DotA Tournament Room 1        id:852044  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: DriveN eSports DotA ROOM        id:852045  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Event Room: DotA Tournament Room 3        id:852046  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Event Room: GCA Tournament                id:852047  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Event Room: Playdota Philippines          id:852048  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Event Room: Philippines Online Staff Room id:852049  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: AKOCDEX-AKOCJUAN DotA Room           id:852050  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Bits&Chips DotA Room                 id:852051  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: G-Master DotA Room                   id:852052  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: HOOKED 168 DotA Room                 id:852053  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Maimai Computers                     id:852055  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Mudhouse Internet Cafe               id:852056  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Netopia DotA Room                    id:852057  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: TheNet.Com Room                      id:852058  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: TK Zone - La Union DotA Room 01      id:852059  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Web iCafe Room                       id:852060  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Local Tambayan: Visayas ROOM (v1.24e)     id:852061  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Local Tambayan: Luzon ROOM (v1.24e)       id:852062  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Local Tambayan: Mindanao ROOM (v1.24e)    id:852063  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Local Tambayan: Cagayan Valley ROOM (v1.24e) id:852064  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
+name: Local Tambayan: Cavite ROOM (v1.24e)      id:852065  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
 name: Russia Imba DotA Room 01 (1.26a)          id:852066  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: A* Sweetopia Dota Rage -cm www.sweetopia.ph id:917487  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:2  
-name: A* Sweetopia CM PLDT (1.26a) Moderated Room id:917488  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:3  
-name: A* Sweetopia All-In Public PLDT (1.26a) Moderated Room id:917489  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Gamerz Planet                        id:917490  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: ROG (Republic of Gamers)             id:917491  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: A* Sweetopia Dota Rage -cm www.sweetopia.ph id:917487  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:2  
+name: A* Sweetopia CM PLDT (1.26a) Moderated Room id:917488  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
+name: A* Sweetopia All-In Public PLDT (1.26a) Moderated Room id:917489  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Gamerz Planet                        id:917490  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: ROG (Republic of Gamers)             id:917491  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: 2012 Garena Tournament Room 01            id:917492  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
 name: 2012 Garena Tournament Room 02            id:917493  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Cyber Fiesta Internet Cafe           id:917494  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: Netquarters DotA Room 01             id:917495  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: BoYzTrEk DotA Tournament Oct-15-2011 @ Jacinto id:917496  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: War of Warlords Internet Cafe        id:917497  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Cyber Fiesta Internet Cafe           id:917494  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: Netquarters DotA Room 01             id:917495  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: BoYzTrEk DotA Tournament Oct-15-2011 @ Jacinto id:917496  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: War of Warlords Internet Cafe        id:917497  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Greece DotA Tournaments Room              id:917498  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: Mindanao DotA League ROOM (v1.24e) id:917499  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: Mindanao Gaming ROOM (v1.24e)   id:917500  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: PinoyGG DotA Havoc Room         id:917501  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:5  
-name: Partners: Drop Dead Gorgeous (DDG) VIP Lounge id:917502  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
-name: GCA: I.T. Log Park Summer Open Tournament - MAY 15 id:917503  sid:12  server:203.117.124.38  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: Mindanao DotA League ROOM (v1.24e) id:917499  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: Mindanao Gaming ROOM (v1.24e)   id:917500  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: PinoyGG DotA Havoc Room         id:917501  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Partners: Drop Dead Gorgeous (DDG) VIP Lounge id:917502  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: GCA: I.T. Log Park Summer Open Tournament - MAY 15 id:917503  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 01 (1.26a)              id:982958  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 02 (1.26a)              id:982959  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 03 (1.26a)              id:982960  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -2189,8 +2188,6 @@ name: Kazakhstan DotA Room 19 (1.26a)           id:983018  sid:3   server:203.11
 name: Kazakhstan DotA Room 20 (1.26a)           id:983019  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Kazakhstan DotA Room 21 (1.26a)           id:983020  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Kazakhstan DotA Room 22 (1.26a)           id:983021  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Kazakhstan DotA Room 23 (1.26a)           id:983022  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Kazakhstan DotA Room 24 (1.26a)           id:983023  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: 0SPL-Allstars Slaves Room                 id:983032  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: 0SPL-Allstars Mortals Room                id:983033  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia DotA Clanwar Room 03 (1.26a)       id:983038  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -2877,6 +2874,8 @@ name: Vietnam DotA LoD ROOM 19 v1.24e           id:1114078 sid:16  server:123.30
 name: Vietnam DotA LoD ROOM 20 v1.24e           id:1114079 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA IMBA ROOM 20 v1.24e          id:1114080 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA IMBA ROOM 19 v1.24e          id:1114081 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 153 v1.24e              id:1114090 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 151 v1.24e              id:1114091 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA OMG ROOM 07 v1.24e           id:1114092 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:5  
 name: Vietnam DotA IMBA ROOM 15 v1.24e          id:1114093 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Divide and Fight ROOM 03       id:1114094 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
@@ -2905,6 +2904,15 @@ name: Custom Map TOWER Defense ROOM 01          id:1114117 sid:17  server:123.30
 name: Custom Map Pudge Wars Reloaded ROOM 1     id:1114118 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Pokemon Defense                    id:1114119 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Naruto Room 01                 id:1114120 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114121 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114122 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114123 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114124 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114125 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114126 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114127 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114128 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114129 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam Thien Kiem ROOM 10 v1.24e         id:1114130 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam Thien Kiem ROOM 09 v1.24e         id:1114131 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam Thien Kiem ROOM 08 v1.24e         id:1114132 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
@@ -2914,6 +2922,8 @@ name: Custom Map Hero Defense Room 09           id:1114135 sid:17  server:123.30
 name: Custom Map Tong Hop Room 10               id:1114136 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Hero Defense Room 08           id:1114137 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Castle Fight ROOM 03           id:1114138 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 003 v1.24e              id:1114139 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:25 
+name: Taiwan ESM SanGuo 4.x 01                  id:1114140 sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA IMBA ROOM 13 v1.24e          id:1114141 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Green TD ROOM 05               id:1114142 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Green TD ROOM 04               id:1114143 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
@@ -2938,6 +2948,11 @@ name: Vietnam DotA OMG ROOM 05 v1.24e           id:1114161 sid:17  server:123.30
 name: Vietnam DotA OMG ROOM 04 v1.24e           id:1114162 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:5  
 name: Vietnam DotA OMG ROOM 03 v1.24e           id:1114163 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA OMG ROOM 02 v1.24e           id:1114164 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
+name: Vietnam DotA OMG ROOM 01 v1.24e           id:1114165 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
+name: Vietnam DotA ROOM 125 v1.24e              id:1114166 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 125 v1.24e              id:1114167 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 125 v1.24e              id:1114168 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA ROOM 125 v1.24e              id:1114169 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA OMG ROOM 01 v1.24e           id:1114165 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA Clan War ROOM 02 v1.24e      id:1114171 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA Clan War ROOM 01 v1.24e      id:1114172 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:3  
@@ -3157,7 +3172,7 @@ name: CS1.6 VivaGamers Room                     id:1179806 sid:2   server:203.11
 name: Peru DotA Room 11                         id:1179819 sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Peru DotA Room 07                         id:1179820 sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Mongolia DotA Room 08                     id:1179822 sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Kazakhstan RPG Room 2 (1.26a)             id:1179828 sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Kazakhstan RPG Room 1 (1.26a)             id:1179828 sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: India DotA Room 08                        id:1179829 sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Brazil DotA Room 40                       id:1179837 sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Kosova DotA Room 01                       id:1179841 sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
