@@ -1,0 +1,404 @@
+Index: ghost/ghost.cpp
+===================================================================
+--- ghost/ghost.cpp	(revision 598)
++++ ghost/ghost.cpp	(working copy)
+@@ -35,6 +35,7 @@
+ #include "savegame.h"
+ #include "gameplayer.h"
+ #include "gameprotocol.h"
++#include "gcbiprotocol.h"
+ #include "gpsprotocol.h"
+ #include "game_base.h"
+ #include "game.h"
+@@ -398,6 +399,7 @@
+ 	m_UDPSocket->SetDontRoute( CFG->GetInt( "udp_dontroute", 0 ) == 0 ? false : true );
+ 	m_ReconnectSocket = NULL;
+ 	m_GPSProtocol = new CGPSProtocol( );
++	m_GCBIProtocol = new CGCBIProtocol( );
+ 	m_CRC = new CCRC32( );
+ 	m_CRC->Initialize( );
+ 	m_SHA = new CSHA1( );
+@@ -699,6 +701,7 @@
+ 		delete *i;
+ 
+ 	delete m_GPSProtocol;
++	delete m_GCBIProtocol;
+ 	delete m_CRC;
+ 	delete m_SHA;
+ 
+@@ -827,6 +830,7 @@
+ 				CONSOLE_Print( "[GHOST] error listening for GProxy++ reconnects on port " + UTIL_ToString( m_ReconnectPort ) );
+ 				delete m_ReconnectSocket;
+ 				m_ReconnectSocket = NULL;
++
+ 				m_Reconnect = false;
+ 			}
+ 		}
+Index: ghost/game_base.h
+===================================================================
+--- ghost/game_base.h	(revision 598)
++++ ghost/game_base.h	(working copy)
+@@ -39,6 +39,7 @@
+ class CIncomingChatPlayer;
+ class CIncomingMapSize;
+ class CCallableScoreCheck;
++class CIncomingGarenaPlayer;
+ 
+ class CBaseGame
+ {
+@@ -162,6 +163,7 @@
+ 
+ 	virtual uint32_t GetNextTimedActionTicks( );
+ 	virtual uint32_t GetSlotsOccupied( );
++	virtual uint32_t GetSlotsAllocated( );
+ 	virtual uint32_t GetSlotsOpen( );
+ 	virtual uint32_t GetNumPlayers( );
+ 	virtual uint32_t GetNumHumanPlayers( );
+Index: ghost/gameplayer.h
+===================================================================
+--- ghost/gameplayer.h	(revision 598)
++++ ghost/gameplayer.h	(working copy)
+@@ -26,6 +26,7 @@
+ class CGameProtocol;
+ class CGame;
+ class CIncomingJoinPlayer;
++class CIncomingGarenaUser;
+ 
+ //
+ // CPotentialPlayer
+@@ -47,6 +48,7 @@
+ 	bool m_Error;
+ 	string m_ErrorString;
+ 	CIncomingJoinPlayer *m_IncomingJoinPlayer;
++	CIncomingGarenaUser *m_IncomingGarenaUser;
+ 
+ public:
+ 	CPotentialPlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket );
+@@ -60,9 +62,12 @@
+ 	virtual bool GetError( )						{ return m_Error; }
+ 	virtual string GetErrorString( )				{ return m_ErrorString; }
+ 	virtual CIncomingJoinPlayer *GetJoinPlayer( )	{ return m_IncomingJoinPlayer; }
++	virtual CIncomingGarenaUser *GetGarenaUser( )	{ return m_IncomingGarenaUser; }
++	virtual BYTEARRAY GetGarenaIP( );
+ 
+ 	virtual void SetSocket( CTCPSocket *nSocket )	{ m_Socket = nSocket; }
+ 	virtual void SetDeleteMe( bool nDeleteMe )		{ m_DeleteMe = nDeleteMe; }
++	virtual void SetGarenaUser( CIncomingGarenaUser *nIncomingGarenaUser ) { m_IncomingGarenaUser = nIncomingGarenaUser; }
+ 
+ 	// processing functions
+ 
+Index: ghost/gameplayer.cpp
+===================================================================
+--- ghost/gameplayer.cpp	(revision 598)
++++ ghost/gameplayer.cpp	(working copy)
+@@ -27,6 +27,7 @@
+ #include "map.h"
+ #include "gameplayer.h"
+ #include "gameprotocol.h"
++#include "gcbiprotocol.h"
+ #include "gpsprotocol.h"
+ #include "game_base.h"
+ 
+@@ -34,7 +35,7 @@
+ // CPotentialPlayer
+ //
+ 
+-CPotentialPlayer :: CPotentialPlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket ) : m_Protocol( nProtocol ), m_Game( nGame ), m_Socket( nSocket ), m_DeleteMe( false ), m_Error( false ), m_IncomingJoinPlayer( NULL )
++CPotentialPlayer :: CPotentialPlayer( CGameProtocol *nProtocol, CBaseGame *nGame, CTCPSocket *nSocket ) : m_Protocol( nProtocol ), m_Game( nGame ), m_Socket( nSocket ), m_DeleteMe( false ), m_Error( false ), m_IncomingJoinPlayer( NULL ), m_IncomingGarenaUser( NULL )
+ {
+ 
+ }
+@@ -51,22 +52,42 @@
+ 	}
+ 
+ 	delete m_IncomingJoinPlayer;
++	delete m_IncomingGarenaUser;
+ }
+ 
++BYTEARRAY CPotentialPlayer :: GetGarenaIP( )
++{
++	if( m_IncomingGarenaUser == NULL ) {
++		return UTIL_CreateByteArray( (uint32_t) 0, true );
++	} else {
++		return UTIL_CreateByteArray( m_IncomingGarenaUser->GetIP( ), true );
++	}
++}
++
+ BYTEARRAY CPotentialPlayer :: GetExternalIP( )
+ {
+ 	unsigned char Zeros[] = { 0, 0, 0, 0 };
+ 
+-	if( m_Socket )
+-		return m_Socket->GetIP( );
++	if( m_Socket ) {
++		if( m_IncomingGarenaUser != NULL )
++			return GetGarenaIP( );
++		else
++			return m_Socket->GetIP( );
++	}
+ 
+ 	return UTIL_CreateByteArray( Zeros, 4 );
+ }
+ 
+ string CPotentialPlayer :: GetExternalIPString( )
+ {
+-	if( m_Socket )
+-		return m_Socket->GetIPString( );
++	if( m_Socket ) {
++		if( m_IncomingGarenaUser != NULL ) {
++			BYTEARRAY GarenaIP = GetGarenaIP( );
++			return UTIL_ToString(GarenaIP[0]) + "." + UTIL_ToString(GarenaIP[1]) + "." + UTIL_ToString(GarenaIP[2]) + "." + UTIL_ToString(GarenaIP[3]);
++		} else {
++			return m_Socket->GetIPString( );
++		}
++	}
+ 
+ 	return string( );
+ }
+@@ -103,7 +124,7 @@
+ 
+ 	while( Bytes.size( ) >= 4 )
+ 	{
+-		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT )
++		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT || Bytes[0] == GCBI_HEADER_CONSTANT )
+ 		{
+ 			// bytes 2 and 3 contain the length of the packet
+ 
+@@ -169,6 +190,16 @@
+ 				return;
+ 			}
+ 		}
++		
++		else if( Packet->GetPacketType( ) == GCBI_HEADER_CONSTANT )
++		{
++			if( Packet->GetID( ) == CGCBIProtocol :: GCBI_INIT )
++			{
++				delete m_IncomingGarenaUser;
++				m_IncomingGarenaUser = m_Game->m_GHost->m_GCBIProtocol->RECEIVE_GCBI_INIT( Packet->GetData( ) );
++				CONSOLE_Print( "[GCBI] Garena user detected; userid=" + UTIL_ToString( m_IncomingGarenaUser->GetUserID( ) ) + ", roomid=" + UTIL_ToString( m_IncomingGarenaUser->GetRoomID( ) ) + ", experience=" + UTIL_ToString( m_IncomingGarenaUser->GetUserExp( ) ) + ", country=" + m_IncomingGarenaUser->GetCountryCode( ) );
++			}
++		}
+ 
+ 		delete Packet;
+ 	}
+@@ -348,7 +379,7 @@
+ 
+ 	while( Bytes.size( ) >= 4 )
+ 	{
+-		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT )
++		if( Bytes[0] == W3GS_HEADER_CONSTANT || Bytes[0] == GPS_HEADER_CONSTANT || Bytes[0] == GCBI_HEADER_CONSTANT )
+ 		{
+ 			// bytes 2 and 3 contain the length of the packet
+ 
+@@ -481,6 +512,7 @@
+ 			case CGameProtocol :: W3GS_PONG_TO_HOST:
+ 				Pong = m_Protocol->RECEIVE_W3GS_PONG_TO_HOST( Packet->GetData( ) );
+ 
++
+ 				// we discard pong values of 1
+ 				// the client sends one of these when connecting plus we return 1 on error to kill two birds with one stone
+ 
+Index: ghost/ghost.h
+===================================================================
+--- ghost/ghost.h	(revision 598)
++++ ghost/ghost.h	(working copy)
+@@ -31,6 +31,7 @@
+ class CTCPServer;
+ class CTCPSocket;
+ class CGPSProtocol;
++class CGCBIProtocol;
+ class CCRC32;
+ class CSHA1;
+ class CBNET;
+@@ -50,6 +51,7 @@
+ 	CTCPServer *m_ReconnectSocket;			// listening socket for GProxy++ reliable reconnects
+ 	vector<CTCPSocket *> m_ReconnectSockets;// vector of sockets attempting to reconnect (connected but not identified yet)
+ 	CGPSProtocol *m_GPSProtocol;
++	CGCBIProtocol *m_GCBIProtocol;
+ 	CCRC32 *m_CRC;							// for calculating CRC's
+ 	CSHA1 *m_SHA;							// for calculating SHA1's
+ 	vector<CBNET *> m_BNETs;				// all our battle.net connections (there can be more than one)
+Index: ghost/game_base.cpp
+===================================================================
+--- ghost/game_base.cpp	(revision 598)
++++ ghost/game_base.cpp	(working copy)
+@@ -32,6 +32,7 @@
+ #include "gameplayer.h"
+ #include "gameprotocol.h"
+ #include "game_base.h"
++#include "gcbiprotocol.h"
+ 
+ #include <cmath>
+ #include <string.h>
+@@ -200,6 +201,7 @@
+ 	if( !m_GameLoaded || m_Lagging )
+ 		return 50;
+ 
++
+ 	uint32_t TicksSinceLastUpdate = GetTicks( ) - m_LastActionSentTicks;
+ 
+ 	if( TicksSinceLastUpdate > m_Latency - m_LastActionLateBy )
+@@ -221,6 +223,17 @@
+ 	return NumSlotsOccupied;
+ }
+ 
++uint32_t CBaseGame :: GetSlotsAllocated( )
++{
++	uint32_t SlotsOccupied = GetSlotsOccupied( );
++	uint32_t NumPlayers = m_Players.size( );
++
++	if( NumPlayers > SlotsOccupied )
++		return NumPlayers;
++	else
++		return SlotsOccupied;
++} 
++
+ uint32_t CBaseGame :: GetSlotsOpen( )
+ {
+ 	uint32_t NumSlotsOpen = 0;
+@@ -363,7 +376,7 @@
+ 
+ 	// create the virtual host player
+ 
+-	if( !m_GameLoading && !m_GameLoaded && GetNumPlayers( ) < 12 )
++	if( !m_GameLoading && !m_GameLoaded && GetSlotsAllocated() < m_Slots.size() )
+ 		CreateVirtualHost( );
+ 
+ 	// unlock the game
+@@ -411,6 +424,11 @@
+ 			// so if we try to send accurate numbers it'll always be off by one and results in Warcraft 3 assuming the game is full when it still needs one more player
+ 			// the easiest solution is to simply send 12 for both so the game will always show up as (1/12) players
+ 
++			uint32_t slotstotal = m_Slots.size( );
++			uint32_t slotsopen = GetSlotsOpen();
++			if (slotsopen<2) slotsopen = 2;
++			if(slotstotal > 12) slotstotal = 12;
++
+ 			if( m_SaveGame )
+ 			{
+ 				// note: the PrivateGame flag is not set when broadcasting to LAN (as you might expect)
+@@ -422,7 +440,7 @@
+ 				BYTEARRAY MapHeight;
+ 				MapHeight.push_back( 0 );
+ 				MapHeight.push_back( 0 );
+-				m_GHost->m_UDPSocket->Broadcast( 6112, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), MapWidth, MapHeight, m_GameName, "Varlock", GetTime( ) - m_CreationTime, "Save\\Multiplayer\\" + m_SaveGame->GetFileNameNoPath( ), m_SaveGame->GetMagicNumber( ), 12, 12, m_HostPort, FixedHostCounter, m_EntryKey ) );
++				m_GHost->m_UDPSocket->Broadcast( 6112, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), MapWidth, MapHeight, m_GameName, "Varlock", GetTime( ) - m_CreationTime, "Save\\Multiplayer\\" + m_SaveGame->GetFileNameNoPath( ), m_SaveGame->GetMagicNumber( ), slotstotal, slotsopen, m_HostPort, FixedHostCounter, m_EntryKey ) );
+ 			}
+ 			else
+ 			{
+@@ -430,7 +448,7 @@
+ 				// note: we do not use m_Map->GetMapGameType because none of the filters are set when broadcasting to LAN (also as you might expect)
+ 
+ 				uint32_t MapGameType = MAPGAMETYPE_UNKNOWN0;
+-				m_GHost->m_UDPSocket->Broadcast( 6112, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), m_Map->GetMapWidth( ), m_Map->GetMapHeight( ), m_GameName, "Varlock", GetTime( ) - m_CreationTime, m_Map->GetMapPath( ), m_Map->GetMapCRC( ), 12, 12, m_HostPort, FixedHostCounter, m_EntryKey ) );
++				m_GHost->m_UDPSocket->Broadcast( 6112, m_Protocol->SEND_W3GS_GAMEINFO( m_GHost->m_TFT, m_GHost->m_LANWar3Version, UTIL_CreateByteArray( MapGameType, false ), m_Map->GetMapGameFlags( ), m_Map->GetMapWidth( ), m_Map->GetMapHeight( ), m_GameName, "Varlock", GetTime( ) - m_CreationTime, m_Map->GetMapPath( ), m_Map->GetMapCRC( ), slotstotal, slotsopen, m_HostPort, FixedHostCounter, m_EntryKey ) );
+ 			}
+ 		}
+ 
+@@ -826,6 +844,7 @@
+ 					// this resets the lag screen timer
+ 
+ 					if( UsingGProxy && !(*i)->GetGProxy( ) )
++
+ 					{
+ 						// we must send additional empty actions to non-GProxy++ players
+ 						// GProxy++ will insert these itself so we don't need to send them to GProxy++ players
+@@ -1599,6 +1618,8 @@
+ 		}
+ 
+ 		return;
++
++
+ 	}
+ 
+ 	player->SetDeleteMe( true );
+@@ -1914,7 +1935,7 @@
+ 	// we have a slot for the new player
+ 	// make room for them by deleting the virtual host player if we have to
+ 
+-	if( GetNumPlayers( ) >= 11 || EnforcePID == m_VirtualHostPID )
++	if( GetSlotsAllocated( ) >= m_Slots.size() - 1 || EnforcePID == m_VirtualHostPID )
+ 		DeleteVirtualHost( );
+ 
+ 	// turning the CPotentialPlayer into a CGamePlayer is a bit of a pain because we have to be careful not to close the socket
+@@ -1924,6 +1945,11 @@
+ 	CONSOLE_Print( "[GAME: " + m_GameName + "] player [" + joinPlayer->GetName( ) + "|" + potential->GetExternalIPString( ) + "] joined the game" );
+ 	CGamePlayer *Player = new CGamePlayer( potential, m_SaveGame ? EnforcePID : GetNewPID( ), JoinedRealm, joinPlayer->GetName( ), joinPlayer->GetInternalIP( ), Reserved );
+ 
++	if( potential->GetGarenaUser( ) != NULL ) {
++		Player->SetGarenaUser( potential->GetGarenaUser( ) );
++		potential->SetGarenaUser( NULL );
++	}
++	
+ 	// consider LAN players to have already spoof checked since they can't
+ 	// since so many people have trouble with this feature we now use the JoinedRealm to determine LAN status
+ 
+@@ -2304,7 +2330,7 @@
+ 	// we have a slot for the new player
+ 	// make room for them by deleting the virtual host player if we have to
+ 
+-	if( GetNumPlayers( ) >= 11 )
++	if( GetSlotsOccupied( ) >= m_Slots.size() - 1 )
+ 		DeleteVirtualHost( );
+ 
+ 	// identify their joined realm
+@@ -4081,6 +4107,7 @@
+ 
+ 								if( Difference > LargestDifference )
+ 									LargestDifference = Difference;
++
+ 							}
+ 						}
+ 					}
+@@ -4337,6 +4364,7 @@
+ bool CBaseGame :: IsGameDataSaved( )
+ {
+ 	return true;
++
+ }
+ 
+ void CBaseGame :: SaveGameData( )
+@@ -4367,6 +4395,7 @@
+ 
+ 			string StillDownloading;
+ 
++
+                         for( vector<CGameSlot> :: iterator i = m_Slots.begin( ); i != m_Slots.end( ); ++i )
+ 			{
+ 				if( (*i).GetSlotStatus( ) == SLOTSTATUS_OCCUPIED && (*i).GetComputer( ) == 0 && (*i).GetDownloadStatus( ) != 100 )
+@@ -4588,7 +4617,7 @@
+ 
+ 	if( SID < m_Slots.size( ) )
+ 	{
+-		if( GetNumPlayers( ) >= 11 )
++		if( GetSlotsAllocated( ) >= m_Slots.size() - 1 )
+ 			DeleteVirtualHost( );
+ 
+ 		m_FakePlayerPID = GetNewPID( );
+Index: ghost/Makefile
+===================================================================
+--- ghost/Makefile	(revision 598)
++++ ghost/Makefile	(working copy)
+@@ -29,7 +29,7 @@
+ CFLAGS += -I../mysql/include/
+ endif
+ 
+-OBJS = bncsutilinterface.o bnet.o bnetprotocol.o bnlsclient.o bnlsprotocol.o commandpacket.o config.o crc32.o csvparser.o game.o game_admin.o game_base.o gameplayer.o gameprotocol.o gameslot.o ghost.o ghostdb.o ghostdbmysql.o ghostdbsqlite.o gpsprotocol.o language.o map.o packed.o replay.o savegame.o sha1.o socket.o stats.o statsdota.o statsw3mmd.o util.o
++OBJS = bncsutilinterface.o bnet.o bnetprotocol.o bnlsclient.o bnlsprotocol.o commandpacket.o config.o crc32.o csvparser.o game.o game_admin.o game_base.o gameplayer.o gameprotocol.o gameslot.o gcbiprotocol.o ghost.o ghostdb.o ghostdbmysql.o ghostdbsqlite.o gpsprotocol.o language.o map.o packed.o replay.o savegame.o sha1.o socket.o stats.o statsdota.o statsw3mmd.o util.o
+ COBJS = sqlite3.o
+ PROGS = ./ghost++
+ 
+@@ -63,10 +63,11 @@
+ game.o: ghost.h includes.h util.h config.h language.h socket.h ghostdb.h bnet.h map.h packed.h savegame.h gameplayer.h gameprotocol.h game_base.h game.h stats.h statsdota.h statsw3mmd.h
+ game_admin.o: ghost.h includes.h util.h config.h language.h socket.h ghostdb.h bnet.h map.h packed.h savegame.h replay.h gameplayer.h gameprotocol.h game_base.h game_admin.h
+ game_base.o: ghost.h includes.h util.h config.h language.h socket.h ghostdb.h bnet.h map.h packed.h savegame.h replay.h gameplayer.h gameprotocol.h game_base.h next_combination.h
+-gameplayer.o: ghost.h includes.h util.h language.h socket.h commandpacket.h bnet.h map.h gameplayer.h gameprotocol.h gpsprotocol.h game_base.h
++gameplayer.o: ghost.h includes.h util.h language.h socket.h commandpacket.h bnet.h map.h gameplayer.h gameprotocol.h gpsprotocol.h game_base.h gcbiprotocol.h
+ gameprotocol.o: ghost.h includes.h util.h crc32.h gameplayer.h gameprotocol.h game_base.h
+ gameslot.o: ghost.h includes.h gameslot.h
+-ghost.o: ghost.h includes.h util.h crc32.h sha1.h csvparser.h config.h language.h socket.h ghostdb.h ghostdbsqlite.h ghostdbmysql.h bnet.h map.h packed.h savegame.h gameplayer.h gameprotocol.h gpsprotocol.h game_base.h game.h game_admin.h
++gcbiprotocol.o: gcbiprotocol.h ghost.h util.h
++ghost.o: ghost.h includes.h util.h crc32.h sha1.h csvparser.h config.h language.h socket.h ghostdb.h ghostdbsqlite.h ghostdbmysql.h bnet.h map.h packed.h savegame.h gameplayer.h gameprotocol.h gpsprotocol.h game_base.h game.h game_admin.h gcbiprotocol.h
+ ghostdb.o: ghost.h includes.h util.h config.h ghostdb.h
+ ghostdbmysql.o: ghost.h includes.h util.h config.h ghostdb.h ghostdbmysql.h
+ ghostdbsqlite.o: ghost.h includes.h util.h config.h ghostdb.h ghostdbsqlite.h
