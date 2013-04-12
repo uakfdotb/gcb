@@ -2128,8 +2128,8 @@ name: Local Tambayan: Cagayan Valley ROOM (v1.24e) id:852064  sid:12  server:203
 name: Local Tambayan: Cavite ROOM (v1.24e)      id:852065  sid:12  server:203.117.124.13  gid:1024  game:unknown       ml:1  
 name: Russia Imba DotA Room 01 (1.26a)          id:852066  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: A* Sweetopia Dota Rage -cm www.sweetopia.ph id:917487  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:2  
-name: A* Sweetopia CM PLDT (1.26a) Moderated Room id:917488  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
-name: A* Sweetopia All-In Public PLDT (1.26a) Moderated Room id:917489  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: A* Fury Dota Room 02                      id:917488  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
+name: A* Fury Dota Room 01                      id:917489  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: GCA: Gamerz Planet                        id:917490  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: GCA: ROG (Republic of Gamers)             id:917491  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: 2012 Garena Tournament Room 01            id:917492  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:1  
@@ -3139,6 +3139,10 @@ name: Vietnam DotA LoD ROOM 17 v1.24e           id:1179629 sid:17  server:123.30
 name: Vietnam DotA IMBA ROOM 18 v1.24e          id:1179630 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA IMBA ROOM 17 v1.24e          id:1179631 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA IMBA ROOM 16 v1.24e          id:1179632 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA Tournament room 02 v1.24e    id:1179639 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam DotA Tournament room 01 v1.24e    id:1179640 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Clan VIE Room v1.24e                      id:1179641 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Clan HGTDVN Room v1.24e                   id:1179642 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA OMG ROOM 08 v1.24e           id:1179643 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA OMG ROOM 06 v1.24e           id:1179644 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:5  
 name: Vietnam DotA IMBA ROOM 14 v1.24e          id:1179645 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
