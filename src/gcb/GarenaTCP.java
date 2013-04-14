@@ -72,11 +72,11 @@ public class GarenaTCP extends Thread {
 	double srttUpper; //maximum round trip time
 	double srttClockGranularity; //clock granularity, default to 20 ms
 	int srttK; //no idea, but RFC2988 says it is 4
-	int maxPacketSize; //limits the size of the packet
+	int maxUDPSize; //limits the size of UDP packets
+	int maxTCPSize; //limits the size of TCP packets
 
 	public GarenaTCP(GarenaInterface garena) {
 		this.garena = garena;
-		buf = ByteBuffer.allocate(65536);
 		packets = new ArrayList<GarenaTCPPacket>();
 		packetRetransmitQueue = new PriorityQueue<GarenaTCPPacket>();
 		out_packets = new HashMap<Integer, GarenaTCPPacket>();
@@ -117,10 +117,6 @@ public class GarenaTCP extends Thread {
 		tcpDebug = GCBConfig.configuration.getBoolean("gcb_tcp_debug", false);
 
 		boolean useBufferedOutput = GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true);
-		if(useBufferedOutput) {
-			out_buffer = ByteBuffer.allocate(65536 * 2);
-			out_buffer.order(ByteOrder.LITTLE_ENDIAN);
-		}
 		
 		localBuffered = GCBConfig.configuration.getBoolean("gcb_tcp_localbuffer", true);
 		
@@ -134,10 +130,18 @@ public class GarenaTCP extends Thread {
 		srttUpper = GCBConfig.configuration.getDouble("gcb_tcp_srttupper", 60000);
 		srttClockGranularity = GCBConfig.configuration.getDouble("gcb_tcp_srttg", 20);
 		srttK = GCBConfig.configuration.getInt("gcb_tcp_srttk", 4);
-		maxPacketSize = GCBConfig.configuration.getInt("gcb_tcp_maxpacketsize", 512);
+		maxUDPSize = GCBConfig.configuration.getInt("gcb_tcp_maxpacketsize", 512);
+		maxTCPSize = GCBConfig.configuration.getInt("gcb_tcp_maxtcpsize", 2000);
 		
-		if(maxPacketSize == 0) {
-			maxPacketSize = 512;
+		if(maxUDPSize == 0) {
+			maxUDPSize = 512;
+		}
+		
+		buf = ByteBuffer.allocate(maxTCPSize);
+		
+		if(useBufferedOutput) {
+			out_buffer = ByteBuffer.allocate(maxTCPSize * 2);
+			out_buffer.order(ByteOrder.LITTLE_ENDIAN);
 		}
 		
 		rttMade = false;
@@ -290,6 +294,12 @@ public class GarenaTCP extends Thread {
 	//called when data is received from remote Garena user
 	public void data(int seq, int ack, byte[] data, int offset, int length) {
 		if(terminated) return;
+		
+		if(length > maxTCPSize) {
+			Main.println("[GarenaTCP " + conn_id + "] Remote invalid packet length (len=" + length + "), terminating");
+			end();
+			return;
+		}
 
 		if(tcpDebug) {
 			Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": received SEQ=" + seq + "; remote ACK=" + ack + "; len=" + length + " in connection " + conn_id);
@@ -567,8 +577,8 @@ public class GarenaTCP extends Thread {
 	}
 
 	public void run() {
-		byte[] rbuf = new byte[65536];
-		ByteBuffer lbuf = ByteBuffer.allocate(65536);
+		byte[] rbuf = new byte[maxTCPSize];
+		ByteBuffer lbuf = ByteBuffer.allocate(maxTCPSize);
 		
 		try {
 			socket.setSoTimeout(soTimeout);
@@ -592,7 +602,7 @@ public class GarenaTCP extends Thread {
 					in.readFully(rbuf, 0, 4);
 					len = GarenaEncrypt.unsignedByte(rbuf[2]) + GarenaEncrypt.unsignedByte(rbuf[3]) * 256;
 					
-					if(len >= 4) {
+					if(len >= 4 && len <= maxTCPSize - 4) {
 						in.readFully(rbuf, 4, len - 4);
 					} else  {
 						Main.println("[GarenaTCP " + conn_id + "] Read invalid packet length (len=" + len + "), terminating");
@@ -634,8 +644,8 @@ public class GarenaTCP extends Thread {
 	}
 	
 	private void handleLocalPacket(byte[] data, ByteBuffer lbuf) {
-		for(int i = 0; i < data.length; i += maxPacketSize) {
-			int currentLength = Math.min(maxPacketSize, data.length - i);
+		for(int i = 0; i < data.length; i += maxUDPSize) {
+			int currentLength = Math.min(maxUDPSize, data.length - i);
 			byte[] currentData = new byte[currentLength];
 			System.arraycopy(data, i, currentData, 0, currentLength);
 			
@@ -648,6 +658,11 @@ public class GarenaTCP extends Thread {
 				while(maximumBufferedPackets != 0 && packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
 					if(tcpDebug) {
 						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
+					}
+					
+					if(terminated) {
+						//oh, we terminated, don't loop here forever!
+						return;
 					}
 					
 					try {
@@ -693,7 +708,7 @@ public class GarenaTCP extends Thread {
 		Main.println("[GarenaTCP " + conn_id + "] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
 		//allocate a new buffer so we don't do anything thread-unsafe
-		ByteBuffer tbuf = ByteBuffer.allocate(65536);
+		ByteBuffer tbuf = ByteBuffer.allocate(maxTCPSize);
 
 		if(socket != null) {
 			try {

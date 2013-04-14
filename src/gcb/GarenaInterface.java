@@ -104,6 +104,9 @@ public class GarenaInterface {
 	
 	//used for gcb_broadcastfilter_key
 	private WC3Interface wc3i;
+	
+	//last time we received something from room, for idle checking
+	long lastRoomReceivedTime = 0;
 
 	public GarenaInterface(PluginManager plugins, int id) {
 		this.id = id;
@@ -1048,6 +1051,8 @@ public class GarenaInterface {
 
 				int size = GarenaEncrypt.byteArrayToIntLittleLength(header, 0, 3);
 				int type = rin.read();
+				
+				lastRoomReceivedTime = System.currentTimeMillis();
 
 				if(type == 48) {
 					processAnnounce(size - 1, lbuf);
@@ -1738,6 +1743,7 @@ public class GarenaInterface {
 					synchronized(tcp_connections) {
 						if(tcp_connections.containsKey(conn_id)) {
 							Main.println("[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
+							tcp_connections.get(conn_id).end();
 						}
 
 						tcp_connections.put(conn_id, tcp_connection);
@@ -2215,11 +2221,15 @@ public class GarenaInterface {
 	
 	class ReconnectTask extends TimerTask {
 		public void run() {
-			//reconnect to Garena room
-			Main.println("[GInterface " + id + "] Reconnecting to Garena room");
-			disconnectRoom();
-
-			//room loop should take care of actual reconnection
+			if(!GCBConfig.configuration.getBoolean("gcb_reconnect_idleonly", false) ||
+					System.currentTimeMillis() - lastRoomReceivedTime > 60000 * 10 ||
+					peer_socket == null || !peer_socket.isBound()) {
+				//reconnect to Garena room
+				Main.println("[GInterface " + id + "] Reconnecting to Garena room");
+				disconnectRoom();
+	
+				//room loop should take care of actual reconnection
+			}
 		}
 	}
 }
