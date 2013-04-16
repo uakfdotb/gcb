@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Timer;
 
 /**
  *
@@ -29,6 +30,8 @@ public class Main {
 	public static String VERSION = "gcb 0g";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
+	public static Timer TIMER;
+	
 	static boolean log;
 	static boolean logCommands;
 	boolean botDisable;
@@ -47,6 +50,7 @@ public class Main {
 	ChatThread chatthread;
 	SQLThread sqlthread;
 	GarenaReconnect reconnect;
+	GCBRcon rcon;
 
 	//determine what will be loaded, what won't be loaded
 	boolean loadBot;
@@ -55,6 +59,7 @@ public class Main {
 	boolean loadPL;
 	boolean loadSQL;
 	boolean loadChat;
+	boolean loadRcon;
 
 	public void init(String[] args) {
 		System.out.println(VERSION);
@@ -62,6 +67,7 @@ public class Main {
 
 		//determine what to load based on gcb_reverse and gcb_bot
 		loadBot = GCBConfig.configuration.getBoolean("gcb_bot", false);
+		loadRcon = GCBConfig.configuration.getBoolean("gcb_rcon", false);
 		botDisable = GCBConfig.configuration.getBoolean("gcb_bot_disable", true);
 		reverse = GCBConfig.configuration.getBoolean("gcb_reverse", false);
 		log = GCBConfig.configuration.getBoolean("gcb_log", false);
@@ -149,6 +155,14 @@ public class Main {
 			//start receiving and broadcasting wc3 packets
 			GarenaThread wc3_thread = new GarenaThread(null, wc3i, GarenaThread.WC3_BROADCAST);
 			wc3_thread.start();
+		}
+		
+		if(loadRcon && !restart) {
+			try {
+				rcon = new GCBRcon(this);
+			} catch(IOException ioe) {
+				println("[Main] Error: failed to load rcon server: " + ioe.getLocalizedMessage());
+			}
 		}
 
 		//make sure we get correct external ip/port; do on restart in case they changed
@@ -372,7 +386,7 @@ public class Main {
 		}
 		System.exit(0);*/
 
-		
+		Main.TIMER = new Timer();
 		Main main = new Main();
 		main.init(args);
 

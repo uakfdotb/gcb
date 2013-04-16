@@ -29,7 +29,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.zip.CRC32;
 
@@ -98,12 +97,12 @@ public class GarenaInterface {
 	//reverse host, to broadcast Garena client hosted games to LAN
 	GCBReverseHost reverseHost;
 	boolean reverseEnabled;
-
-	//timer
-	Timer timer;
 	
 	//used for gcb_broadcastfilter_key
 	private WC3Interface wc3i;
+	
+	//whether we're trying to shut down nicely
+	boolean exitingNicely;
 	
 	//last time we received something from room, for idle checking
 	long lastRoomReceivedTime = 0;
@@ -117,12 +116,14 @@ public class GarenaInterface {
 		rooms = new ArrayList<RoomInfo>();
 		listeners = new ArrayList<GarenaListener>();
 		tcp_connections = new HashMap<Integer, GarenaTCP>();
+		exitingNicely = false;
 
-		timer = new Timer();
-		timer.schedule(new RetransmitTask(), 20000, 20);
-		timer.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
-		timer.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
-		timer.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
+		synchronized(Main.TIMER) {
+			Main.TIMER.schedule(new RetransmitTask(), 20000, 20);
+			Main.TIMER.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
+			Main.TIMER.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
+			Main.TIMER.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
+		}
 		
 		//configuration
 		room_id = GCBConfig.configuration.getInt("garena" + id + "_roomid", 590633);
@@ -134,7 +135,9 @@ public class GarenaInterface {
 		
 		if(reconnectInterval > 0) {
 			//reconnect every now and then if desired
-			timer.schedule(new ReconnectTask(), 60000 * reconnectInterval, 60000 * reconnectInterval);
+			synchronized(Main.TIMER) {
+				Main.TIMER.schedule(new ReconnectTask(), 60000 * reconnectInterval, 60000 * reconnectInterval);
+			}
 		}
 	}
 	
@@ -1725,7 +1728,7 @@ public class GarenaInterface {
 					} else {
 						//Main.println("[GInterface " + id + "] Received HELLO from invalid member: " + id);
 					}
-				} else if(buf_array[0] == 0x0B) { //initconn
+				} else if(buf_array[0] == 0x0B && !exitingNicely) { //initconn, don't accept if we're exiting though
 					int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
 					int conn_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 8);
 					int destination = GarenaEncrypt.byteArrayToIntLittle(buf_array, 16); //little endian short followed by two zeroes
@@ -2122,6 +2125,22 @@ public class GarenaInterface {
 		SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT);
 		return sdf.format(cal.getTime());
 	}
+	
+	public void exitNicely() {
+		exitingNicely = true;
+		disconnected(GARENA_MAIN);
+		disconnected(GARENA_ROOM);
+	}
+	
+	public boolean hasExited() {
+		if(exitingNicely) {
+			synchronized(tcp_connections) {
+				return tcp_connections.isEmpty();
+			}
+		} else {
+			return false;
+		}
+	}
 
 	public void disconnected(int x) {
 		if(x == GARENA_MAIN && socket != null && socket.isConnected()) {
@@ -2140,9 +2159,11 @@ public class GarenaInterface {
 			peer_socket.close();
 		}
 
-		synchronized(listeners) {
-			for(GarenaListener listener : listeners) {
-				listener.disconnected(this, x);
+		if(!exitingNicely) {
+			synchronized(listeners) {
+				for(GarenaListener listener : listeners) {
+					listener.disconnected(this, x);
+				}
 			}
 		}
 
@@ -2171,6 +2192,11 @@ public class GarenaInterface {
 	public void removeTCPConnection(int conn_id) {
 		synchronized(tcp_connections) {
 			tcp_connections.remove(conn_id);
+			
+			//if we're exiting nicely and we've finished exiting, then unbind UDP
+			if(hasExited()) {
+				disconnected(GARENA_PEER);
+			}
 		}
 	}
 	
