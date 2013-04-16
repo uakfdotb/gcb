@@ -1,3 +1,18 @@
+1.0.0
+* LAN list is updated using REFRESHGAME and DECREATEGAME packets
+* Option to reconnect only when gcb detects room is idle
+* Memory consumption decreased with strict maximum packet settings (means smaller buffers)
+* Host bot hostname/port combined into one configuration setting
+   (this means that you can have host bots on multiple servers)
+* Added rcon tool: allows commands to be sent through sockets
+* Exiting nicely feature to shut down gcb without disconnecting already-connected players
+* Automatic port selection to allow gcb to decide which port to bind to (UDP peer port)
+- fix: unknown type messages only show in debug mode
+- fix: old games still removed even if no more UDP packets are received
+- fix: avoid crash when invalid packets received on broadcast port
+- fix: members and TCP connections no longer cleared when unrelated service disconnects
+- fix: gcbi-extend patch no longer causes players to disconnect when twelvth player is kicked
+
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
   this replaces the rebroadcast feature, although rebroadcast is still supporetd
