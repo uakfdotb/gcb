@@ -2170,5 +2170,7 @@ class CommandInputThread extends Thread {
 				System.out.println("[RESPONSE] " + response);
 			}
 		}
+		
+		scanner.close();
 	}
 }
