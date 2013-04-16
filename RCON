@@ -1,0 +1,33 @@
+gcb rcon is a feature of gcb that allows you to send commands through sockets.
+This file basically tells you how to set it up and how to send a command.
+
+== Configuration ==
+
+Set gcb_rcon = true in gcb.cfg to enable gcb rcon.
+
+Then, you may wish to set additional options:
+	rcon_bind:
+		the default, 0.0.0.0, means the rcon server will bind to all addresses.
+		if you only want to bind to one address, you should set this, otherwise leave as default
+	rcon_port: this is the port gcb rcon will use, default is 7464
+	rcon_localonly: if this is true (default), then gcb rcon will only accept local connections
+	rcon_password: the password needed to authenticate into gcb rcon
+
+== Protocol ==
+
+The protocol is simple. Each command is simply text, and commands are separated by newline characters.
+
+The password must be the first "command" received by gcb rcon. If the password is incorrect, you will be disconnected.
+Note that if rcon_password is blank, it will be impossible to connect because blank lines are ignored...
+
+== Send a command ==
+
+Here, we will use telnet.
+This assumes gcb_rcon is running locally on port 7464, and the password is "password":
+	telnet localhost 7464
+	> password
+	> exit nicely
+
+Then gcb will exit nicely. To disconnect:
+	Ctrl+]
+	> quit
