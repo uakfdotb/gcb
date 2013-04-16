@@ -14,9 +14,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.configuration.ConversionException;
 
@@ -34,11 +36,9 @@ public class WC3Interface {
 
 	int[] rebroadcastPorts;
 
-	//gcb_tcp_port list; only set if broadcastfilter is true
-	int[] tcpPorts;
-
-	//gcb_tcp_host; only set if broadcastfilter is true
-	InetAddress tcpHost;
+	//gcb_tcp_host list; only set if broadcastfilter is true
+	Set<Integer> tcpPorts;
+	Set<InetAddress> tcpHosts;
 
 	//games that we have detected for gcb_broadcastfilter_key
 	//use this to generate unique entry keys for Garena so that people can't spoof regular LAN joining
@@ -82,33 +82,41 @@ public class WC3Interface {
 		}
 
 		Main.debug("[WC3Interface] Detected " + rebroadcastPorts.length + " rebroadcast ports");
+		tcpPorts = new HashSet<Integer>();
+		tcpHosts = new HashSet<InetAddress>();
 
-		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
+		if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true) ||
+				GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
 			try {
-				String[] array = GCBConfig.configuration.getStringArray("gcb_tcp_port");
-				tcpPorts = new int[array.length];
+				String[] array = GCBConfig.configuration.getStringArray("gcb_tcp_host");
 
 				for(int i = 0; i < array.length; i++) {
-					tcpPorts[i] = Integer.parseInt(array[i]);
-
+					String[] parts = array[i].split(":");
+					int port = 6112;
+					
+					if(parts.length >= 2) {
+						try {
+							port = Integer.parseInt(parts[1]);
+						} catch(NumberFormatException e) {
+							Main.println("[WC3Interface] Configuration warning: unable to parse " + parts[1] + " as port");
+							continue;
+						}
+					}
+					
+					if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
+						tcpPorts.add(port);
+					}
+					
+					if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
+						try {
+							tcpHosts.add(InetAddress.getByName(parts[1]));
+						} catch(IOException ioe) {
+							Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
+						}
+					}
 				}
 			} catch(ConversionException ce) {
-				Main.println("[WC3Interface] Conversion exception while processing gcb_tcp_port; ignoring port filter");
-				tcpPorts = new int[] {};
-			} catch(NumberFormatException nfe) {
-				Main.println("[WC3Interface] Number format exception while processing gcb_tcp_port; ignoring port filter");
-				tcpPorts = new int[] {};
-			}
-
-			Main.debug("[WC3Interface] Detected " + tcpPorts.length + " TCP ports");
-
-			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
-				try {
-					tcpHost = InetAddress.getByName(GCBConfig.configuration.getString("gcb_tcp_host"));
-				} catch(IOException ioe) {
-					Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
-					tcpHost = null;
-				}
+				Main.println("[WC3Interface] Conversion exception while processing gcb_tcp_host; ignoring port/host filters");
 			}
 		}
 	}
@@ -130,7 +138,7 @@ public class WC3Interface {
 
 	//returns true if port is in tcpPorts array and tcpPorts array is not empty
 	public boolean isValidPort(int port) {
-		if(tcpPorts.length == 0) return true;
+		if(tcpPorts.isEmpty()) return true;
 
 		for(int x : tcpPorts) {
 			if(x == port) return true;
@@ -199,7 +207,7 @@ public class WC3Interface {
 			//so if filter succeeds, ignore; only if it fails, set filtersuccess to false
 			if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
 				//first check IP address
-				if(tcpHost == null || packet.getAddress().equals(tcpHost) || (packet.getAddress().isAnyLocalAddress() && tcpHost.isAnyLocalAddress())) {
+				if(tcpHosts.isEmpty() || tcpHosts.contains(packet.getAddress()) || packet.getAddress().isAnyLocalAddress()) {
 					try {
 						ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
 						buf.position(0);

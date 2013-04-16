@@ -16,7 +16,9 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
+
 import org.apache.commons.configuration.ConversionException;
 
 /**
@@ -29,8 +31,9 @@ public class GarenaTCP extends Thread {
 	long last_time; //last time in milliseconds that a packet was sent
 	long last_received; //last time in milliseconds that a packet was received from GHost++
 
-	String local_hostname; //local server hostname
-	int[] local_ports; //port on local server we are connected to
+	//ports on local server that we can connect to
+	// maps from port to hostname
+	Map<Integer, String> local_ports;
 
 	int remote_id; //remote user ID
 	String remote_username;
@@ -88,23 +91,28 @@ public class GarenaTCP extends Thread {
 		ack = 0;
 
 		//configuration
-		local_hostname = GCBConfig.configuration.getString("gcb_tcp_host", "192.168.1.1");
+		local_ports = new HashMap<Integer, String>();
 
 		try {
-			String[] local_ports_str = GCBConfig.configuration.getStringArray("gcb_tcp_port");
-			local_ports = new int[local_ports_str.length];
+			String[] local_ports_str = GCBConfig.configuration.getStringArray("gcb_tcp_host");
 
 			for(int i = 0; i < local_ports_str.length; i++) {
-				try {
-					local_ports[i] = Integer.parseInt(local_ports_str[i]);
-				} catch(NumberFormatException e) {
-					Main.println("[GarenaTCP " + conn_id + "] Configuration warning: unable to parse " + local_ports_str[i]);
-					local_ports[i] = -1;
+				String[] parts = local_ports_str[i].split(":");
+				int port = 6112;
+				
+				if(parts.length >= 2) {
+					try {
+						port = Integer.parseInt(parts[1]);
+					} catch(NumberFormatException e) {
+						Main.println("[GarenaTCP " + conn_id + "] Configuration warning: unable to parse " + parts[1] + " as port");
+						continue;
+					}
 				}
+				
+				local_ports.put(port, parts[0]);
 			}
 		} catch(ConversionException e) {
-			Main.println("[GarenaTCP " + conn_id + "] Configuration error: while parsing gcb_tcp_port as string array");
-			local_ports = new int[] {};
+			Main.println("[GarenaTCP " + conn_id + "] Configuration error: while parsing host as string array");
 		}
 
 		try {
@@ -148,12 +156,8 @@ public class GarenaTCP extends Thread {
 		retransmissionTimeout = standardDelay;
 	}
 
-	public boolean isValidPort(int port) {
-		for(int i = 0; i < local_ports.length; i++) {
-			if(local_ports[i] == port && local_ports[i] != -1) return true;
-		}
-
-		return false;
+	public String getPortHost(int port) {
+		return local_ports.get(port); //returns null on failure
 	}
 
 	public boolean init(InetAddress remote_address, int remote_port, int remote_id, int conn_id, int destination_port, MemberInfo member) {
@@ -178,15 +182,17 @@ public class GarenaTCP extends Thread {
 			return false;
 		}
 
-		if(!isValidPort(destination_port)) {
+		String hostname = getPortHost(destination_port);
+		
+		if(hostname == null) { //means this port is not allowed
 			Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
 			end();
 			return false;
 		} else {
 			//establish real TCP connection with GHost (hopefully)
-			Main.println("[GarenaTCP " + conn_id + "] Connecting to GAMEHOST at " + local_hostname + " on port " + destination_port + " for connection " + conn_id);
+			Main.println("[GarenaTCP " + conn_id + "] Connecting to GAMEHOST at " + hostname + " on port " + destination_port + " for connection " + conn_id);
 			try {
-				InetAddress local_address = InetAddress.getByName(local_hostname);
+				InetAddress local_address = InetAddress.getByName(hostname);
 				socket = new Socket(local_address, destination_port);
 
 				out = new DataOutputStream(socket.getOutputStream());
