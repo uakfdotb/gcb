@@ -215,6 +215,9 @@ public class GarenaInterface {
 	public boolean initPeer() {
 		Main.println("[GInterface " + id + "] Initializing peer socket...");
 		
+		//reload peer port in case it's set to 0 (autodetermine port)
+		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 1513);
+		
 		//init GP2PP socket
 		try {
 			//determine bind address from configuration
@@ -226,9 +229,25 @@ public class GarenaInterface {
 			}
 
 			//if bindAddress unset, then use wildcard address; otherwise bind to specified address
+			//similarly, if peer port is 0, allow OS to determine port
 			if(bindAddress == null) {
-				peer_socket = new DatagramSocket(peer_port);
+				if(peer_port == 0) {
+					peer_socket = new DatagramSocket();
+					peer_port = peer_socket.getLocalPort();
+					Main.println("[GInterface " + id + "] Autoset peerport=" + peer_port);
+				} else {
+					peer_socket = new DatagramSocket(peer_port);
+				}
 			} else {
+				if(peer_port == 0) {
+					//in this case, we need to set a port since bind address is set
+					//we'll just choose randomly, if the port is taken then GarenaReconnect should retry
+					synchronized(Main.RANDOM) {
+						peer_port = Main.RANDOM.nextInt(5000) + 1500;
+						Main.println("[GInterface " + id + "] Autoset peerport=" + peer_port);
+					}
+				}
+				
 				peer_socket = new DatagramSocket(peer_port, bindAddress);
 			}
 
@@ -1681,7 +1700,7 @@ public class GarenaInterface {
 					lbuf.get(iExternal);
 
 					lbuf.order(ByteOrder.BIG_ENDIAN);
-					pExternal = lbuf.getShort(12);
+					pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
 					lbuf.order(ByteOrder.LITTLE_ENDIAN);
 
 					String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +

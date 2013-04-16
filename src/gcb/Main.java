@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 
 /**
@@ -31,6 +32,7 @@ public class Main {
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static Timer TIMER;
+	public static Random RANDOM;
 	
 	static boolean log;
 	static boolean logCommands;
@@ -387,6 +389,7 @@ public class Main {
 		System.exit(0);*/
 
 		Main.TIMER = new Timer();
+		Main.RANDOM = new Random();
 		Main main = new Main();
 		main.init(args);
 
