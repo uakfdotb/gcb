@@ -948,6 +948,13 @@ public class GarenaInterface {
 
 	public boolean sendGCRPMeJoin() {
 		Main.println("[GInterface " + id + "] Sending GCRP me join...");
+		
+		//make sure we got myinfo from main server first
+		if(myinfo == null) {
+			Main.println("[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
+			return false;
+		}
+		
 		String password = GCBConfig.configuration.getString("garena" + id + "_password");
 		String roomPassword = GCBConfig.configuration.getString("garena" + id + "_roompassword", "");
 		

@@ -12,6 +12,7 @@
 - fix: avoid crash when invalid packets received on broadcast port
 - fix: members and TCP connections no longer cleared when unrelated service disconnects
 - fix: gcbi-extend patch no longer causes players to disconnect when twelvth player is kicked
+- fix: resolved null pointer exception if main server authentication fails
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
