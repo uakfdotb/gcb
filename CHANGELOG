@@ -13,6 +13,7 @@
 - fix: members and TCP connections no longer cleared when unrelated service disconnects
 - fix: gcbi-extend patch no longer causes players to disconnect when twelvth player is kicked
 - fix: resolved null pointer exception if main server authentication fails
+- fix: member information display is optional and different Garena connections won't overwrite each other
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms

@@ -1214,7 +1214,9 @@ public class GarenaInterface {
 			rin.read(tmp);
 		}
 
-		displayMemberInfo();
+		if(GCBConfig.configuration.getBoolean("gcb_display_members", false)) {
+			displayMemberInfo();
+		}
 	}
 
 	public MemberInfo readMemberInfo(int size, ByteBuffer lbuf) throws IOException {
@@ -1290,7 +1292,7 @@ public class GarenaInterface {
 	}
 
 	public void displayMemberInfo() throws IOException {
-		FileWriter out = new FileWriter("room_users.txt");
+		FileWriter out = new FileWriter("room_users_" + id + ".txt");
 
 		synchronized(members) {
 			for(MemberInfo member : members) {
