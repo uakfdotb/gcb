@@ -61,7 +61,14 @@ public class GarenaEncrypt {
 		try {
 			kgen = KeyGenerator.getInstance("AES");
 		} catch(NoSuchAlgorithmException nsae) {
-			nsae.printStackTrace();
+			if(Main.DEBUG){ 
+				nsae.printStackTrace();
+			}
+			
+			Main.println("[GEncrypt] Failed to initialize AES keys: " + nsae.getLocalizedMessage());
+			Main.println("[GEncrypt] ... this probably means that your policy files are not updated");
+			Main.println("[GEncrypt] ... see INSTALL for details on policy file configuration");
+			Main.println("[GEncrypt] ... enable gcb_debug for full exception output");
 		}
 		
 		kgen.init(256);
@@ -94,7 +101,13 @@ public class GarenaEncrypt {
 			rsaKey = (KeyPair) pemreader.readObject();
 			pemreader.close();
 		} catch(IOException ioe) {
-			ioe.printStackTrace();
+			if(Main.DEBUG) {
+				ioe.printStackTrace();
+			}
+			
+			Main.println("[GEncrypt] Failed to read the Garena RSA key: " + ioe.getLocalizedMessage());
+			Main.println("[GEncrypt] ... check to make sure that gkey.pem exists in the working directory and is readable by gcb");
+			Main.println("[GEncrypt] ... enable gcb_debug for full exception output");
 		}
 	}
 
