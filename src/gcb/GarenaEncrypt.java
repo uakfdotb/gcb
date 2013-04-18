@@ -17,7 +17,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -33,8 +32,13 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.crypto.encodings.PKCS1Encoding;
+import org.bouncycastle.crypto.engines.RSAEngine;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
 
 /**
  *
@@ -46,7 +50,7 @@ public class GarenaEncrypt {
 	byte[] iv;
 	IvParameterSpec iv_spec;
 
-	KeyPair rsaKey;
+	PEMKeyPair rsaKey;
 
 	Random random;
 
@@ -97,8 +101,8 @@ public class GarenaEncrypt {
 
 		Main.println("[GEncrypt] Reading private key in PEM format...");
 		try {
-			PEMReader pemreader = new PEMReader(new FileReader("gkey.pem"));
-			rsaKey = (KeyPair) pemreader.readObject();
+			PEMParser pemreader = new PEMParser(new FileReader("gkey.pem"));
+			rsaKey = (PEMKeyPair) pemreader.readObject();
 			pemreader.close();
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
@@ -112,15 +116,19 @@ public class GarenaEncrypt {
 	}
 
 	public byte[] rsaEncryptPrivate(byte[] data) throws Exception {
-		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, rsaKey.getPrivate());
-		return cipher.doFinal(data);
+		AsymmetricKeyParameter privKey = PrivateKeyFactory.createKey(rsaKey.getPrivateKeyInfo());
+		RSAEngine engine = new RSAEngine();
+		PKCS1Encoding cipher = new PKCS1Encoding(engine);
+		cipher.init(true, privKey);
+		return cipher.processBlock(data, 0, data.length);
 	}
 
 	public byte[] rsaDecryptPrivate(byte[] data) throws Exception {
-		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.DECRYPT_MODE, rsaKey.getPublic());
-		return cipher.doFinal(data);
+		AsymmetricKeyParameter privKey = PrivateKeyFactory.createKey(rsaKey.getPrivateKeyInfo());
+		RSAEngine engine = new RSAEngine();
+		PKCS1Encoding cipher = new PKCS1Encoding(engine);
+		cipher.init(true, privKey);
+		return cipher.processBlock(data, 0, data.length);
 	}
 
 	public byte[] aesDecrypt(byte[] data) throws Exception {
