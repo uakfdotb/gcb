@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -101,6 +103,8 @@ public class Main {
 		
 		bots = new HashMap<Integer, GChatBot>();
 		garenaConnections = new HashMap<Integer, GarenaInterface>();
+		
+		TIMER.schedule(new StatusTask(), 10000, GCBConfig.configuration.getInt("gcb_status", 60) * 1000);
 	}
 
 	public void initPlugins() {
@@ -487,4 +491,62 @@ public class Main {
 		return data;
 	}
 
+	class StatusTask extends TimerTask {
+		public void run() {
+			int numTCPConnections = 0;
+			
+			int mostPopularId = 0;
+			int maxTCPConnections = 0;
+			
+			int rooms = 0;
+			int users = 0;
+			
+			synchronized(garenaConnections) {
+				Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+				
+				while(it.hasNext()) {
+					GarenaInterface garena = it.next();
+					int connected = garena.numConnected();
+					numTCPConnections += connected;
+					
+					if(connected > maxTCPConnections) {
+						maxTCPConnections = connected;
+						mostPopularId = garena.id;
+					}
+					
+					rooms++;
+					users += garena.numRoomUsers();
+				}
+			}
+			
+			int memory = (int) (Runtime.getRuntime().totalMemory() / 1024);
+			int threads = ManagementFactory.getThreadMXBean().getThreadCount();
+			
+			int uptime = (int) (ManagementFactory.getRuntimeMXBean().getUptime() / 1000);
+			
+			int upDays = uptime / 86400;
+			int upHours = (uptime % 86400) / 3600;
+			int upMinutes = (uptime % 3600) / 60;
+			int upSeconds = uptime % 60;
+			
+			String uptimeString = "";
+			if(upDays != 0) uptimeString += upDays + "d";
+			if(uptime >= 3600) uptimeString += upHours + "h";
+			if(uptime >= 60) uptimeString += upMinutes + "m";
+			uptimeString += upSeconds + "s";
+			
+			String statusString = String.format(
+					"[STATUS] connected: %d (max: %d/%d); mem: %d KB; threads: %d; rooms/users: %d/%d; up: %s",
+					numTCPConnections,
+					mostPopularId,
+					maxTCPConnections,
+					memory,
+					threads,
+					rooms,
+					users,
+					uptimeString);
+			
+			Main.println(statusString);
+		}
+	}
 }

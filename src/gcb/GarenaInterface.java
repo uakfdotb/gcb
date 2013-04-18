@@ -2169,6 +2169,18 @@ public class GarenaInterface {
 			return false;
 		}
 	}
+	
+	public int numConnected() {
+		synchronized(tcp_connections) {
+			return tcp_connections.size();
+		}
+	}
+	
+	public int numRoomUsers() {
+		synchronized(members) {
+			return members.size();
+		}
+	}
 
 	public void disconnected(int x) {
 		if(x == GARENA_MAIN && socket != null && socket.isConnected()) {
