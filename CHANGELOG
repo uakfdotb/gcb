@@ -1,12 +1,15 @@
 1.0.0
 * LAN list is updated using REFRESHGAME and DECREATEGAME packets
-* Option to reconnect only when gcb detects room is idle
-* Memory consumption decreased with strict maximum packet settings (means smaller buffers)
-* Host bot hostname/port combined into one configuration setting
+* option to reconnect only when gcb detects room is idle
+* memory consumption decreased with strict maximum packet settings (means smaller buffers)
+* host bot hostname/port combined into one configuration setting
    (this means that you can have host bots on multiple servers)
-* Added rcon tool: allows commands to be sent through sockets
-* Exiting nicely feature to shut down gcb without disconnecting already-connected players
-* Automatic port selection to allow gcb to decide which port to bind to (UDP peer port)
+* added rcon tool: allows commands to be sent through sockets
+* exiting nicely feature to shut down gcb without disconnecting already-connected players
+* automatic port selection to allow gcb to decide which port to bind to (UDP peer port)
+* other minor changes are listed below
+- added periodic gcb status message
+- updated library dependencies to newest versions as of April 18
 - fix: unknown type messages only show in debug mode
 - fix: old games still removed even if no more UDP packets are received
 - fix: avoid crash when invalid packets received on broadcast port
