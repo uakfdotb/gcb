@@ -48,6 +48,9 @@ public class WC3Interface {
 
 	//this random is used to generate entry keys for Garena
 	Random random;
+	
+	//whether we're exiting nicely
+	boolean exitingNicely = false;
 
 	public WC3Interface(Map<Integer, GarenaInterface> garenaConnections) {
 		this.garenaConnections = garenaConnections;
@@ -135,6 +138,11 @@ public class WC3Interface {
 			return false;
 		}
 	}
+	
+	public void exitNicely() {
+		exitingNicely = true;
+		socket.close();
+	}
 
 	//returns true if port is in tcpPorts array and tcpPorts array is not empty
 	public boolean isValidPort(int port) {
@@ -175,6 +183,15 @@ public class WC3Interface {
 		//we want to process a broadcast here, specifically looking for GAMEINFO
 		// then we do various things with it depending on our configuration
 		//this is called in a loop from GarenaThread
+		
+		//first make sure we weren't exiting nicely
+		if(exitingNicely) {
+			try {
+				Thread.sleep(60000);
+			} catch(InterruptedException ie) {}
+			
+			return;
+		}
 		
 		try {
 			//receive the packet
@@ -362,11 +379,13 @@ public class WC3Interface {
 			}
 
 		} catch(IOException ioe) {
-			if(Main.DEBUG) {
-				ioe.printStackTrace();
+			if(!exitingNicely) {
+				if(Main.DEBUG) {
+					ioe.printStackTrace();
+				}
+	
+				Main.println("[WC3Interface] Error: " + ioe.getLocalizedMessage());
 			}
-
-			Main.println("[WC3Interface] Error: " + ioe.getLocalizedMessage());
 		}
 	}
 

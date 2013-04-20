@@ -133,6 +133,10 @@ public class GCBRcon implements Runnable {
 							}
 						}
 						
+						if(main.wc3i != null) {
+							main.wc3i.exitNicely();
+						}
+						
 						//wait for them to actually do so, then terminate
 						synchronized(Main.TIMER) {
 							Main.TIMER.schedule(new ExitTask(), 1000, 5000);
