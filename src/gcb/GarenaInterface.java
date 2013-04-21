@@ -123,6 +123,7 @@ public class GarenaInterface {
 			Main.TIMER.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
 			Main.TIMER.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
 			Main.TIMER.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
+			Main.TIMER.schedule(new CleanTask(), 1000, 300000); //clean TCP connections every five minutes
 		}
 		
 		//configuration
@@ -2296,6 +2297,12 @@ public class GarenaInterface {
 	
 				//room loop should take care of actual reconnection
 			}
+		}
+	}
+	
+	class CleanTask extends TimerTask {
+		public void run() {
+			cleanTCPConnections();
 		}
 	}
 }

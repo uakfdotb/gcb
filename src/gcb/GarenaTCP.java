@@ -746,8 +746,8 @@ public class GarenaTCP extends Thread {
 	}
 
 	public boolean isTimeout() {
-		long minTime = Math.min(System.currentTimeMillis() - last_time, System.currentTimeMillis() - last_received);
-		if(minTime > 300000) {
+		long maxTime = Math.max(System.currentTimeMillis() - last_time, System.currentTimeMillis() - last_received);
+		if(maxTime > 300000) {
 			return true;
 		} else {
 			return false;
