@@ -618,7 +618,6 @@ public class GarenaTCP extends Thread {
 				} else {
 					//read as many bytes as we can and relay them onwards to remote
 					len = in.read(rbuf); //definitely _don't_ want to readfully here!
-					last_received = System.currentTimeMillis();
 
 					if(len == -1) {
 						Main.println("[GarenaTCP " + conn_id + "] Local host for connection " + conn_id + " disconnected");
@@ -627,6 +626,7 @@ public class GarenaTCP extends Thread {
 					}
 				}
 
+				last_received = System.currentTimeMillis();
 				byte[] data = new byte[len];
 				System.arraycopy(rbuf, 0, data, 0, len);
 				

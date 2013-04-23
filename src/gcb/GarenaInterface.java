@@ -2220,9 +2220,7 @@ public class GarenaInterface {
 				GarenaTCP connection = tcp_connections.get(x);
 
 				if(connection.isTimeout()) {
-					if(Main.DEBUG) {
-						Main.println("[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
-					}
+					Main.println("[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
 
 					//using end(true) would remove the connection, but
 					// since we're currently iterating over it that
