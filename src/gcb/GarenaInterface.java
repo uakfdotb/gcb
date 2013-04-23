@@ -1775,7 +1775,7 @@ public class GarenaInterface {
 					synchronized(tcp_connections) {
 						if(tcp_connections.containsKey(conn_id)) {
 							Main.println("[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
-							tcp_connections.get(conn_id).end();
+							tcp_connections.get(conn_id).end(true);
 						}
 
 						tcp_connections.put(conn_id, tcp_connection);
@@ -1815,7 +1815,7 @@ public class GarenaInterface {
 						Main.println("[GInterface " + id + "] User requested termination on connection " + conn_id);
 						// tcp_connections will be updated by GarenaTCP
 						// tcp_connections.remove(conn_id);
-						tcp_connection.end();
+						tcp_connection.end(true);
 					} else {
 						Main.debug("[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
 					}
@@ -2224,7 +2224,12 @@ public class GarenaInterface {
 						Main.println("[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
 					}
 
-					connection.end(); //this removes the connection as well
+					//using end(true) would remove the connection, but
+					// since we're currently iterating over it that
+					// would cause a concurrent modification exception
+					//so instead we remove it from here
+					connection.end(false);
+					connectionIterator.remove();
 				}
 			}
 		}

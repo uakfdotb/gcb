@@ -178,7 +178,7 @@ public class GarenaTCP extends Thread {
 		//make sure their username is not reserved
 		if(isReservedName(remote_username)) {
 			Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " at " + remote_address + " in connection " + conn_id + " tried to use a reserved name");
-			end();
+			end(true);
 			return false;
 		}
 
@@ -186,7 +186,7 @@ public class GarenaTCP extends Thread {
 		
 		if(hostname == null) { //means this port is not allowed
 			Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
-			end();
+			end(true);
 			return false;
 		} else {
 			//establish real TCP connection with GHost (hopefully)
@@ -198,7 +198,7 @@ public class GarenaTCP extends Thread {
 				out = new DataOutputStream(socket.getOutputStream());
 				in = new DataInputStream(socket.getInputStream());
 			} catch(IOException ioe) {
-				end();
+				end(true);
 				
 				if(Main.DEBUG) {
 					ioe.printStackTrace();
@@ -246,7 +246,7 @@ public class GarenaTCP extends Thread {
 			out = new DataOutputStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
 		} catch(IOException ioe) {
-			end();
+			end(true);
 			
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
@@ -303,7 +303,7 @@ public class GarenaTCP extends Thread {
 		
 		if(length > maxTCPSize) {
 			Main.println("[GarenaTCP " + conn_id + "] Remote invalid packet length (len=" + length + "), terminating");
-			end();
+			end(true);
 			return;
 		}
 
@@ -408,12 +408,12 @@ public class GarenaTCP extends Thread {
 						}
 					} else {
 						Main.println("[GarenaTCP " + conn_id + "] Received invalid length in connection " + conn_id + ", disconnecting");
-						end();
+						end(true);
 						return;
 					}
 				} else {
 					Main.println("[GarenaTCP " + conn_id + "] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
-					end();
+					end(true);
 					return;
 				}
 			}
@@ -479,7 +479,7 @@ public class GarenaTCP extends Thread {
 				writeOutData(rewrittenData.array(), true);
 			} else {
 				Main.println("[GarenaTCP " + conn_id + "] Invalid length in join request in connection " + conn_id);
-				end();
+				end(true);
 				return;
 			}
 		} else {
@@ -612,7 +612,7 @@ public class GarenaTCP extends Thread {
 						in.readFully(rbuf, 4, len - 4);
 					} else  {
 						Main.println("[GarenaTCP " + conn_id + "] Read invalid packet length (len=" + len + "), terminating");
-						end();
+						end(true);
 						break;
 					}
 				} else {
@@ -622,7 +622,7 @@ public class GarenaTCP extends Thread {
 
 					if(len == -1) {
 						Main.println("[GarenaTCP " + conn_id + "] Local host for connection " + conn_id + " disconnected");
-						end();
+						end(true);
 						break;
 					}
 				}
@@ -638,7 +638,7 @@ public class GarenaTCP extends Thread {
 			} catch(SocketTimeoutException e) {
 				//continue loop with standard retransmission
 			} catch(IOException ioe) {
-				end();
+				end(true);
 				
 				if(Main.DEBUG) {
 					ioe.printStackTrace();
@@ -710,7 +710,7 @@ public class GarenaTCP extends Thread {
 		return -1; //todo: implement timestamp correctly in GarenaInterface
 	}
 
-	public void end() {
+	public void end(boolean removeGarenaInterface) {
 		Main.println("[GarenaTCP " + conn_id + "] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
 		//allocate a new buffer so we don't do anything thread-unsafe
@@ -730,8 +730,10 @@ public class GarenaTCP extends Thread {
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 
-		//remove connection from GarenaInterface map
-		garena.removeTCPConnection(conn_id);
+		if(removeGarenaInterface) {
+			//remove connection from GarenaInterface map
+			garena.removeTCPConnection(conn_id);
+		}
 	}
 
 	//check if name is in the list of reserved names
