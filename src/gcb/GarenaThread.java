@@ -43,7 +43,7 @@ public class GarenaThread extends Thread {
 		terminated = true;
 		
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(20000);
 		} catch(InterruptedException e) {}
 		
 		GarenaThread thread = new GarenaThread(garenaInterface, wc3Interface, type);
