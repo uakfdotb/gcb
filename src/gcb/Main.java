@@ -317,26 +317,29 @@ public class Main {
 		if(newLogInterval != 0) {
 			while(true) {
 				if(System.currentTimeMillis() - lastLog > newLogInterval) {
-					println("[Main] Closing old log file and creating new log file");
-					log_out.close();
 					String currentDate = date();
-					File log_directory = new File("log/");
-					if(!log_directory.exists()) {
-						log_directory.mkdir();
-					}
 					
-					File log_target = new File(log_directory, currentDate + ".log");
-					
-					try {
-						log_out = new PrintWriter(new FileWriter(log_target, true), true);
-					} catch(IOException e) {
-						if(DEBUG) {
-							e.printStackTrace();
+					if(log_out != null) {
+						println("[Main] Closing old log file and creating new log file");
+						log_out.close();
+						File log_directory = new File("log/");
+						if(!log_directory.exists()) {
+							log_directory.mkdir();
 						}
-						println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
+						
+						File log_target = new File(log_directory, currentDate + ".log");
+						
+						try {
+							log_out = new PrintWriter(new FileWriter(log_target, true), true);
+						} catch(IOException e) {
+							if(DEBUG) {
+								e.printStackTrace();
+							}
+							println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
+						}
 					}
 					
-					if(logCommands) {
+					if(logCommands && log_cmd_out != null) {
 						log_cmd_out.close();
 						File log_cmd_directory = new File("cmd_log/");
 						if(!log_cmd_directory.exists()) {
