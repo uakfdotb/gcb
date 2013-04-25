@@ -7,6 +7,9 @@
 * added rcon tool: allows commands to be sent through sockets
 * exiting nicely feature to shut down gcb without disconnecting already-connected players
 * automatic port selection to allow gcb to decide which port to bind to (UDP peer port)
+* TCP connection pruning is enabled (timeout on Garena TCP)
+   (there is an odd bug where connection inexplicably is not terminated after GHost times out;
+    while this resolves the1 symptoms of that issue, the issue itself likely remains)
 * other minor changes are listed below
 - added periodic gcb status message
 - updated library dependencies to newest versions as of April 18
@@ -17,6 +20,8 @@
 - fix: gcbi-extend patch no longer causes players to disconnect when twelvth player is kicked
 - fix: resolved null pointer exception if main server authentication fails
 - fix: member information display is optional and different Garena connections won't overwrite each other
+- fix: null pointer exception when log rotation is enabled but logging is not
+- fix: terminate on startup connection errors instead of silently quitting initialization
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
