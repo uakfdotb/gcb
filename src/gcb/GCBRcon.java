@@ -42,7 +42,7 @@ public class GCBRcon implements Runnable {
 		password = GCBConfig.configuration.getString("rcon_password", "");
 		
 		if(password.isEmpty()) {
-			Main.println("[GCBRcon] WARNING: rcon_password is empty, this is a security risk");
+			Main.println("[GCBRcon] WARNING: rcon_password is empty, you won't be able to authenticate");
 		}
 		
 		new Thread(this).start();
