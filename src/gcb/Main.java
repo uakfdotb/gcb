@@ -430,13 +430,19 @@ public class Main {
 		DEBUG = GCBConfig.configuration.getBoolean("gcb_debug", false);
 
 		main.initPlugins();
-		if(!main.initGarenaAll(false)) return;
+		if(!main.initGarenaAll(false)) {
+			System.exit(-1);
+			return;
+		}
 		
 		synchronized(main.garenaConnections) {
 			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
 			
 			while(it.hasNext()) {
-				if(!main.initRoom(it.next(), false)) return;
+				if(!main.initRoom(it.next(), false)) {
+					System.exit(-1);
+					return;
+				}
 			}
 		}
 		
