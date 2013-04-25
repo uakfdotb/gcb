@@ -2161,6 +2161,10 @@ public class GarenaInterface {
 		disconnected(GARENA_ROOM);
 	}
 	
+	public boolean isExiting() {
+		return exitingNicely;
+	}
+	
 	public boolean hasExited() {
 		if(exitingNicely) {
 			synchronized(tcp_connections) {
@@ -2269,7 +2273,7 @@ public class GarenaInterface {
 	
 	class PlayTask extends TimerTask {
 		public void run() {
-			if(room_socket != null && room_socket.isConnected()) {
+			if(room_socket != null && room_socket.isConnected() && !isExiting()) {
 				//in case of exception, don't print anything
 				try {
 					startPlaying();
@@ -2280,7 +2284,7 @@ public class GarenaInterface {
 	
 	class ExperienceTask extends TimerTask {
 		public void run() {
-			if(socket != null && socket.isConnected()) {
+			if(socket != null && socket.isConnected() && !isExiting()) {
 				//in case of exception, don't print anything
 				try {
 					sendGSPXP(user_id, 100, 1001);
