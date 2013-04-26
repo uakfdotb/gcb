@@ -128,7 +128,7 @@ public class GarenaInterface {
 		
 		//configuration
 		room_id = GCBConfig.configuration.getInt("garena" + id + "_roomid", 590633);
-		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 1513);
+		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 0);
 		reverseEnabled = GCBConfig.configuration.getBoolean("garena" + id + "_reverse", false);
 		
 		//configuration: reconnect
@@ -217,7 +217,7 @@ public class GarenaInterface {
 		Main.println("[GInterface " + id + "] Initializing peer socket...");
 		
 		//reload peer port in case it's set to 0 (autodetermine port)
-		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 1513);
+		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 0);
 		
 		//init GP2PP socket
 		try {
