@@ -104,6 +104,8 @@ public class WC3Interface {
 							Main.println("[WC3Interface] Configuration warning: unable to parse " + parts[1] + " as port");
 							continue;
 						}
+					} else {
+						Main.println("[WC3Interface] Warning: missing port for gcb_tcp_host [" + array[i] + "]; assuming 6112");
 					}
 					
 					if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
@@ -112,7 +114,7 @@ public class WC3Interface {
 					
 					if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_ip", false)) {
 						try {
-							tcpHosts.add(InetAddress.getByName(parts[1]));
+							tcpHosts.add(InetAddress.getByName(parts[0]));
 						} catch(IOException ioe) {
 							Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
 						}
