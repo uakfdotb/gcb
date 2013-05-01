@@ -172,10 +172,11 @@ public class WC3Interface {
 				Iterator<WC3GameIdentifier> it = games.values().iterator();
 				
 				while(it.hasNext()) {
-					byte[] data = it.next().rawPacket;
+					WC3GameIdentifier game = it.next();
+					byte[] data = game.rawPacket;
 					
 					//Warcraft clients always listen on BROADCAST_PORT
-					garena.sendUDPEncap(address, port, BROADCAST_PORT, BROADCAST_PORT, data, 0, data.length);
+					garena.sendUDPEncap(address, port, game.gameport, BROADCAST_PORT, data, 0, data.length);
 				}
 			}
 		}
