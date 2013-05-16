@@ -232,22 +232,63 @@ public class WC3Interface {
 						ByteBuffer buf = ByteBuffer.wrap(data, offset, length);
 						buf.position(0);
 						buf.order(ByteOrder.LITTLE_ENDIAN);
+						
+						ByteBuffer newPacket = ByteBuffer.allocate(1024);
+						newPacket.order(ByteOrder.LITTLE_ENDIAN);
 
 						//check header constant
 						if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_HEADER_CONSTANT) {
+							newPacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
+							
 							//check packet type
 							if(GarenaEncrypt.unsignedByte(buf.get()) == Constants.W3GS_GAMEINFO) {
+								newPacket.put((byte) Constants.W3GS_GAMEINFO);
+								
+								System.arraycopy(buf.array(), buf.position(), newPacket.array(), newPacket.position(), 18);
 								buf.position(buf.position() + 18); //skip to gamename
+								newPacket.position(newPacket.position() + 18);
+								
 								String gamename = GarenaEncrypt.getTerminatedString(buf); //get/skip gamename
-								buf.get(); //skip game password
-								GarenaEncrypt.getTerminatedString(buf); //skip statstring
+								String gamenameSkeleton = GCBConfig.configuration.getString("gcb_broadcastfilter_gamename");
+								if(gamenameSkeleton != null && !gamenameSkeleton.trim().isEmpty()) {
+									gamenameSkeleton = gamenameSkeleton.replace("%g", gamename);
+									
+									if(gamenameSkeleton.length() > 31) {
+										gamenameSkeleton = gamenameSkeleton.substring(0, 31);
+									}
+									
+									newPacket.put(gamenameSkeleton.getBytes());
+								} else {
+									newPacket.put(gamename.getBytes());
+								}
+								newPacket.put((byte) 0); //null terminator for gamename
+								
+								newPacket.put(buf.get()); //skip game password
+								newPacket.put(GarenaEncrypt.getTerminatedArray(buf)); //skip statstring
+								newPacket.put((byte) 0); //null terminator for stats string
+								
+								System.arraycopy(buf.array(), buf.position(), newPacket.array(), newPacket.position(), 12);
 								buf.position(buf.position() + 12); //skip to slots available
+								newPacket.position(newPacket.position() + 12);
+								
 								//read slots available for the REFRESHGAME packet
 								int slotsAvailable = buf.getInt();
-								buf.position(buf.position() + 4); //skip to port
+								newPacket.putInt(slotsAvailable);
+								
+								newPacket.putInt(buf.getInt()); //skip to port
+								
 								//read port in _little_ endian
 								int port = GarenaEncrypt.unsignedShort(buf.getShort());
-
+								newPacket.putShort((short) port);
+								
+								//copy any remaining bytes after the port
+								int remainingBytes = buf.limit() - buf.position();
+								
+								if(remainingBytes > 0) {
+									System.arraycopy(buf.array(), buf.position(), newPacket.array(), newPacket.position(), remainingBytes);
+									newPacket.position(newPacket.position() + remainingBytes);
+								}
+								
 								//check port
 								if(!isValidPort(port)) {
 									Main.debug("[WC3Interface] Filter fail: invalid port " + port);
@@ -298,8 +339,13 @@ public class WC3Interface {
 										}
 
 										//replace packet's entry key from GHost with our generated one
-										//replacing in bytebuffer will cause modifications to data (wrapped)
-										buf.putInt(16, garenaEntryKey);
+										newPacket.putInt(16, garenaEntryKey);
+										
+										//update the data packet, which gets broadcasted
+										data = new byte[newPacket.position()];
+										System.arraycopy(newPacket.array(), 0, data, 0, newPacket.position());
+										offset = 0;
+										length = data.length;
 										
 										//update the existing WC3GameIdentifier so it doesn't get deleted
 										//we must do this after rewriting the packet (above) or else we will
