@@ -253,8 +253,8 @@ public class WC3Interface {
 								if(gamenameSkeleton != null && !gamenameSkeleton.trim().isEmpty()) {
 									gamenameSkeleton = gamenameSkeleton.replace("%g", gamename);
 									
-									if(gamenameSkeleton.length() > 31) {
-										gamenameSkeleton = gamenameSkeleton.substring(0, 31);
+									if(gamenameSkeleton.length() >= 31) {
+										gamenameSkeleton = gamenameSkeleton.substring(0, 30);
 									}
 									
 									newPacket.put(gamenameSkeleton.getBytes());
