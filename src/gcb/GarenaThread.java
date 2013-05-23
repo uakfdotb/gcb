@@ -29,16 +29,23 @@ public class GarenaThread extends Thread {
 	}
 
 	public void run() {
-		if(type == GSP_LOOP) garenaInterface.readGSPLoop();
-		else if(type == GCRP_LOOP) garenaInterface.readGCRPLoop();
-		else if(type == PEER_LOOP) garenaInterface.readPeerLoop();
-		else if(type == WC3_BROADCAST) {
-			while(true) {
-				wc3Interface.readBroadcast();
+		try {
+			if(type == GSP_LOOP) garenaInterface.readGSPLoop();
+			else if(type == GCRP_LOOP) garenaInterface.readGCRPLoop();
+			else if(type == PEER_LOOP) garenaInterface.readPeerLoop();
+			else if(type == WC3_BROADCAST) {
+				while(true) {
+					wc3Interface.readBroadcast();
+				}
 			}
-		}
 
-		else return;
+			else return;
+		} catch(Exception e) {
+			Main.println("CRITICAL ERROR: caught in loop, type=" + type + ": " + e.getLocalizedMessage());
+			System.err.println("CRITICAL ERROR: caught in loop, type=" + type + ": " + e.getLocalizedMessage());
+			e.printStackTrace();
+			
+		}
 
 		terminated = true;
 		

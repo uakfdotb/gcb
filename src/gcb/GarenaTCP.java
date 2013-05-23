@@ -332,6 +332,11 @@ public class GarenaTCP extends Thread {
 
 			writeOutData(data, offset, length, false);
 			
+			//if buffered output, extract packets from out_buffer and process
+			if(out_buffer != null) {
+				processOutData(out_buffer);
+			}
+			
 			//send any other packets that we have stored
 			synchronized(out_packets) {
 				while(out_packets.containsKey(this.ack)) {
@@ -346,6 +351,11 @@ public class GarenaTCP extends Thread {
 					}
 
 					writeOutData(packet.data, false);
+
+					//if buffered output, extract packets from out_buffer and process
+					if(out_buffer != null) {
+						processOutData(out_buffer);
+					}
 
 					packet = out_packets.get(this.ack);
 				}
@@ -378,50 +388,49 @@ public class GarenaTCP extends Thread {
 		}
 		
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
+	}
+	
+	public void processOutData(ByteBuffer buf) {
+		while(out_buffer.position() >= 4) {
+			int header = GarenaEncrypt.unsignedByte(out_buffer.get(0));
 
-		//if buffered output, extract packets from out_buffer and process
-		if(out_buffer != null) {
-			while(out_buffer.position() >= 4) {
-				int header = GarenaEncrypt.unsignedByte(out_buffer.get(0));
+			//validate header
+			if(header == Constants.W3GS_HEADER_CONSTANT) {
+				int oLength = GarenaEncrypt.unsignedShort(out_buffer.getShort(2));
+				
+				if(tcpDebug) {
+					Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " out buffered header=" + header + ", length=" + oLength);
+				}
 
-				//validate header
-				if(header == Constants.W3GS_HEADER_CONSTANT) {
-					int oLength = GarenaEncrypt.unsignedShort(out_buffer.getShort(2));
-					
-					if(tcpDebug) {
-						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " out buffered header=" + header + ", length=" + oLength);
-					}
+				//validate length; minimum packet legnth is 4
+				if(oLength >= 4) {
+					if(out_buffer.position() >= oLength) {
+						//write the data if process returns true, else disconnect
+						processOutDataSingle(out_buffer, oLength);
 
-					//validate length; minimum packet legnth is 4
-					if(oLength >= 4) {
-						if(out_buffer.position() >= oLength) {
-							//write the data if process returns true, else disconnect
-							processOutData(out_buffer, oLength);
-
-							//reset buffer: move everything so buffer starts at zero
-							int remainingBytes = out_buffer.position() - oLength;
-							System.arraycopy(out_buffer.array(), oLength, out_buffer.array(), 0, remainingBytes);
-							out_buffer.position(remainingBytes);
-						} else {
-							//not enough bytes yet
-							return;
-						}
+						//reset buffer: move everything so buffer starts at zero
+						int remainingBytes = out_buffer.position() - oLength;
+						System.arraycopy(out_buffer.array(), oLength, out_buffer.array(), 0, remainingBytes);
+						out_buffer.position(remainingBytes);
 					} else {
-						Main.println("[GarenaTCP " + conn_id + "] Received invalid length in connection " + conn_id + ", disconnecting");
-						end(true);
+						//not enough bytes yet
 						return;
 					}
 				} else {
-					Main.println("[GarenaTCP " + conn_id + "] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
+					Main.println("[GarenaTCP " + conn_id + "] Received invalid length in connection " + conn_id + ", disconnecting");
 					end(true);
 					return;
 				}
+			} else {
+				Main.println("[GarenaTCP " + conn_id + "] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
+				end(true);
+				return;
 			}
 		}
 	}
 
 	//processes one packet from the output buffer to local WC3 host
-	public void processOutData(ByteBuffer buf, int length) {
+	public void processOutDataSingle(ByteBuffer buf, int length) {
 		int old_position = buf.position();
 
 		if(GarenaEncrypt.unsignedByte(buf.get(1)) == Constants.W3GS_REQJOIN) {
