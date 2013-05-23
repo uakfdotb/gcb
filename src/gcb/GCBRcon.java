@@ -31,13 +31,7 @@ public class GCBRcon implements Runnable {
 	public GCBRcon(Main main) throws IOException {
 		this.main = main;
 		
-		String bind = GCBConfig.configuration.getString("rcon_bind", "0.0.0.0");
-		int port = GCBConfig.configuration.getInt("rcon_port", RCON_DEFAULTPORT);
 		localOnly = GCBConfig.configuration.getBoolean("rcon_localonly", true);
-		
-		Main.println("[GCBRcon] Initializing on " + bind + ":" + port);
-		server = new ServerSocket();
-		server.bind(new InetSocketAddress(bind, port));
 		
 		password = GCBConfig.configuration.getString("rcon_password", "");
 		
@@ -49,6 +43,24 @@ public class GCBRcon implements Runnable {
 	}
 	
 	public void run() {
+		String bind = GCBConfig.configuration.getString("rcon_bind", "0.0.0.0");
+		int port = GCBConfig.configuration.getInt("rcon_port", RCON_DEFAULTPORT);
+		
+		while(server == null) {
+			try {
+				Main.println("[GCBRcon] Initializing on " + bind + ":" + port);
+				server = new ServerSocket();
+				server.bind(new InetSocketAddress(bind, port));
+			} catch(IOException ioe) {
+				Main.println("[GCBRcon] Failed to bind; trying again in 10 seconds: " + ioe.getLocalizedMessage());
+				server = null;
+				
+				try {
+					Thread.sleep(10000);
+				} catch(InterruptedException ie) {}
+			}
+		}
+		
 		while(true) {
 			try {
 				Socket socket = server.accept();
@@ -142,7 +154,14 @@ public class GCBRcon implements Runnable {
 							Main.TIMER.schedule(new ExitTask(), 1000, 5000);
 						}
 						
+						try {
+							server.close();
+						} catch(IOException ioe) {
+							Main.println("Failed to shut down rcon port.");
+						}
+
 						out.println("Connections set to exit nicely.");
+						Main.println("Connections set to exit nicely.");
 					} else {
 						out.println("Good night.");
 						System.exit(0);
