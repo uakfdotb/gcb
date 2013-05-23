@@ -7,12 +7,15 @@
 * added rcon tool: allows commands to be sent through sockets
 * exiting nicely feature to shut down gcb without disconnecting already-connected players
 * automatic port selection to allow gcb to decide which port to bind to (UDP peer port)
+    (this is now the default option)
 * TCP connection pruning is enabled (timeout on Garena TCP)
    (there is an odd bug where connection inexplicably is not terminated after GHost times out;
     while this resolves the1 symptoms of that issue, the issue itself likely remains)
 * other minor changes are listed below
 - added periodic gcb status message
+- added feature to rewrite gamename, for adding prefix or suffix (ex: colored gamenames)
 - updated library dependencies to newest versions as of April 18
+- save memory with smaller buffers in Garena TCP and enforcing packet size limits
 - fix: unknown type messages only show in debug mode
 - fix: old games still removed even if no more UDP packets are received
 - fix: avoid crash when invalid packets received on broadcast port
@@ -22,6 +25,7 @@
 - fix: member information display is optional and different Garena connections won't overwrite each other
 - fix: null pointer exception when log rotation is enabled but logging is not
 - fix: terminate on startup connection errors instead of silently quitting initialization
+- fix: might resolve issue where multiple games do not appear on the LAN gamelist
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
