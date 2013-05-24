@@ -137,7 +137,7 @@ public class Main {
 			reconnect = new GarenaReconnect(this);
 
 			//initiate each connetion
-			for(int i = 1; i < 30; i++) {
+			for(int i = 1; i < 100; i++) {
 				if(GCBConfig.configuration.containsKey("garena" + i + "_roomid") ||
 						GCBConfig.configuration.containsKey("garena" + i + "_roomname")) {
 					GarenaInterface garena = new GarenaInterface(plugins, i);
