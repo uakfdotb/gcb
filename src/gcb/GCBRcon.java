@@ -76,10 +76,14 @@ public class GCBRcon implements Runnable {
 			} catch(IOException ioe) {
 				Main.println("[GCBRcon] Error while accepting new connection: " + ioe.getLocalizedMessage());
 				
-				if(!server.isBound()) {
+				if(!server.isBound() || server.isClosed()) {
 					Main.println("[GCBRcon] Terminating: I am no longer bound!");
 					break;
 				}
+				
+				try {
+					Thread.sleep(1000);
+				} catch(InterruptedException ie) {}
 			}
 		}
 	}
