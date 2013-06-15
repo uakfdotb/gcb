@@ -411,8 +411,6 @@ public class Main {
 				File log_target = new File(log_directory, date() + ".log");
 
 				log_out = new PrintWriter(new FileWriter(log_target, true), true);
-			} else {
-				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
 			}
 		}
 		if(logCommands) {
@@ -461,8 +459,19 @@ public class Main {
 		
 		System.out.println(str);
 		
+		if(log_out == null && newLogInterval == 0) {
+			try {
+				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
+			} catch(IOException ioe) {}
+		}
+		
 		if(log_out != null) {
 			log_out.println("[" + dateString + "] " + str);
+		}
+		
+		if(newLogInterval == 0) {
+			log_out.close();
+			log_out = null;
 		}
 	}
 	
