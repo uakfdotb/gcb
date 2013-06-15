@@ -529,6 +529,7 @@ public class GarenaTCP extends Thread {
 					
 					//double the retransmission timeout
 					retransmissionTimeout *= 2;
+					smoothedRTT *= 2;
 					
 					//don't fast retransmit this packet since we standard retranmsitted it
 					curr.fastRetransmitted = true;
