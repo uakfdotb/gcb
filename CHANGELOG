@@ -16,6 +16,7 @@
 - added feature to rewrite gamename, for adding prefix or suffix (ex: colored gamenames)
 - updated library dependencies to newest versions as of April 18
 - save memory with smaller buffers in Garena TCP and enforcing packet size limits
+- logging when a single log file is used will be done without file locking (new stream initialized for each out line)
 - fix: unknown type messages only show in debug mode
 - fix: old games still removed even if no more UDP packets are received
 - fix: avoid crash when invalid packets received on broadcast port
@@ -26,6 +27,8 @@
 - fix: null pointer exception when log rotation is enabled but logging is not
 - fix: terminate on startup connection errors instead of silently quitting initialization
 - fix: might resolve issue where multiple games do not appear on the LAN gamelist
+- fix: multiply smoothed RTT time by two in addition to current standard retransmission timeout
+- fix: bug with REVERSE after the 0g update involving Garena Interface reading the wrong configuration value
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
