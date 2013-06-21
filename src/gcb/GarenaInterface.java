@@ -129,7 +129,7 @@ public class GarenaInterface {
 		//configuration
 		room_id = GCBConfig.configuration.getInt("garena" + id + "_roomid", 590633);
 		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 0);
-		reverseEnabled = GCBConfig.configuration.getBoolean("garena" + id + "_reverse", false);
+		reverseEnabled = GCBConfig.configuration.getBoolean("gcb_reverse", false);
 		
 		//configuration: reconnect
 		int reconnectInterval = GCBConfig.configuration.getInt("gcb_reconnect_interval", -1);
