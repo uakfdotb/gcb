@@ -143,7 +143,10 @@ public class Main {
 					GarenaInterface garena = new GarenaInterface(plugins, i);
 					garena.registerListener(reconnect);
 					
-					initGarena(garena, false);
+					if(!initGarena(garena, false)) {
+						//startup failed, so restart at a later time
+						garena.disconnected(GarenaInterface.GARENA_MAIN);
+					}
 					
 					synchronized(garenaConnections) {
 						garenaConnections.put(i, garena);
@@ -440,9 +443,10 @@ public class Main {
 			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
 			
 			while(it.hasNext()) {
-				if(!main.initRoom(it.next(), false)) {
-					System.exit(-1);
-					return;
+				GarenaInterface garena = it.next();
+				
+				if(!main.initRoom(garena, false)) {
+					garena.disconnected(GarenaInterface.GARENA_ROOM);
 				}
 			}
 		}
@@ -462,7 +466,11 @@ public class Main {
 		if(log_out == null && newLogInterval == 0) {
 			try {
 				log_out = new PrintWriter(new FileWriter("gcb.log", true), true);
-			} catch(IOException ioe) {}
+			} catch(IOException ioe) {
+				System.err.println("Unable to print to file: " + ioe.getLocalizedMessage());
+				ioe.printStackTrace();
+				return;
+			}
 		}
 		
 		if(log_out != null) {

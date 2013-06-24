@@ -20,6 +20,7 @@ import java.net.DatagramSocket;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -193,6 +194,7 @@ public class GarenaInterface {
 		try {
 			out = new DataOutputStream(socket.getOutputStream());
 			in = new DataInputStream(socket.getInputStream());
+			socket.setSoTimeout(10000);
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
@@ -397,16 +399,20 @@ public class GarenaInterface {
 		lbuf.put((byte) 0x23); //PART identifier
 		lbuf.putInt(user_id);
 
-		try {
-			rout.write(lbuf.array());
-		} catch(IOException ioe) {
-			//ignore
+		if(rout != null) {
+			try {
+				rout.write(lbuf.array());
+			} catch(IOException ioe) {
+				//ignore
+			}
 		}
 
-		try {
-			room_socket.close();
-		} catch(IOException ioe) {
-			//ignore
+		if(room_socket != null) {
+			try {
+				room_socket.close();
+			} catch(IOException ioe) {
+				//ignore
+			}
 		}
 
 		//cleanup room objects
@@ -766,6 +772,9 @@ public class GarenaInterface {
 				} else {
 					Main.debug("[GInterface " + id + "] GSPLoop: unknown type received: " + data[0]);
 				}
+			} catch(SocketTimeoutException ste) {
+				//ignore, only matters on startup
+				continue;
 			} catch(IOException ioe) {
 				Main.println("[GInterface " + id + "] GSPLoop: error: " + ioe.getLocalizedMessage());
 				disconnected(GARENA_MAIN);

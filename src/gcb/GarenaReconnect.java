@@ -58,7 +58,9 @@ class GarenaReconnectThread extends Thread {
 		
 				}
 				
-				main.initGarena(garena, true);
+				if(!main.initGarena(garena, true)) {
+					garena.disconnected(GarenaInterface.GARENA_MAIN);
+				}
 			}
 	
 			if(garena.room_socket == null || garena.room_socket.isClosed()) {
@@ -68,7 +70,9 @@ class GarenaReconnectThread extends Thread {
 		
 				}
 				
-				main.initRoom(garena, true);
+				if(!main.initRoom(garena, true)) {
+					garena.disconnected(GarenaInterface.GARENA_ROOM);
+				}
 			}
 	
 			if(garena.peer_socket == null || garena.peer_socket.isClosed()) {
@@ -78,7 +82,9 @@ class GarenaReconnectThread extends Thread {
 		
 				}
 				
-				main.initPeer(garena, true);
+				if(!main.initPeer(garena, true)) {
+					garena.disconnected(GarenaInterface.GARENA_PEER);
+				}
 			}
 		}
 	}
