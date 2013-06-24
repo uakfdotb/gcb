@@ -457,7 +457,7 @@ public class Main {
 		main.newLogLoop();
 	}
 
-	public static void println(String str) {
+	public static synchronized void println(String str) {
 		Date date = new Date();
 		String dateString = DateFormat.getDateTimeInstance().format(date);
 		
@@ -475,11 +475,11 @@ public class Main {
 		
 		if(log_out != null) {
 			log_out.println("[" + dateString + "] " + str);
-		}
-		
-		if(newLogInterval == 0) {
-			log_out.close();
-			log_out = null;
+			
+			if(newLogInterval == 0) {
+				log_out.close();
+				log_out = null;
+			}
 		}
 	}
 	
