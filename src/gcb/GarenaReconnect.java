@@ -59,7 +59,7 @@ class GarenaReconnectThread extends Thread {
 				}
 				
 				if(!main.initGarena(garena, true)) {
-					garena.disconnected(GarenaInterface.GARENA_MAIN);
+					garena.disconnected(GarenaInterface.GARENA_MAIN, true);
 				}
 			}
 	
@@ -71,7 +71,7 @@ class GarenaReconnectThread extends Thread {
 				}
 				
 				if(!main.initRoom(garena, true)) {
-					garena.disconnected(GarenaInterface.GARENA_ROOM);
+					garena.disconnected(GarenaInterface.GARENA_ROOM, true);
 				}
 			}
 	
@@ -83,7 +83,7 @@ class GarenaReconnectThread extends Thread {
 				}
 				
 				if(!main.initPeer(garena, true)) {
-					garena.disconnected(GarenaInterface.GARENA_PEER);
+					garena.disconnected(GarenaInterface.GARENA_PEER, true);
 				}
 			}
 		}

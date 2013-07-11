@@ -145,7 +145,7 @@ public class Main {
 					
 					if(!initGarena(garena, false)) {
 						//startup failed, so restart at a later time
-						garena.disconnected(GarenaInterface.GARENA_MAIN);
+						garena.disconnected(GarenaInterface.GARENA_MAIN, true);
 					}
 					
 					synchronized(garenaConnections) {
@@ -446,7 +446,7 @@ public class Main {
 				GarenaInterface garena = it.next();
 				
 				if(!main.initRoom(garena, false)) {
-					garena.disconnected(GarenaInterface.GARENA_ROOM);
+					garena.disconnected(GarenaInterface.GARENA_ROOM, true);
 				}
 			}
 		}

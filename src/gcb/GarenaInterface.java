@@ -172,7 +172,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Unable to locate main host: " + uhe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 
@@ -187,7 +186,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Error while connecting to main host: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 
@@ -201,7 +199,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Error(2) while connecting to main host: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 		
@@ -263,7 +260,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Unable to establish peer socket on port " + peer_port + ": " + ioe.getLocalizedMessage());
-			disconnected(GARENA_PEER);
 			return false;
 		}
 		
@@ -285,7 +281,6 @@ public class GarenaInterface {
 
 			if(roomName == null) {
 				Main.println("[GInterface " + id + "] Error: no room name set; shutting down!");
-				disconnected(GARENA_ROOM);
 				return false;
 			}
 
@@ -293,7 +288,6 @@ public class GarenaInterface {
 
 			if(!roomFile.exists()) {
 				Main.println("[GInterface " + id + "] Error: " + roomFile.getAbsolutePath() + " does not exist!");
-				disconnected(GARENA_ROOM);
 				return false;
 			}
 
@@ -321,7 +315,6 @@ public class GarenaInterface {
 
 				if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
 					Main.println("[GInterface " + id + "] Error: no matches found; exiting...");
-					disconnected(GARENA_ROOM);
 					return false;
 				}
 			} catch(IOException ioe) {
@@ -330,7 +323,6 @@ public class GarenaInterface {
 				}
 				
 				Main.println("[GInterface " + id + "] Error during autosearch: " + ioe.getLocalizedMessage());
-				disconnected(GARENA_ROOM);
 				return false;
 			}
 		}
@@ -346,7 +338,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Unable to locate room host: " + uhe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
 			return false;
 		}
 
@@ -361,7 +352,6 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Error while connecting to room host: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
 			return false;
 		}
 
@@ -374,13 +364,11 @@ public class GarenaInterface {
 			}
 
 			Main.println("[GInterface " + id + "] Error(2) while connecting to room host: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
 			return false;
 		}
 
 		//notify main server that we joined the room
 		if(!sendGSPJoinedRoom(user_id, room_id)) {
-			disconnected(GARENA_ROOM);
 			return false;
 		}
 
@@ -453,7 +441,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionInit: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 	}
@@ -484,7 +471,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionInitReply: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
 			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionInitReply: " + e.getLocalizedMessage());
@@ -527,7 +513,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionHello: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 	}
@@ -558,7 +543,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionHelloReply: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
 			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionHelloReply: " + e.getLocalizedMessage());
@@ -654,7 +638,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionLogin: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 	}
@@ -693,7 +676,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionLoginReply: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		} catch(Exception e) {
 			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionLoginReply: " + e.getLocalizedMessage());
@@ -777,7 +759,7 @@ public class GarenaInterface {
 				continue;
 			} catch(IOException ioe) {
 				Main.println("[GInterface " + id + "] GSPLoop: error: " + ioe.getLocalizedMessage());
-				disconnected(GARENA_MAIN);
+				disconnected(GARENA_MAIN, true);
 				return;
 			} catch(Exception e) {
 				if(Main.DEBUG) {
@@ -827,7 +809,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O error in sendGSPQueryUser: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
+			disconnected(GARENA_MAIN, false);
 			return false;
 		}
 	}
@@ -877,7 +859,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O error in sendGSPRequestFriend: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
+			disconnected(GARENA_MAIN, false);
 			return false;
 		}
 	}
@@ -913,7 +895,6 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O error in sendGSPJoinedRoom: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
 			return false;
 		}
 	}
@@ -951,7 +932,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O error in sendGSPXP: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_MAIN);
+			disconnected(GARENA_MAIN, false);
 			return false;
 		}
 	}
@@ -1072,7 +1053,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] I/O error in sendGCRPMeJoin: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1141,11 +1122,11 @@ public class GarenaInterface {
 					}
 
 					Main.println("[GInterface " + id + "] Error received: id: " + error_id + "; means: " + error_string);
-					disconnected(GARENA_ROOM);
+					disconnected(GARENA_ROOM, true);
 					return;
 				} else {
 					if(type == -1) {
-						disconnected(GARENA_ROOM);
+						disconnected(GARENA_ROOM, true);
 						return;
 					}
 
@@ -1166,7 +1147,7 @@ public class GarenaInterface {
 				}
 				
 				Main.println("[GInterface " + id + "] GCRP loop IO error: " + ioe.getLocalizedMessage());
-				disconnected(GARENA_ROOM);
+				disconnected(GARENA_ROOM, true);
 				return;
 			} catch(Exception e) {
 				if(Main.DEBUG) {
@@ -1505,7 +1486,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in sendGCRPChat: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1535,7 +1516,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in sendGCRPAnnounce: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1567,7 +1548,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in ban: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1608,7 +1589,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in kick: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1626,7 +1607,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in startPlaying: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 		}
 	}
 
@@ -1643,7 +1624,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in stopPlaying: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 		}
 	}
 
@@ -1673,7 +1654,7 @@ public class GarenaInterface {
 			return true;
 		} catch(IOException ioe) {
 			Main.println("[GInterface " + id + "] Error in sendGCRPWhisper: " + ioe.getLocalizedMessage());
-			disconnected(GARENA_ROOM);
+			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
@@ -1858,7 +1839,7 @@ public class GarenaInterface {
 				Main.println("[GInterface " + id + "] PeerLoop: peer socket failed!");
 				ioe.printStackTrace();
 				
-				disconnected(GARENA_PEER);
+				disconnected(GARENA_PEER, true);
 			}
 		}
 	}
@@ -2166,8 +2147,8 @@ public class GarenaInterface {
 	
 	public void exitNicely() {
 		exitingNicely = true;
-		disconnected(GARENA_MAIN);
-		disconnected(GARENA_ROOM);
+		disconnected(GARENA_MAIN, false);
+		disconnected(GARENA_ROOM, false);
 	}
 	
 	public boolean isExiting() {
@@ -2196,7 +2177,7 @@ public class GarenaInterface {
 		}
 	}
 
-	public void disconnected(int x) {
+	public void disconnected(int x, boolean alert) {
 		if(x == GARENA_MAIN && socket != null && socket.isConnected()) {
 			try {
 				socket.close();
@@ -2213,7 +2194,12 @@ public class GarenaInterface {
 			peer_socket.close();
 		}
 
-		if(!exitingNicely) {
+		//only notify listeners if we're not exiting nicely and if this should alert
+		//alert is set only if the disconnected call comes from one of the read loops
+		// (otherwise, we never really connected, so no reason to call disconnected;
+		//  also this resolves problems where we get lots of threads from multiple
+		//  reconnection thread spawns)
+		if(!exitingNicely && alert) {
 			synchronized(listeners) {
 				for(GarenaListener listener : listeners) {
 					listener.disconnected(this, x);
@@ -2252,7 +2238,7 @@ public class GarenaInterface {
 			
 			//if we're exiting nicely and we've finished exiting, then unbind UDP
 			if(hasExited()) {
-				disconnected(GARENA_PEER);
+				disconnected(GARENA_PEER, false);
 			}
 		}
 	}
