@@ -281,7 +281,7 @@
  Brazil DotA God-Stars Room**196600**2**203.117.124.15**1001**WC3/RPG**5
  UAE DotA Room 02 [Moderated]**196601**2**203.117.124.15**1001**WC3/RPG**8
  Bulgaria RPG Room 03**196602**2**203.117.124.15**1001**WC3/RPG**1
- Iran DotA High Level League Room**196604**2**203.117.124.15**1001**WC3/RPG**15
+ Iran DotA High Level League Room**196604**2**203.117.124.15**1001**WC3/RPG**5
  Kazakhstan DotA Clan War Room 02 (1.26a)**196605**2**203.117.124.15**1012**WC3/RPG***1
  Brazil DotA High Level League Room**196606**2**203.117.124.15**1001**WC3/RPG**10
  Iran DotA Fairplay League Room**196607**2**203.117.124.15**1001**WC3/RPG**1
@@ -308,8 +308,6 @@
  Russia TD Room 04 (1.26a)**196671**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 044 (1.26a)**196675**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 047 (1.26a)**196676**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 052 (1.26a)**196677**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 069 (1.26a)**196678**3**203.117.124.12**1001**WC3/RPG**1
  Russia LoD DotA Room 03 (1.26a)**196685**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 049 (1.26a)**196687**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 048 (1.26a)**196688**3**203.117.124.12**1001**WC3/RPG**1
@@ -341,33 +339,15 @@
  Russia DotA Room 020 (1.26a)**196714**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 019 (1.26a)**196715**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 018 (1.26a)**196716**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 065 (1.26a)**196736**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 063 (1.26a)**196737**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 062 (1.26a)**196738**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 061 (1.26a)**196739**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 060 (1.26a)**196740**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 059 (1.26a)**196741**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 058 (1.26a)**196742**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 057 (1.26a)**196743**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 056 (1.26a)**196744**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 055 (1.26a)**196745**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 053 (1.26a)**196746**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 050 (1.26a)**196747**3**203.117.124.12**1001**WC3/RPG**1
  Russia FarEast RPG Room 01 (1.26a)**196748**3**203.117.124.12**1001**WC3/RPG**1
  Russia FarEast DotA Room 04 (1.26a)**196749**3**203.117.124.12**1001**WC3/RPG**1
  Russia FarEast DotA Room 03 (1.26a)**196750**3**203.117.124.12**1001**WC3/RPG**1
  Russia FarEast DotA Room 02 (1.26a)**196751**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Tournaments Room (1.26a)**196754**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 066 (1.26a)**196772**3**203.117.124.12**1001**WC3/RPG**1
  Russian DotA League Room**196787**3**203.117.124.12**1012**WC3/RPG***18
  Russia TD Room 09 (1.26a)**196789**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 08 (1.26a)**196790**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 07 (1.26a)**196791**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 068 (1.26a)**196793**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 067 (1.26a)**196794**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 064 (1.26a)**196795**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 054 (1.26a)**196796**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 051 (1.26a)**196797**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 06 (1.26a)**196798**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 05 (1.26a)**196799**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 03 (1.26a)**196800**3**203.117.124.12**1001**WC3/RPG**1
@@ -436,8 +416,8 @@
  Singapore DotA Room 13**262168**6**203.117.124.16**1001**WC3/RPG**1
  Singapore DotA Room 12**262169**6**203.117.124.16**1001**WC3/RPG**1
  Singapore DotA Room 11**262170**6**203.117.124.16**1001**WC3/RPG**1
- Singapore DotA Room 10**262171**6**203.117.124.16**1001**WC3/RPG**1
- Singapore DotA Room 09**262172**6**203.117.124.16**1001**WC3/RPG**1
+ Singapore DotA Room 10 [Moderated Room]**262171**6**203.117.124.16**1001**WC3/RPG**1
+ Singapore DotA Room 09 [Moderated Room]**262172**6**203.117.124.16**1001**WC3/RPG**1
  Australia Chinese Community DotA Room (CCR)**262173**1**203.117.124.14**1001**WC3/RPG**1
  Czech and Slovakia DotA Room 02**262174**1**203.117.124.14**1001**WC3/RPG**1
  Czech and Slovakia DotA Room 01**262175**1**203.117.124.14**1001**WC3/RPG**5
@@ -499,12 +479,12 @@
  Jordan DotA Room 02**262285**1**203.117.124.14**1001**WC3/RPG**1
  Jordan DotA Room 03**262286**1**203.117.124.14**1001**WC3/RPG**1
  Canada DotA Room 05**262287**1**203.117.124.14**1001**WC3/RPG**1
- Indonesia DotA Room 01**262290**6**203.117.124.16**1001**WC3/RPG**1
+ Indonesia DotA Room 01**262290**6**203.117.124.16**1001**WC3/RPG**5
  Ecuador DotA Room 06**262296**1**203.117.124.14**1001**WC3/RPG**1
  Macedonia DotA Room 01 [Moderated]**262297**1**203.117.124.14**1001**WC3/RPG**5
  Pakistan DotA Room 03**262300**1**203.117.124.14**1001**WC3/RPG**1
  Belarus DotA Room 01 (1.26a)**262306**3**203.117.124.12**1001**WC3/RPG**5
- Genesis Dota Room 01**262308**6**203.117.124.16**1001**WC3/RPG**3
+ Genesis Dota Room**262308**6**203.117.124.16**1001**WC3/RPG**8
  Hungary DotA High Level Room**262313**1**203.117.124.14**1001**WC3/RPG**1
  Croatia DotA Room 02**262314**1**203.117.124.14**1001**WC3/RPG**1
  Croatia DotA Room 01 [Moderated]**262315**1**203.117.124.14**1001**WC3/RPG**1
@@ -543,7 +523,7 @@
  Malaysia DotA ROOM 27 (v1.24e)**262398**6**203.117.124.16**1001**WC3/RPG**1
  Malaysia DotA ROOM 26 (v1.24e)**262399**6**203.117.124.16**1001**WC3/RPG**1
  Korea DotA Room 01**262402**1**203.117.124.14**1001**WC3/RPG**1
- Colombia DotA Room 01**262403**1**203.117.124.14**1001**WC3/RPG**1
+ Colombia DotA Room 01 [Moderada]**262403**1**203.117.124.14**1001**WC3/RPG**3
  War 3 Custom Map : Hero Defense ROOM 2 (v1.24e)**262405**6**203.117.124.16**1001**WC3/RPG**1
  War 3 Custom Map : Hero Defense ROOM 1 (v1.24e)**262406**6**203.117.124.16**1001**WC3/RPG**1
  DotA Room 02 (MyGarena.com)**262517**6**203.117.124.16**1001**WC3/RPG**1
@@ -587,7 +567,7 @@
  USA DotA Tournaments Room**327639**1**203.117.124.14**1001**WC3/RPG**1
  Bosnia and Herzegovina DotA Room 03**327641**1**203.117.124.14**1001**WC3/RPG**1
  Ukraine DotA High Level Room 02 (1.26a)**327642**3**203.117.124.12**1001**WC3/RPG**8
- Bosnia and Herzegovina DotA Room 01 [Moderated]**327644**1**203.117.124.14**1001**WC3/RPG**2
+ Bosnia and Herzegovina DotA Room 01 [Moderated]**327644**1**203.117.124.14**1001**WC3/RPG**1
  Russia Room 08**327646**3**203.117.124.12**1000**WC3/TFT**1
  GCA: Shiawase Internet Cafe**327647**12**203.117.124.13**1001**WC3/RPG**1
  Cyberstar Room**327648**6**203.117.124.16**1001**WC3/RPG**5
@@ -792,7 +772,11 @@
  Taiwan ESM Nobu -high room 33**458677**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu -high room 32**458678**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu -high room 31**458679**6**203.117.124.16**1001**WC3/RPG**1
- SoftArea Gaming Room**458711**2**203.117.124.15**1012**WC3/RPG***1
+ War 3 Custom Map : Fufu United Ninja ROOM 5 (v1.24e)**458707**6**203.117.124.16**1001**WC3/RPG**1
+ War 3 Custom Map : Fufu United Ninja ROOM 4 (v1.24e)**458708**6**203.117.124.16**1001**WC3/RPG**1
+ Malaysia DotA Clan War Room 02 (v1.24e)**458709**6**203.117.124.16**1001**WC3/RPG**1
+ Malaysia DotA ROOM 40 (v1.24e)**458710**6**203.117.124.16**1001**WC3/RPG**1
+ Malaysia DotA ROOM 39 (v1.24e)**458711**6**203.117.124.16**1001**WC3/RPG**1
  Final Fantasy DISSIDIA**458712**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  170 (new version)**458713**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  169 (new version)**458714**6**203.117.124.16**1001**WC3/RPG**1
@@ -804,6 +788,8 @@
  Taiwan ESM Nobu  163 (new version)**458720**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  162 (new version)**458721**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  161 (new version)**458722**6**203.117.124.16**1001**WC3/RPG**1
+ Malaysia DotA ROOM 38 (v1.24e)**458723**6**203.117.124.16**1001**WC3/RPG**1
+ Malaysia DotA ROOM 37 (v1.24e)**458724**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  160 (new version)**458725**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  159 (new version)**458726**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu  158 (new version)**458727**6**203.117.124.16**1001**WC3/RPG**1
@@ -828,7 +814,7 @@
  Taiwan ESM Nobu -high room 13**458746**6**203.117.124.16**1001**WC3/RPG**3
  Taiwan ESM Nobu -high room 12**458747**6**203.117.124.16**1001**WC3/RPG**3
  Taiwan ESM Nobu -high room 11**458748**6**203.117.124.16**1001**WC3/RPG**3
- Venezuela RPG Room 02**458749**2**203.117.124.15**1001**WC3/RPG**1
+ Malaysia DotA ROOM 36 (v1.24e)**458749**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Nobu -high room 10**458750**6**203.117.124.16**1001**WC3/RPG**5
  Taiwan ESM Nobu -high room 09**458751**6**203.117.124.16**1001**WC3/RPG**5
  Naruto Wars Room**458759**2**203.117.124.15**1012**WC3/RPG***1
@@ -855,7 +841,7 @@
  Australia DotA Room 01**458789**2**203.117.124.15**1001**WC3/RPG**1
  Australia DotA Room 02**458790**2**203.117.124.15**1001**WC3/RPG**1
  Australia DotA Room 03**458791**2**203.117.124.15**1001**WC3/RPG**1
- Indonesia DotA Room 02**458792**6**203.117.124.16**1001**WC3/RPG**1
+ Indonesia DotA Room 02**458792**6**203.117.124.16**1001**WC3/RPG**10
  USA DotA Room 13**458793**2**203.117.124.15**1001**WC3/RPG**1
  Mongolia DotA Room 01 [Moderated]**458794**2**203.117.124.15**1001**WC3/RPG**20
  Pakistan DotA Room 02**458795**2**203.117.124.15**1001**WC3/RPG**1
@@ -1246,7 +1232,6 @@
  Peru DotA Battle League Room**655343**1**203.117.124.14**1001**WC3/RPG**1
  Colombia DotA Ladder**655344**1**203.117.124.14**1001**WC3/RPG**1
  Peru DotA Tournament Room**655345**1**203.117.124.14**1001**WC3/RPG**1
- BoaCompra Public Room**655346**1**203.117.124.14**1001**WC3/RPG**1
  BoaCompra DotA BYS 4**655348**1**203.117.124.14**1001**WC3/RPG**1
  Europe DotA High Level Room 3**655350**1**203.117.124.14**1001**WC3/RPG**10
  BoaCompra DotA BYS 3**655351**1**203.117.124.14**1001**WC3/RPG**5
@@ -1349,7 +1334,7 @@
  Taiwan ESM Naruto Ninja 03**720979**6**203.117.124.16**1001**WC3/RPG**5
  Taiwan ESM Naruto Ninja 02**720980**6**203.117.124.16**1001**WC3/RPG**5
  Taiwan ESM Naruto Ninja 01**720981**6**203.117.124.16**1001**WC3/RPG**10
- Taiwan ESM Nanoha Fight 01**720982**6**203.117.124.16**1001**WC3/RPG**4
+ Taiwan ESM Nanoha Fight 01**720982**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM FuJiaTianXia 01**720983**6**203.117.124.16**1001**WC3/RPG**1
  Taiwan ESM Fate/Another 01**720984**6**203.117.124.16**1001**WC3/RPG**3
  Taiwan ESM Eastern THDOTA 01**720985**6**203.117.124.16**1001**WC3/RPG**3
@@ -1472,9 +1457,9 @@
  Partners: DotA Strategy Community Room**786562**12**203.117.124.13**1001**WC3/RPG**3
  Partners: DotAPH.com DotA Room**786563**12**203.117.124.13**1001**WC3/RPG**5
  Partners: Mineski Infinity Room 02 -cm www.mineski.net**786564**12**203.117.124.13**1001**WC3/RPG**5
- Partners: Mineski Grounds Moderated Room -CM**786565**12**203.117.124.13**1001**WC3/RPG**3
+ Partners: Mineski Infinity Bayantel Room Pubgame -AP**786565**12**203.117.124.13**1001**WC3/RPG**3
  Partners: Mineski Infinity Room -cm www.mineski.net**786566**12**203.117.124.13**1001**WC3/RPG**7
- Partners: Mineski Infinity High Level Room Pubgame -AP**786567**12**203.117.124.13**1001**WC3/RPG**7
+ Partners: Mineski Infinity HLR 01 Pubgame -AP**786567**12**203.117.124.13**1001**WC3/RPG**7
  Partners: PinoyGG DotA Carnage Room**786568**12**203.117.124.13**1001**WC3/RPG**5
  Partners: PinoyGG Clan War Room**786569**12**203.117.124.13**1001**WC3/RPG**3
  Philippines BayanTel: DotA High Level ROOM 01 (v1.26a)**786570**12**203.117.124.13**1001**WC3/RPG**5
@@ -1483,7 +1468,7 @@
  Philippines BayanTel: DotA ROOM 03 (v1.26a)**786573**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA ROOM 04 (v1.26a)**786574**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA ROOM 05 (v1.26a)**786575**12**203.117.124.13**1001**WC3/RPG**1
- Partners: Mineski Infinity High Level Room 2 Pubgame -AP**851909**12**203.117.124.13**1001**WC3/RPG**5
+ Partners: Mineski Infinity HLR 02 Pubgame -AP**851909**12**203.117.124.13**1001**WC3/RPG**5
  Pacific eSports - Ichill Room**851910**12**203.117.124.13**1001**WC3/RPG**5
  Pacific eSports - LiveandWired Room**851911**12**203.117.124.13**1001**WC3/RPG**1
  GCA: Battle Station Internet Cafe**851912**12**203.117.124.13**1001**WC3/RPG**1
@@ -1492,7 +1477,7 @@
  del ALL-STARS Sweetopia E-walker High Level ROOM 01 (v1.26a**851916**0**unknown**1012**WC3/RPG***10
  GCA: CXG Cainta**851917**12**203.117.124.13**1001**WC3/RPG**1
  GCA: Gizmo Dojo**851918**12**203.117.124.13**1001**WC3/RPG**1
- Partners: Mineski DotA Shop to Shop/Clanwar Room-CM**851919**12**203.117.124.13**1001**WC3/RPG**1
+ Partners: Mineski Infinity HLR 03 Pubgame -AP**851919**12**203.117.124.13**1001**WC3/RPG**3
  Philippines BayanTel: DotA ROOM 31 (v1.24e)**851920**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA ROOM 30 (v1.24e)**851921**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA ROOM 29 (v1.24e)**851922**12**203.117.124.13**1001**WC3/RPG**1
@@ -1928,15 +1913,6 @@
  Custom Map Pudge Wars Reloaded ROOM 1**1114118**17**123.30.104.108**1001**WC3/RPG**1
  Custom Pokemon Defense**1114119**17**123.30.104.108**1001**WC3/RPG**1
  Custom Map Naruto Room 01**1114120**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114121**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114122**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114123**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114124**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114125**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114126**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114127**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114128**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam Thien Kiem ROOM 10 v1.24e**1114129**17**123.30.104.108**1001**WC3/RPG**1
  Vietnam Thien Kiem ROOM 10 v1.24e**1114130**17**123.30.104.108**1001**WC3/RPG**1
  Vietnam Thien Kiem ROOM 09 v1.24e**1114131**17**123.30.104.108**1001**WC3/RPG**1
  Vietnam Thien Kiem ROOM 08 v1.24e**1114132**17**123.30.104.108**1001**WC3/RPG**1
@@ -1946,8 +1922,6 @@
  Custom Map Tong Hop Room 10**1114136**17**123.30.104.108**1001**WC3/RPG**1
  Custom Map Hero Defense Room 08**1114137**17**123.30.104.108**1001**WC3/RPG**1
  Custom Map Castle Fight ROOM 03**1114138**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam DotA ROOM 003 v1.24e**1114139**17**123.30.104.108**1001**WC3/RPG**30
- Taiwan ESM SanGuo 4.x 01**1114140**6**203.117.124.16**1001**WC3/RPG**10
  Custom Map Green TD ROOM 05**1114142**17**123.30.104.108**1001**WC3/RPG**1
  Custom Map Green TD ROOM 04**1114143**17**123.30.104.108**1001**WC3/RPG**1
  Custom Maps Room 18**1114144**17**123.30.104.108**1001**WC3/RPG**1
@@ -1965,11 +1939,6 @@
  Vietnam DotA ROOM 005 v1.24e**1114156**17**123.30.104.108**1001**WC3/RPG**25
  Vietnam DotA ROOM 003 v1.24e**1114158**17**123.30.104.108**1001**WC3/RPG**30
  Vietnam DotA ROOM 002 v1.24e**1114159**17**123.30.104.108**1001**WC3/RPG**25
- Custom Map Divide and Fight ROOM 05**1114165**17**123.30.104.108**1001**WC3/RPG**1
- Vietnam DotA ROOM 125 v1.24e**1114166**17**123.30.104.108**1001**WC3/RPG**5
- Vietnam DotA ROOM 125 v1.24e**1114167**17**123.30.104.108**1001**WC3/RPG**5
- Vietnam DotA ROOM 125 v1.24e**1114168**17**123.30.104.108**1001**WC3/RPG**5
- Vietnam DotA ROOM 125 v1.24e**1114169**17**123.30.104.108**1001**WC3/RPG**5
  Vietnam DotA Clan War ROOM 02 v1.24e**1114171**17**123.30.104.108**1001**WC3/RPG**1
  Vietnam DotA Clan War ROOM 01 v1.24e**1114172**17**123.30.104.108**1001**WC3/RPG**3
  Vietnam DDay 20.0fe ROOM 04 v1.23**1114175**17**123.30.104.108**1001**WC3/RPG**1
