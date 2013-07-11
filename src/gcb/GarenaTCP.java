@@ -556,7 +556,6 @@ public class GarenaTCP extends Thread {
 		synchronized(packets) {
 			GarenaTCPPacket packet = packets.remove(x);
 			packets.notifyAll();
-			x--;
 			
 			packetRetransmitQueue.remove(packet);
 			

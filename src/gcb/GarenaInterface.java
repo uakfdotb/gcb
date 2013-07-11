@@ -1732,8 +1732,6 @@ public class GarenaInterface {
 					if(member != null) {
 						member.correctIP = packet.getAddress();
 						member.correctPort = packet.getPort();
-					} else {
-						//Main.println("[GInterface " + id + "] Received HELLO reply from invalid member: " + id);
 					}
 				} else if(buf_array[0] == 0x02) {
 					int id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
@@ -1744,8 +1742,6 @@ public class GarenaInterface {
 						member.correctPort = packet.getPort();
 
 						sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
-					} else {
-						//Main.println("[GInterface " + id + "] Received HELLO from invalid member: " + id);
 					}
 				} else if(buf_array[0] == 0x0B && !exitingNicely) { //initconn, don't accept if we're exiting though
 					int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
@@ -1804,7 +1800,7 @@ public class GarenaInterface {
 					} else if(buf_array[1] == 0x01) {
 						Main.println("[GInterface " + id + "] User requested termination on connection " + conn_id);
 						// tcp_connections will be updated by GarenaTCP
-						// tcp_connections.remove(conn_id);
+						// so just call end
 						tcp_connection.end(true);
 					} else {
 						Main.debug("[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
@@ -1813,8 +1809,6 @@ public class GarenaInterface {
 					int senderId = lbuf.getInt(4);
 					
 					lbuf.order(ByteOrder.BIG_ENDIAN);
-					//int sourcePort = GarenaEncrypt.unsignedShort(lbuf.getShort(8));
-					//int destPort = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
 					lbuf.order(ByteOrder.LITTLE_ENDIAN);
 
 					lbuf.position(16);
