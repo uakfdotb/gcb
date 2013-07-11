@@ -120,7 +120,7 @@ public class GarenaInterface {
 		exitingNicely = false;
 
 		synchronized(Main.TIMER) {
-			Main.TIMER.schedule(new RetransmitTask(), 20000, 20);
+			Main.TIMER.schedule(new RetransmitTask(), 20000, (int) Math.ceil(GCBConfig.configuration.getDouble("gcb_tcp_srttg", 20)));
 			Main.TIMER.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
 			Main.TIMER.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
 			Main.TIMER.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
