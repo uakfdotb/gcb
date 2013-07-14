@@ -40,7 +40,7 @@ public class ChatThread extends Thread {
 			if(garenaConnections.containsKey(garenaId)) {
 				garena = garenaConnections.get(garenaId);
 			} else {
-				Main.println("[ChatThread] Warning: unable to find Garena interface for id=" + garenaId);
+				Main.println(1, "[ChatThread] Warning: unable to find Garena interface for id=" + garenaId);
 				return;
 			}
 		}
@@ -76,7 +76,7 @@ public class ChatThread extends Thread {
 			}
 
 			chat_queue.notifyAll(); //in case run() is waiting for us
-			Main.println("[QUEUED: " + target_user + "] " + message);
+			Main.println(0, "[QUEUED: " + target_user + "] " + message);
 		}
 	}
 
@@ -112,13 +112,13 @@ public class ChatThread extends Thread {
 				try {
 					Thread.sleep(1500);
 				} catch(InterruptedException e) {
-					Main.println("[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
+					Main.println(11, "[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
 				}
 			} else if(message.target_user == SLEEP) { //stops the bot sending messages too quickly
 				try {
 				Thread.sleep(1500); //prevent flooding
 				} catch(InterruptedException e) {
-					Main.println("[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
+					Main.println(11, "[ChatThread] Sleep was interrupted!" + e.getLocalizedMessage());
 				}
 			} else {
 				message.garena.sendGCRPWhisper(message.target_user, message.str);

@@ -36,7 +36,7 @@ public class GCBRcon implements Runnable {
 		password = GCBConfig.configuration.getString("rcon_password", "");
 		
 		if(password.isEmpty()) {
-			Main.println("[GCBRcon] WARNING: rcon_password is empty, you won't be able to authenticate");
+			Main.println(1, "[GCBRcon] WARNING: rcon_password is empty, you won't be able to authenticate");
 		}
 		
 		new Thread(this).start();
@@ -48,11 +48,11 @@ public class GCBRcon implements Runnable {
 		
 		while(server == null) {
 			try {
-				Main.println("[GCBRcon] Initializing on " + bind + ":" + port);
+				Main.println(3, "[GCBRcon] Initializing on " + bind + ":" + port);
 				server = new ServerSocket();
 				server.bind(new InetSocketAddress(bind, port));
 			} catch(IOException ioe) {
-				Main.println("[GCBRcon] Failed to bind; trying again in 10 seconds: " + ioe.getLocalizedMessage());
+				Main.println(1, "[GCBRcon] Failed to bind; trying again in 10 seconds: " + ioe.getLocalizedMessage());
 				server = null;
 				
 				try {
@@ -64,20 +64,20 @@ public class GCBRcon implements Runnable {
 		while(true) {
 			try {
 				Socket socket = server.accept();
-				Main.println("[GCBRcon] New connection from " + socket.getInetAddress());
+				Main.println(0, "[GCBRcon] New connection from " + socket.getInetAddress());
 				
 				if(localOnly && !socket.getInetAddress().isAnyLocalAddress() && !socket.getInetAddress().isLoopbackAddress()) {
-					Main.println("[GCBRcon] Rejecting connection: not local");
+					Main.println(1, "[GCBRcon] Rejecting connection: not local");
 					socket.close();
 					continue;
 				}
 				
 				new RconHandler(socket);
 			} catch(IOException ioe) {
-				Main.println("[GCBRcon] Error while accepting new connection: " + ioe.getLocalizedMessage());
+				Main.println(1, "[GCBRcon] Error while accepting new connection: " + ioe.getLocalizedMessage());
 				
 				if(!server.isBound() || server.isClosed()) {
-					Main.println("[GCBRcon] Terminating: I am no longer bound!");
+					Main.println(0, "[GCBRcon] Terminating: I am no longer bound!");
 					break;
 				}
 				
@@ -110,7 +110,7 @@ public class GCBRcon implements Runnable {
 				try {
 					str = in.readLine();
 				} catch(IOException ioe) {
-					Main.println("[GCBRcon " + socket.getInetAddress() + "] Error while reading: " + ioe.getLocalizedMessage() + "; terminating");
+					Main.println(1, "[GCBRcon " + socket.getInetAddress() + "] Error while reading: " + ioe.getLocalizedMessage() + "; terminating");
 				}
 				
 				if(str == null) {
@@ -124,17 +124,17 @@ public class GCBRcon implements Runnable {
 				} else if(!authenticated) {
 					if(str.equals(password)) {
 						authenticated = true;
-						Main.println("[GCBRcon " + socket.getInetAddress() + "] authentication succeeded");
+						Main.println(0, "[GCBRcon " + socket.getInetAddress() + "] authentication succeeded");
 						continue;
 					} else {
 						out.println("gtfo");
-						Main.println("[GCBRcon " + socket.getInetAddress() + "] authentication failed");
+						Main.println(0, "[GCBRcon " + socket.getInetAddress() + "] authentication failed");
 						break;
 					}
 				}
 				
 				str = str.toLowerCase();
-				Main.println("[GCBRcon " + socket.getInetAddress() + "] received command: " + str);
+				Main.println(0, "[GCBRcon " + socket.getInetAddress() + "] received command: " + str);
 				String[] parts = str.split(" ");
 				String command = parts[0];
 				
@@ -161,11 +161,11 @@ public class GCBRcon implements Runnable {
 						try {
 							server.close();
 						} catch(IOException ioe) {
-							Main.println("Failed to shut down rcon port.");
+							Main.println(1, "Failed to shut down rcon port.");
 						}
 
 						out.println("Connections set to exit nicely.");
-						Main.println("Connections set to exit nicely.");
+						Main.println(0, "Connections set to exit nicely.");
 					} else {
 						out.println("Good night.");
 						System.exit(0);

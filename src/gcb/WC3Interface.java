@@ -64,7 +64,7 @@ public class WC3Interface {
 			//for some reason, caching the game packets is enabled even though
 			// entry key rewriting is disabled
 			//this combination does not work, so we print a warning message
-			Main.debug("Warning: gcb_broadcastfilter_cache has been disabled; gcb_broadcastfilter_key must be on for caching to work properly!");
+			Main.println(11, "Warning: gcb_broadcastfilter_cache has been disabled; gcb_broadcastfilter_key must be on for caching to work properly!");
 		}
 
 		//config
@@ -77,14 +77,14 @@ public class WC3Interface {
 
 			}
 		} catch(ConversionException ce) {
-			Main.println("[WC3Interface] Conversion exception while processing gcb_rebroadcast; ignoring rebroadcast");
+			Main.println(1, "[WC3Interface] Conversion exception while processing gcb_rebroadcast; ignoring rebroadcast");
 			rebroadcastPorts = new int[] {};
 		} catch(NumberFormatException nfe) {
-			Main.println("[WC3Interface] Number format exception while processing gcb_rebroadcast; ignoring rebroadcast");
+			Main.println(1, "[WC3Interface] Number format exception while processing gcb_rebroadcast; ignoring rebroadcast");
 			rebroadcastPorts = new int[] {};
 		}
 
-		Main.debug("[WC3Interface] Detected " + rebroadcastPorts.length + " rebroadcast ports");
+		Main.println(11, "[WC3Interface] Detected " + rebroadcastPorts.length + " rebroadcast ports");
 		tcpPorts = new HashSet<Integer>();
 		tcpHosts = new HashSet<InetAddress>();
 
@@ -101,11 +101,11 @@ public class WC3Interface {
 						try {
 							port = Integer.parseInt(parts[1]);
 						} catch(NumberFormatException e) {
-							Main.println("[WC3Interface] Configuration warning: unable to parse " + parts[1] + " as port");
+							Main.println(1, "[WC3Interface] Configuration warning: unable to parse " + parts[1] + " as port");
 							continue;
 						}
 					} else {
-						Main.println("[WC3Interface] Warning: missing port for gcb_tcp_host [" + array[i] + "]; assuming 6112");
+						Main.println(1, "[WC3Interface] Warning: missing port for gcb_tcp_host [" + array[i] + "]; assuming 6112");
 					}
 					
 					if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter", true)) {
@@ -116,12 +116,12 @@ public class WC3Interface {
 						try {
 							tcpHosts.add(InetAddress.getByName(parts[0]));
 						} catch(IOException ioe) {
-							Main.println("[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
+							Main.println(1, "[WC3Interface] Failed to resolve gcb_tcp_host; ignoring IP filter");
 						}
 					}
 				}
 			} catch(ConversionException ce) {
-				Main.println("[WC3Interface] Conversion exception while processing gcb_tcp_host; ignoring port/host filters");
+				Main.println(1, "[WC3Interface] Conversion exception while processing gcb_tcp_host; ignoring port/host filters");
 			}
 		}
 	}
@@ -136,7 +136,7 @@ public class WC3Interface {
 				ioe.printStackTrace();
 			}
 			
-			Main.println("[WC3Interface] Error: cannot bind to broadcast port");
+			Main.println(1, "[WC3Interface] Error: cannot bind to broadcast port");
 			return false;
 		}
 	}
@@ -158,13 +158,13 @@ public class WC3Interface {
 	}
 	
 	public void receivedUDP(GarenaInterface garena, ByteBuffer lbuf, InetAddress address, int port, int senderId) {
-		Main.debug("[WC3Interface] Received UDP packet (Garena) from " + address);
+		Main.println(11, "[WC3Interface] Received UDP packet (Garena) from " + address);
 		
 		if(GarenaEncrypt.unsignedByte(lbuf.get()) == 247 //247 is W3GS header constant
 				&& GarenaEncrypt.unsignedByte(lbuf.get()) == 47 //if packet is W3GS_SEARCHGAME; 47 is packet id
 				&& GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)
 				&& GCBConfig.configuration.getBoolean("gcb_broadcastfilter_cache", true)) {
-			Main.debug("[WC3Interface] Sending games to " + address);
+			Main.println(11, "[WC3Interface] Sending games to " + address);
 			removeOldGames();
 			
 			//ok, then I guess we should send all cached packets to the client
@@ -210,7 +210,7 @@ public class WC3Interface {
 				data[22] = 119;
 			}
 
-			Main.debug("[WC3Interface] Received UDP packet from " + packet.getAddress());
+			Main.println(11, "[WC3Interface] Received UDP packet from " + packet.getAddress());
 
 			//this will be false if we want to filter the packet
 			boolean filterSuccess = true;
@@ -291,7 +291,7 @@ public class WC3Interface {
 								
 								//check port
 								if(!isValidPort(port)) {
-									Main.debug("[WC3Interface] Filter fail: invalid port " + port);
+									Main.println(11, "[WC3Interface] Filter fail: invalid port " + port);
 									filterSuccess = false;
 								} else {
 									//if we let Garena users know the LAN entry key, they can spoof joining through LAN directly (without gcb)
@@ -304,7 +304,7 @@ public class WC3Interface {
 								
 									if(GCBConfig.configuration.getBoolean("gcb_broadcastfilter_key", true)) {
 										if(!GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true)) {
-											Main.println("[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
+											Main.println(1, "[WC3Interface] Warning: gcb_tcp_buffer must be enabled if gcb_broadcastfilter_key is!");
 										}
 
 										//return to entry key
@@ -321,7 +321,7 @@ public class WC3Interface {
 											garenaEntryKey = random.nextInt();
 											game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey);
 
-											Main.println("[WC3Interface] Detected new game with name " + gamename +
+											Main.println(4, "[WC3Interface] Detected new game with name " + gamename +
 													"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
 
 											synchronized(games) {
@@ -378,11 +378,11 @@ public class WC3Interface {
 									}
 								}
 							} else {
-								Main.debug("[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
+								Main.println(11, "[WC3Interface] Filter fail: not W3GS_GAMEINFO or bad length");
 								filterSuccess = false;
 							}
 						} else {
-							Main.debug("[WC3Interface] Filter fail: invalid header constant");
+							Main.println(11, "[WC3Interface] Filter fail: invalid header constant");
 							filterSuccess = false;
 						}
 					} catch(BufferUnderflowException bue) {
@@ -390,11 +390,11 @@ public class WC3Interface {
 							bue.printStackTrace();
 						}
 						
-						Main.debug("[WC3Interface] Filter fail: invalid packet format");
+						Main.println(11, "[WC3Interface] Filter fail: invalid packet format");
 						filterSuccess = false;
 					}
 				} else {
-					Main.debug("[WC3Interface] Filter fail: wrong IP address: " + packet.getAddress());
+					Main.println(11, "[WC3Interface] Filter fail: wrong IP address: " + packet.getAddress());
 					filterSuccess = false;
 				}
 			}
@@ -417,12 +417,12 @@ public class WC3Interface {
 				}
 			} else {
 				//let user know why packet was filtered, in case they didn't want this functionality
-				Main.debug("[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
+				Main.println(11, "[WC3Interface] Warning: not broadcasting packet to Garena (filtered by gcb_broadcastfilter)");
 			}
 
 			//always rebroadcast packets: other gcb instances may be using different TCP ports
 			for(int port : rebroadcastPorts) {
-				Main.debug("[WC3Interface] Retransmitting packet to port " + port);
+				Main.println(11, "[WC3Interface] Retransmitting packet to port " + port);
 				DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
 				socket.send(retransmitPacket);
 			}
@@ -433,7 +433,7 @@ public class WC3Interface {
 					ioe.printStackTrace();
 				}
 	
-				Main.println("[WC3Interface] Error: " + ioe.getLocalizedMessage());
+				Main.println(1, "[WC3Interface] Error: " + ioe.getLocalizedMessage());
 			}
 		}
 	}
@@ -495,7 +495,7 @@ public class WC3Interface {
 						games.remove(game.garenaEntryKey);
 					}
 
-					Main.println("[WC3Interface] Removed old game with name: " + game.gamename);
+					Main.println(4, "[WC3Interface] Removed old game with name: " + game.gamename);
 				}
 			}
 		}

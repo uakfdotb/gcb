@@ -53,7 +53,6 @@ public class GarenaTCP extends Thread {
 	DataInputStream in;
 	ByteBuffer buf;
 
-	boolean tcpDebug;
 	boolean localBuffered;
 	
 	//dynamic connection properties
@@ -104,7 +103,7 @@ public class GarenaTCP extends Thread {
 					try {
 						port = Integer.parseInt(parts[1]);
 					} catch(NumberFormatException e) {
-						Main.println("[GarenaTCP " + conn_id + "] Configuration warning: unable to parse " + parts[1] + " as port");
+						Main.println(2, "[GarenaTCP " + conn_id + "] Configuration warning: unable to parse " + parts[1] + " as port");
 						continue;
 					}
 				}
@@ -112,17 +111,15 @@ public class GarenaTCP extends Thread {
 				local_ports.put(port, parts[0]);
 			}
 		} catch(ConversionException e) {
-			Main.println("[GarenaTCP " + conn_id + "] Configuration error: while parsing host as string array");
+			Main.println(2, "[GarenaTCP " + conn_id + "] Configuration error: while parsing host as string array");
 		}
 
 		try {
 			reservedNames = GCBConfig.configuration.getStringArray("gcb_tcp_reservednames");
 		} catch(ConversionException e) {
-			Main.println("[GarenaTCP " + conn_id + "] Configuration error: while parsing gcb_tcp_reservednames as string array");
+			Main.println(2, "[GarenaTCP " + conn_id + "] Configuration error: while parsing gcb_tcp_reservednames as string array");
 			reservedNames = new String[] {};
 		}
-
-		tcpDebug = GCBConfig.configuration.getBoolean("gcb_tcp_debug", false);
 
 		boolean useBufferedOutput = GCBConfig.configuration.getBoolean("gcb_tcp_buffer", true);
 		
@@ -172,12 +169,12 @@ public class GarenaTCP extends Thread {
 			this.remote_username = remote_id + "";
 		}
 
-		Main.println("[GarenaTCP " + conn_id + "] Starting new virtual TCP connection " + conn_id +
+		Main.println(5, "[GarenaTCP " + conn_id + "] Starting new virtual TCP connection " + conn_id +
 				" with user " + remote_username + " at " + remote_address + " to " + destination_port);
 
 		//make sure their username is not reserved
 		if(isReservedName(remote_username)) {
-			Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " at " + remote_address + " in connection " + conn_id + " tried to use a reserved name");
+			Main.println(6, "[GarenaTCP " + conn_id + "] User " + remote_username + " at " + remote_address + " in connection " + conn_id + " tried to use a reserved name");
 			end(true);
 			return false;
 		}
@@ -185,12 +182,12 @@ public class GarenaTCP extends Thread {
 		String hostname = getPortHost(destination_port);
 		
 		if(hostname == null) { //means this port is not allowed
-			Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
+			Main.println(6, "[GarenaTCP " + conn_id + "] User " + remote_username + " tried to connect on port " + destination_port + "; terminating");
 			end(true);
 			return false;
 		} else {
 			//establish real TCP connection with GHost (hopefully)
-			Main.println("[GarenaTCP " + conn_id + "] Connecting to GAMEHOST at " + hostname + " on port " + destination_port + " for connection " + conn_id);
+			Main.println(7, "[GarenaTCP " + conn_id + "] Connecting to GAMEHOST at " + hostname + " on port " + destination_port + " for connection " + conn_id);
 			try {
 				InetAddress local_address = InetAddress.getByName(hostname);
 				socket = new Socket(local_address, destination_port);
@@ -253,7 +250,7 @@ public class GarenaTCP extends Thread {
 			}
 		}
 
-		Main.println("[GarenaTCP " + conn_id + "] Starting new reverse virtual TCP " + conn_id + " with " + remote_address + " on port " + remote_port);
+		Main.println(5, "[GarenaTCP " + conn_id + "] Starting new reverse virtual TCP " + conn_id + " with " + remote_address + " on port " + remote_port);
 		start();
 	}
 
@@ -261,9 +258,7 @@ public class GarenaTCP extends Thread {
 	public void connAck(int seq, int ack) {
 		if(terminated) return;
 
-		if(tcpDebug) {
-			Main.println("[GarenaTCP " + conn_id + "] debug@connack@" + System.currentTimeMillis() + ": received acknowledge for " + seq + ", remote ack=" + ack + " in connection " + conn_id);
-		}
+		Main.println(12, "[GarenaTCP " + conn_id + "] debug@connack@" + System.currentTimeMillis() + ": received acknowledge for " + seq + ", remote ack=" + ack + " in connection " + conn_id);
 
 		//acknowledge packets =seq or <ack
 		synchronized(packets) {
@@ -285,10 +280,7 @@ public class GarenaTCP extends Thread {
 						curr.timesSent++;
 
 						garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
-
-						if(tcpDebug) {
-							Main.println("[GarenaTCP " + conn_id + "] debug@connack@" + System.currentTimeMillis() + ": fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
-						}
+						Main.println(12, "[GarenaTCP " + conn_id + "] debug@connack@" + System.currentTimeMillis() + ": fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
 					}
 				}
 			}
@@ -302,14 +294,12 @@ public class GarenaTCP extends Thread {
 		if(terminated) return;
 		
 		if(length > maxTCPSize) {
-			Main.println("[GarenaTCP " + conn_id + "] Remote invalid packet length (len=" + length + "), terminating");
+			Main.println(6, "[GarenaTCP " + conn_id + "] Remote invalid packet length (len=" + length + "), terminating");
 			end(true);
 			return;
 		}
 
-		if(tcpDebug) {
-			Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": received SEQ=" + seq + "; remote ACK=" + ack + "; len=" + length + " in connection " + conn_id);
-		}
+		Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": received SEQ=" + seq + "; remote ACK=" + ack + "; len=" + length + " in connection " + conn_id);
 
 		//acknowledge packets
 		synchronized(packets) {
@@ -346,10 +336,7 @@ public class GarenaTCP extends Thread {
 						this.ack++;
 					}
 
-					if(tcpDebug) {
-						Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
-					}
-
+					Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": sending stored packet to GHost++, SEQ=" + packet.seq + " in connection " + conn_id);
 					writeOutData(packet.data, false);
 
 					//if buffered output, extract packets from out_buffer and process
@@ -368,25 +355,18 @@ public class GarenaTCP extends Thread {
 			packet.seq = seq;
 			packet.data = copy;
 
-			if(tcpDebug) {
-				Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack + " in connection " + conn_id);
-			}
+			Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": storing remote packet, SEQ=" + packet.seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 
 			synchronized(out_packets) {
 				out_packets.put(seq, packet);
 			}
 		} else {
 			//ignore packet if seq is less than our ack
-			if(tcpDebug) {
-				Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
-			}
+			Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": ignoring remote packet, SEQ=" + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 		}
 
 		//send conn ack
-		if(tcpDebug) {
-			Main.println("[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
-		}
-		
+		Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": acknowledging " + seq + "; our ACK=" + this.ack + " in connection " + conn_id);
 		garena.sendTCPAck(remote_address, remote_port, conn_id, lastTime(), seq, this.ack, buf);
 	}
 	
@@ -397,10 +377,7 @@ public class GarenaTCP extends Thread {
 			//validate header
 			if(header == Constants.W3GS_HEADER_CONSTANT) {
 				int oLength = GarenaEncrypt.unsignedShort(out_buffer.getShort(2));
-				
-				if(tcpDebug) {
-					Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " out buffered header=" + header + ", length=" + oLength);
-				}
+				Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " out buffered header=" + header + ", length=" + oLength);
 
 				//validate length; minimum packet legnth is 4
 				if(oLength >= 4) {
@@ -417,12 +394,12 @@ public class GarenaTCP extends Thread {
 						return;
 					}
 				} else {
-					Main.println("[GarenaTCP " + conn_id + "] Received invalid length in connection " + conn_id + ", disconnecting");
+					Main.println(6, "[GarenaTCP " + conn_id + "] Received invalid length in connection " + conn_id + ", disconnecting");
 					end(true);
 					return;
 				}
 			} else {
-				Main.println("[GarenaTCP " + conn_id + "] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
+				Main.println(6, "[GarenaTCP " + conn_id + "] Received invalid header " + header + " in connection " + conn_id + ", disconnecting");
 				end(true);
 				return;
 			}
@@ -446,7 +423,7 @@ public class GarenaTCP extends Thread {
 				int remainderLength = length - buf.position();
 
 				if(!name.equalsIgnoreCase(remote_username)) {
-					Main.println("[GarenaTCP " + conn_id + "] User " + remote_username + " in connection " + conn_id + " attempted to use an invalid name: " + name);
+					Main.println(6, "[GarenaTCP " + conn_id + "] User " + remote_username + " in connection " + conn_id + " attempted to use an invalid name: " + name);
 				}
 
 				//add part after username + part before username + name + null terminator
@@ -469,7 +446,7 @@ public class GarenaTCP extends Thread {
 					
 					if(identifier != null) {
 						rewrittenData.putInt(identifier.ghostEntryKey);
-						Main.debug("[GarenaTCP] Rewrote entry key (" + entryKey + " -> " + identifier.ghostEntryKey + ")");
+						Main.println(10, "[GarenaTCP] Rewrote entry key (" + entryKey + " -> " + identifier.ghostEntryKey + ")");
 					} else {
 						rewrittenData.putInt(entryKey);
 					}
@@ -487,7 +464,7 @@ public class GarenaTCP extends Thread {
 				//force so that it doesn't go straight back into the output buffer
 				writeOutData(rewrittenData.array(), true);
 			} else {
-				Main.println("[GarenaTCP " + conn_id + "] Invalid length in join request in connection " + conn_id);
+				Main.println(6, "[GarenaTCP " + conn_id + "] Invalid length in join request in connection " + conn_id);
 				end(true);
 				return;
 			}
@@ -535,10 +512,7 @@ public class GarenaTCP extends Thread {
 					curr.fastRetransmitted = true;
 					
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
-
-					if(tcpDebug) {
-						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": standard retransmitting in connection " + conn_id);
-					}
+					Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": standard retransmitting in connection " + conn_id);
 					
 					//update the retransmission queue, since the time of this element changed
 					packetRetransmitQueue.poll();
@@ -582,11 +556,9 @@ public class GarenaTCP extends Thread {
 
 				retransmissionTimeout = (int) Math.ceil(smoothedRTT + Math.max(srttClockGranularity, srttK * rttVariation));
 
-				if(tcpDebug) {
-					Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id +
-							" setting retransmission timeout to " + retransmissionTimeout +
-							" (last rtt=" + roundTripTime + ", srtt = " + smoothedRTT + ", rttvar = " + rttVariation + ")");
-				}
+				Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id +
+						" setting retransmission timeout to " + retransmissionTimeout +
+						" (last rtt=" + roundTripTime + ", srtt = " + smoothedRTT + ", rttvar = " + rttVariation + ")");
 			}
 		}
 	}
@@ -599,10 +571,7 @@ public class GarenaTCP extends Thread {
 			socket.setSoTimeout(soTimeout);
 		} catch(IOException e) {
 			//not a major problem, this is only necessary in special circumstances
-			
-			if(tcpDebug) {
-				Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": setting soTimeout failed, but continuing");
-			}
+			Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": setting soTimeout failed, but continuing");
 		}
 
 		while(!terminated) {
@@ -620,7 +589,7 @@ public class GarenaTCP extends Thread {
 					if(len >= 4 && len <= maxTCPSize - 4) {
 						in.readFully(rbuf, 4, len - 4);
 					} else  {
-						Main.println("[GarenaTCP " + conn_id + "] Read invalid packet length (len=" + len + "), terminating");
+						Main.println(6, "[GarenaTCP " + conn_id + "] Read invalid packet length (len=" + len + "), terminating");
 						end(true);
 						break;
 					}
@@ -629,7 +598,7 @@ public class GarenaTCP extends Thread {
 					len = in.read(rbuf); //definitely _don't_ want to readfully here!
 
 					if(len == -1) {
-						Main.println("[GarenaTCP " + conn_id + "] Local host for connection " + conn_id + " disconnected");
+						Main.println(6, "[GarenaTCP " + conn_id + "] Local host for connection " + conn_id + " disconnected");
 						end(true);
 						break;
 					}
@@ -639,10 +608,7 @@ public class GarenaTCP extends Thread {
 				byte[] data = new byte[len];
 				System.arraycopy(rbuf, 0, data, 0, len);
 				
-				if(tcpDebug) {
-					Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " new packet from local: " + seq + " (len=" + len + ")");
-				}
-
+				Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " new packet from local: " + seq + " (len=" + len + ")");
 				handleLocalPacket(data, lbuf);
 			} catch(SocketTimeoutException e) {
 				//continue loop with standard retransmission
@@ -671,9 +637,7 @@ public class GarenaTCP extends Thread {
 	
 			synchronized(packets) {
 				while(maximumBufferedPackets != 0 && packets.size() > maximumBufferedPackets) { //let's wait a while before sending more
-					if(tcpDebug) {
-						Main.println("[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
-					}
+					Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " waiting because of " + packets.size() + " packets");
 					
 					if(terminated) {
 						//oh, we terminated, don't loop here forever!
@@ -720,7 +684,7 @@ public class GarenaTCP extends Thread {
 	}
 
 	public void end(boolean removeGarenaInterface) {
-		Main.println("[GarenaTCP " + conn_id + "] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
+		Main.println(6, "[GarenaTCP " + conn_id + "] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
 		//allocate a new buffer so we don't do anything thread-unsafe
 		ByteBuffer tbuf = ByteBuffer.allocate(maxTCPSize);

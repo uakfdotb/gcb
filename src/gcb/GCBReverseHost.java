@@ -54,7 +54,7 @@ public class GCBReverseHost {
 				uhe.printStackTrace();
 			}
 
-			Main.println("[GCBReverseHost] Error with broadcast address: " + uhe.getLocalizedMessage());
+			Main.println(1, "[GCBReverseHost] Error with broadcast address: " + uhe.getLocalizedMessage());
 		}
 
 		war3version = GCBConfig.configuration.getInt("gcb_reverse_war3version", 26);
@@ -68,9 +68,9 @@ public class GCBReverseHost {
 			int port = reversePort == 0 ? 0 : reversePort + i;
 			
 			if(port == 0) {
-				Main.println("[GCBReverseHost] Initiating server instance " + i);
+				Main.println(4, "[GCBReverseHost] Initiating server instance " + i);
 			} else {
-				Main.println("[GCBReverseHost] Initiating on port " + port);
+				Main.println(4, "[GCBReverseHost] Initiating on port " + port);
 			}
 			
 			try {
@@ -80,11 +80,11 @@ public class GCBReverseHost {
 					ioe.printStackTrace();
 				}
 
-				Main.println("[GCBReverseHost] Error while initiating server: " + ioe.getLocalizedMessage());
+				Main.println(1, "[GCBReverseHost] Error while initiating server: " + ioe.getLocalizedMessage());
 			}
 		}
 
-		Main.println("[GCBReverseHost] Creating UDP socket...");
+		Main.println(4, "[GCBReverseHost] Creating UDP socket...");
 		try {
 			udpSocket = new DatagramSocket();
 		} catch(IOException ioe) {
@@ -92,7 +92,7 @@ public class GCBReverseHost {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GCBReverseHost] Error while initiating UDP socket: " + ioe.getLocalizedMessage());
+			Main.println(1, "[GCBReverseHost] Error while initiating UDP socket: " + ioe.getLocalizedMessage());
 		}
 	}
 
@@ -103,7 +103,7 @@ public class GCBReverseHost {
 	}
 
 	public void sendSearch() {
-		Main.println("[GCBReverseHost] Sending W3GS SEARCH with version " + war3version + "...");
+		Main.println(4, "[GCBReverseHost] Sending W3GS SEARCH with version " + war3version + "...");
 
 		byte[] productId = new byte[] {80, 88, 51, 87};
 
@@ -139,7 +139,7 @@ public class GCBReverseHost {
 		int header = GarenaEncrypt.unsignedByte(lbuf.get()); //W3GS header constant
 
 		if(header != 247) {
-			Main.println("[GCBReverseHost] Invalid W3GS header constant " + header);
+			Main.println(4, "[GCBReverseHost] Invalid W3GS header constant " + header);
 			return;
 		}
 
@@ -200,7 +200,7 @@ public class GCBReverseHost {
 		//send packet to LAN, or to udpTarget
 		DatagramPacket packet = new DatagramPacket(packetBytes, packetBytes.length, udpTarget, udpPort);
 
-		Main.println("[GCBReverseHost] Broadcasting with gamename [" + gamename + "]; version: " + version +
+		Main.println(4, "[GCBReverseHost] Broadcasting with gamename [" + gamename + "]; version: " + version +
 				"; productid: " + productid + "; senderport: " + senderPort + "; serverport: " + server.port);
 		try {
 			udpSocket.send(packet);
@@ -209,7 +209,7 @@ public class GCBReverseHost {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GCBReverseHost] Error while broadcast UDP: " + ioe.getLocalizedMessage());
+			Main.println(1, "[GCBReverseHost] Error while broadcast UDP: " + ioe.getLocalizedMessage());
 		}
 	}
 }
@@ -251,10 +251,10 @@ class ReverseServer extends Thread {
 					ioe.printStackTrace();
 				}
 
-				Main.println("[ReverseServer] Accept failed: " + ioe.getLocalizedMessage());
+				Main.println(1, "[ReverseServer] Accept failed: " + ioe.getLocalizedMessage());
 			}
 
-			Main.println("[ReverseServer] New connection from " + client.getInetAddress());
+			Main.println(0, "[ReverseServer] New connection from " + client.getInetAddress());
 			garena.sendTCPInit(lastAddress, lastPort, lastDestination, lastId, client);
 		}
 	}

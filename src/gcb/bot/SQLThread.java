@@ -70,7 +70,7 @@ public class SQLThread extends Thread {
 		} else if(dbtype_str.equalsIgnoreCase("ghost_extended")) {
 			dbtype = TYPE_GHOSTPP_EXTENDED;
 		} else {
-			Main.println("[SQLThread] Warning: unknown database type " + dbtype_str + "; assuming gcb-like");
+			Main.println(1, "[SQLThread] Warning: unknown database type " + dbtype_str + "; assuming gcb-like");
 			dbtype = TYPE_GCB;
 		}
 	}
@@ -81,7 +81,7 @@ public class SQLThread extends Thread {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch(ClassNotFoundException cnfe) {
-			Main.println("[SQLThread] MySQL driver cannot be found: " + cnfe.getLocalizedMessage());
+			Main.println(1, "[SQLThread] MySQL driver cannot be found: " + cnfe.getLocalizedMessage());
 			
 			if(Main.DEBUG) {
 				cnfe.printStackTrace();
@@ -94,11 +94,11 @@ public class SQLThread extends Thread {
 		synchronized(connections) {
 			if(connections.isEmpty()) {
 				try {
-					System.out.println("[SQL] Creating new connection...");
+					Main.println(11, "[SQL] Creating new connection...");
 					connections.add(DriverManager.getConnection(host, username, password));
 				}
 				catch(SQLException e) {
-					System.out.println("[SQL] Unable to connect to mysql database: " + e.getLocalizedMessage());
+					Main.println(1, "[SQL] Unable to connect to mysql database: " + e.getLocalizedMessage());
 					e.printStackTrace();
 				}
 			}
@@ -124,7 +124,7 @@ public class SQLThread extends Thread {
 		synchronized(connections) {
 			connections.add(connection);
 			
-			Main.debug("[SQLThread] Recovering connection; now at " + connections.size() + " connections");
+			Main.println(11, "[SQLThread] Recovering connection; now at " + connections.size() + " connections");
 		}
 	}
 
@@ -152,7 +152,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add admin: " + e.getLocalizedMessage());
 		}
 
 		return false;
@@ -170,7 +170,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to delete admin: " + e.getLocalizedMessage());
 		}
 
 		return false;
@@ -200,7 +200,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add safelist: " + e.getLocalizedMessage());
 		}
 
 		return false;
@@ -223,7 +223,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to delete safelist: " + e.getLocalizedMessage());
 		}
 
 		return false;
@@ -248,7 +248,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add user " + properUsername + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add user " + properUsername + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -265,7 +265,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete rank for user " + user + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to delete rank for user " + user + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -289,7 +289,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add bot ban to MySQL database: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add bot ban to MySQL database: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -312,7 +312,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add kick to MySQL database: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add kick to MySQL database: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -329,7 +329,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to remove ban from MySQL database: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to remove ban from MySQL database: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -354,7 +354,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to check if " + user + " is banned: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to check if " + user + " is banned: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -379,7 +379,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to check if " + user + " has been kicked: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to check if " + user + " has been kicked: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -409,7 +409,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to get ban information on " + user + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to get ban information on " + user + ": " + e.getLocalizedMessage());
 		}
 		return "";
 	}
@@ -437,7 +437,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to get kick information on " + user + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to get kick information on " + user + ": " + e.getLocalizedMessage());
 		}
 		return "";
 	}
@@ -460,7 +460,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to submit command: " + e.getLocalizedMessage());
 		}
 
 		return false;
@@ -479,7 +479,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add banned word: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -496,7 +496,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to remove banned word from database: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to remove banned word from database: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -514,7 +514,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to add auto announcement: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to add auto announcement: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -531,7 +531,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to delete announcement: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to delete announcement: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -550,7 +550,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to change rank for user " + username + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to change rank for user " + username + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -568,7 +568,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to set unbanned by for user " + username + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to set unbanned by for user " + username + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -589,7 +589,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to set user details for user " + properUsername + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to set user details for user " + properUsername + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -607,7 +607,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to set last seen for user " + username + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to set last seen for user " + username + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -625,7 +625,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to set IP address for user " + username + ": " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to set IP address for user " + username + ": " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -645,7 +645,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to count number of rows in bans table: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to count number of rows in bans table: " + e.getLocalizedMessage());
 		}
 		return 0;
 	}
@@ -665,7 +665,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] Unable to count number of rows in kicks table: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] Unable to count number of rows in kicks table: " + e.getLocalizedMessage());
 		}
 		return 0;
 	}
@@ -690,7 +690,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-			Main.println("[SQLThread] User can not be found in gameplayers list: " + e.getLocalizedMessage());
+			Main.println(1, "[SQLThread] User can not be found in gameplayers list: " + e.getLocalizedMessage());
 		}
 		return false;
 	}
@@ -794,7 +794,7 @@ public class SQLThread extends Thread {
 			if(Main.DEBUG) {
 				e.printStackTrace();
 			}
-            Main.println("[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
+            Main.println(1, "[SQLThread] Unable to retrive gameid from gameplayers: " + e.getLocalizedMessage());
 		}
 		return "";
 	}
@@ -804,50 +804,49 @@ public class SQLThread extends Thread {
 			if(initial) {
 				Connection connection = connection();
 				try {
-					Main.println("[SQLThread] Creating bans table if not exists...");
+					Main.println(4, "[SQLThread] Creating bans table if not exists...");
 					Statement statement = connection.createStatement();
 					statement.execute("CREATE TABLE IF NOT EXISTS bans (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, botid int(11) NOT NULL, server varchar(100) NOT NULL, name varchar(15) NOT NULL, ip varchar(15) NOT NULL, date datetime NOT NULL, gamename varchar(31) NOT NULL, admin varchar(15) NOT NULL, reason varchar(255) NOT NULL, gamecount int(11) NOT NULL DEFAULT '0', expiredate varchar(31) NOT NULL DEFAULT '', warn int(11) NOT NULL DEFAULT '0') ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
 				} catch(SQLException e) {
 					if(Main.DEBUG) {
 						e.printStackTrace();
 					}
-					Main.println("[SQLThread] Error while creating bans table: " + e.getLocalizedMessage());
+					Main.println(1, "[SQLThread] Error while creating bans table: " + e.getLocalizedMessage());
 				}
 				try {
-					Main.println("[SQLThread] Creating kicks table if not exists...");
+					Main.println(4, "[SQLThread] Creating kicks table if not exists...");
 					Statement statement = connection.createStatement();
 					statement.execute("CREATE TABLE IF NOT EXISTS kicks (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, botid int(11) NOT NULL, server varchar(100) NOT NULL, name varchar(15) NOT NULL, ip varchar(15) NOT NULL, date datetime NOT NULL, admin varchar(15) NOT NULL, reason varchar (150) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
 				} catch(SQLException e) {
 					if(Main.DEBUG) {
 						e.printStackTrace();
 					}
-					Main.println("[SQLThread] Error while creating kicks table: " + e.getLocalizedMessage());
+					Main.println(1, "[SQLThread] Error while creating kicks table: " + e.getLocalizedMessage());
 				}
 				try {
-					Main.println("[SQLThread] Creating phrases table if not exists...");
+					Main.println(4, "[SQLThread] Creating phrases table if not exists...");
 					Statement statement = connection.createStatement();
 					statement.execute("CREATE TABLE IF NOT EXISTS phrases (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, type varchar(100) NOT NULL, phrase varchar(150) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
 				} catch(SQLException e) {
 					if(Main.DEBUG) {
 						e.printStackTrace();
 					}
-					Main.println("[SQLThread] Error while creating phrases table: " + e.getLocalizedMessage());
+					Main.println(1, "[SQLThread] Error while creating phrases table: " + e.getLocalizedMessage());
 				}
 				try {
-					Main.println("[SQLThread] Creating users table if not exists...");
+					Main.println(4, "[SQLThread] Creating users table if not exists...");
 					Statement statement = connection.createStatement();
 					statement.execute("CREATE TABLE IF NOT EXISTS users (id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, username varchar(15) NOT NULL, properusername varchar(15) NOT NULL DEFAULT 'unknown', uid INT(10) NOT NULL DEFAULT '0', rank INT(2) NOT NULL DEFAULT '0', ipaddress varchar(15) NOT NULL DEFAULT 'unknown', lastseen varchar(31) NOT NULL DEFAULT 'unknown', promotedby varchar(15) NOT NULL DEFAULT 'unknown', unbannedby varchar(15) NOT NULL DEFAULT 'unknown') ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1");
 				} catch(SQLException e) {
 					if(Main.DEBUG) {
 						e.printStackTrace();
 					}
-					Main.println("[SQLThread] Error while creating users table: " + e.getLocalizedMessage());
+					Main.println(1, "[SQLThread] Error while creating users table: " + e.getLocalizedMessage());
 				}
 				connectionReady(connection);
 			}
-			if(Main.DEBUG) {
-				Main.println("[SQLThread] Refreshing internal lists with database...");
-			}
+			
+			Main.println(11, "[SQLThread] Refreshing internal lists with database...");
 			
 			Connection connection = connection();
 			
@@ -944,21 +943,21 @@ public class SQLThread extends Thread {
 					}
 					
 					if(bot != null) {
-						Main.println("[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
-						Main.println("[SQLThread] Initial refresh: found " + bot.announceThread.getMessageSize() + " Auto Announcements");
+						Main.println(4, "[SQLThread] Initial refresh: found " + bot.userDB.size() + " Users");
+						Main.println(4, "[SQLThread] Initial refresh: found " + bot.announceThread.getMessageSize() + " Auto Announcements");
 						
 						if(bannedWordDetectType > 0) {
-							Main.println("[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");
+							Main.println(4, "[SQLThread] Initial refresh: found " + bot.bannedWords.size() + " Banned Words");
 						}
 					} else {
-						Main.println("[SQLThread] Initial refresh: no bot found to store into");
+						Main.println(4, "[SQLThread] Initial refresh: no bot found to store into");
 					}
 				}
 			} catch(SQLException e) {
 				if(Main.DEBUG) {
 					e.printStackTrace();
 				}
-				Main.println("[SQLThread] Unable to refresh lists: " + e.getLocalizedMessage());
+				Main.println(1, "[SQLThread] Unable to refresh lists: " + e.getLocalizedMessage());
 			}
 			
 			connectionReady(connection);
@@ -981,7 +980,7 @@ public class SQLThread extends Thread {
 			try {
 				Thread.sleep(dbRefreshRate*1000);
 			} catch(InterruptedException e) {
-				Main.println("[SQLThread] Run sleep was interrupted: " + e.getLocalizedMessage());
+				Main.println(11, "[SQLThread] Run sleep was interrupted: " + e.getLocalizedMessage());
 			}
 		}
 	}

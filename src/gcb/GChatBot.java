@@ -252,7 +252,7 @@ public class GChatBot implements GarenaListener {
 	public String command(MemberInfo member, String command, String payload) {
 		int memberRank = getUserRank(member.username.toLowerCase());
 		String memberRankTitle = getTitleFromRank(memberRank);
-		Main.println("[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + memberRankTitle + " " + member.username);
+		Main.println(0, "[GChatBot] Received command \"" + command + "\" with payload \"" + payload + "\" from " + memberRankTitle + " " + member.username);
 		Main.cmdprintln("Recieved command \"" + command + "\" with payload \"" + payload + "\" from " + memberRankTitle + " " + member.username);
 
 		command = processAlias(command.toLowerCase()); //if it's alias, convert it to original command
@@ -368,7 +368,7 @@ public class GChatBot implements GarenaListener {
 					try {
 						GCBConfig.configuration.setProperty("gcb_roomid", Integer.parseInt(parts[0]));
 					} catch(NumberFormatException e) {
-						Main.println("[GChatBot] Warning: ignoring invalid number " + parts[0]);
+						Main.println(1, "[GChatBot] Warning: ignoring invalid number " + parts[0]);
 					}
 				}
 				if(parts.length > 1 && !parts[1].trim().equals("")) {
@@ -495,7 +495,7 @@ public class GChatBot implements GarenaListener {
 							if(Main.DEBUG) {
 								e.printStackTrace();
 							}
-							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+							Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 						}
 						garena.ban(target, banLength);
 						return null;
@@ -567,7 +567,7 @@ public class GChatBot implements GarenaListener {
 						if(Main.DEBUG) {
 							e.printStackTrace();
 						}
-						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+						Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
 					chatthread.queueChat(garena.id, "For information about this kick use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
 					return null;
@@ -605,7 +605,7 @@ public class GChatBot implements GarenaListener {
 						if(Main.DEBUG) {
 							e.printStackTrace();
 						}
-						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+						Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
 					garena.unban(victim.username);
 					chatthread.queueChat(garena.id, "For information about this kick, use " + trigger + "kickinfo " + victim.username, ANNOUNCEMENT);
@@ -842,7 +842,7 @@ public class GChatBot implements GarenaListener {
 								if(Main.DEBUG) {
 									e.printStackTrace();
 								}
-								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+								Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
 							garena.ban(usernames[i], banLength);
 						} else {
@@ -1605,7 +1605,7 @@ public class GChatBot implements GarenaListener {
 			try {
 				aliases = GCBConfig.configuration.getStringArray("gcb_bot_alias_" + command);
 			} catch(ConversionException e) {
-				Main.println("[GChatBot] Warning: unable to parse entry for alias of " + command);
+				Main.println(1, "[GChatBot] Warning: unable to parse entry for alias of " + command);
 				aliases = new String[] {command};
 			}
 		}
@@ -1745,7 +1745,7 @@ public class GChatBot implements GarenaListener {
 				user.lastSeen = "unknown";
 				userDB.add(user);
 			} else {
-				Main.println("Failed to add root admin " + root_admin + ". There was an error with your database. Please inform GG.Dragon");
+				Main.println(1, "Failed to add root admin " + root_admin + ". There was an error with your database. Please inform GG.Dragon");
 			}
 		}
 		UserInfo root = userFromName("GG.Dragon");
@@ -1877,7 +1877,7 @@ public class GChatBot implements GarenaListener {
 								if(Main.DEBUG) {
 									e.printStackTrace();
 								}
-								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+								Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
 							chatthread.queueChat(garena.id, player.username + " banned for reason: " + banned_word_detect_message + " for " + bannedWordBanLength + " hours", ANNOUNCEMENT);
 							return;
@@ -1904,7 +1904,7 @@ public class GChatBot implements GarenaListener {
 								if(Main.DEBUG) {
 									e.printStackTrace();
 								}
-								Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+								Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 							}
 							chatthread.queueChat(garena.id, "Successfully banned <" + player.username + "> for 1 year. Banned by: Auto detection. Reason: bypassing flood protection. For information about this ban use " + trigger + "baninfo " + player.username, ANNOUNCEMENT);
 							return;
@@ -1953,7 +1953,7 @@ public class GChatBot implements GarenaListener {
 						if(Main.DEBUG) {
 							e.printStackTrace();
 						}
-						Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+						Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 					}
 					chatthread.queueChat(garena.id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 					return;
@@ -1970,7 +1970,7 @@ public class GChatBot implements GarenaListener {
 							if(Main.DEBUG) {
 								e.printStackTrace();
 							}
-							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+							Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 						}
 						chatthread.queueChat(garena.id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 						return;
@@ -1997,7 +1997,7 @@ public class GChatBot implements GarenaListener {
 							if(Main.DEBUG) {
 								e.printStackTrace();
 							}
-							Main.println("[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
+							Main.println(11, "[GChatBot] Sleep interrupted: " + e.getLocalizedMessage());
 						}
 						chatthread.queueChat(garena.id, "For information about this kick use " + trigger + "kickinfo " + player.username, ANNOUNCEMENT);
 						return;

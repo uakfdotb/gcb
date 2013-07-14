@@ -63,7 +63,7 @@ public class PluginManager {
 
 		if(files == null) return;
 
-		Main.println("[PluginManager] Searching through " + files.length + " files for plugins...");
+		Main.println(0, "[PluginManager] Searching through " + files.length + " files for plugins...");
 
 		// Convert File to a URL
 		ClassLoader loader = null;
@@ -77,7 +77,7 @@ public class PluginManager {
 				e.printStackTrace();
 			}
 
-			Main.println("[PluginManager] Malformed URL: " + e.getLocalizedMessage());
+			Main.println(1, "[PluginManager] Malformed URL: " + e.getLocalizedMessage());
 			return;
 		}
 
@@ -93,7 +93,7 @@ public class PluginManager {
 						e.printStackTrace();
 					}
 
-					Main.println("[PluginManager] Warning: unable to parse plugin configuration file " + file.getAbsolutePath());
+					Main.println(1, "[PluginManager] Warning: unable to parse plugin configuration file " + file.getAbsolutePath());
 				}
 
 				String fullyQualifiedName = pluginConfig.getString("classname");
@@ -109,7 +109,7 @@ public class PluginManager {
 						e.printStackTrace();
 					}
 
-					Main.println("[PluginManager] Error while initiating " + fullyQualifiedName + " in " + pluginFile + ":" + e.getLocalizedMessage());
+					Main.println(1, "[PluginManager] Error while initiating " + fullyQualifiedName + " in " + pluginFile + ":" + e.getLocalizedMessage());
 				}
 			} else {
 				//skip folders
@@ -117,7 +117,7 @@ public class PluginManager {
 			}
 		}
 
-		Main.println("[PluginManager] " + pluginList.size() + " plugins found!");
+		Main.println(4, "[PluginManager] " + pluginList.size() + " plugins found!");
 
 		//call init on all plugins
 		for(Plugin plugin : pluginList) {
@@ -190,7 +190,7 @@ public class PluginManager {
 		try {
 			String[] pluginNames = GCBConfig.configuration.getStringArray("gcb_plugins");
 
-			Main.println("[PluginManager] Loading " + pluginNames.length + " plugins...");
+			Main.println(0, "[PluginManager] Loading " + pluginNames.length + " plugins...");
 			for(String pluginName : pluginNames) {
 				if(pluginName.equals("")) {
 					continue;
@@ -204,7 +204,7 @@ public class PluginManager {
 	}
 
 	public void loadPlugin(String name) {
-		Main.println("[PluginManager] Loading " + name + "...");
+		Main.println(4, "[PluginManager] Loading " + name + "...");
 
 		Plugin plugin = plugins.get(name);
 		if(plugin != null) {
@@ -215,7 +215,7 @@ public class PluginManager {
 				e.printStackTrace();
 			}
 		} else {
-			Main.println("[PluginManager] Load failed: plugin not found!");
+			Main.println(1, "[PluginManager] Load failed: plugin not found!");
 		}
 	}
 
@@ -267,7 +267,7 @@ public class PluginManager {
 	}
 
 	public void log(String message) {
-		Main.println(message);
+		Main.println(0, message);
 	}
 
 	public ChatThread getChatThread() {

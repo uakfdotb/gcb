@@ -41,7 +41,7 @@ public class GarenaThread extends Thread {
 
 			else return;
 		} catch(Exception e) {
-			Main.println("CRITICAL ERROR: caught in loop, type=" + type + ": " + e.getLocalizedMessage());
+			Main.println(1, "CRITICAL ERROR: caught in loop, type=" + type + ": " + e.getLocalizedMessage());
 			System.err.println("CRITICAL ERROR: caught in loop, type=" + type + ": " + e.getLocalizedMessage());
 			e.printStackTrace();
 			

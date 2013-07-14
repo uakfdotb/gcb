@@ -158,7 +158,7 @@ public class GarenaInterface {
 	}
 
 	public boolean init() {
-		Main.println("[GInterface " + id + "] Initializing...");
+		Main.println(5, "[GInterface " + id + "] Initializing...");
 		crypt.initAES();
 		crypt.initRSA();
 
@@ -171,21 +171,21 @@ public class GarenaInterface {
 				uhe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Unable to locate main host: " + uhe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Unable to locate main host: " + uhe.getLocalizedMessage());
 			return false;
 		}
 
 		//connect
-		Main.println("[GInterface " + id + "] Connecting to " + main_address.getHostAddress() + "...");
+		Main.println(5, "[GInterface " + id + "] Connecting to " + main_address.getHostAddress() + "...");
 		try {
 			socket = new Socket(main_address, 7456);
-			Main.println("[GInterface " + id + "] Using local port: " + socket.getLocalPort());
+			Main.println(7, "[GInterface " + id + "] Using local port: " + socket.getLocalPort());
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Error while connecting to main host: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error while connecting to main host: " + ioe.getLocalizedMessage());
 			return false;
 		}
 
@@ -198,7 +198,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Error(2) while connecting to main host: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error(2) while connecting to main host: " + ioe.getLocalizedMessage());
 			return false;
 		}
 		
@@ -213,7 +213,7 @@ public class GarenaInterface {
 	}
 	
 	public boolean initPeer() {
-		Main.println("[GInterface " + id + "] Initializing peer socket...");
+		Main.println(5, "[GInterface " + id + "] Initializing peer socket...");
 		
 		//reload peer port in case it's set to 0 (autodetermine port)
 		peer_port = GCBConfig.configuration.getInt("garena" + id + "_peerport", 0);
@@ -234,7 +234,7 @@ public class GarenaInterface {
 				if(peer_port == 0) {
 					peer_socket = new DatagramSocket();
 					peer_port = peer_socket.getLocalPort();
-					Main.println("[GInterface " + id + "] Autoset peerport=" + peer_port);
+					Main.println(7, "[GInterface " + id + "] Autoset peerport=" + peer_port);
 				} else {
 					peer_socket = new DatagramSocket(peer_port);
 				}
@@ -244,7 +244,7 @@ public class GarenaInterface {
 					//we'll just choose randomly, if the port is taken then GarenaReconnect should retry
 					synchronized(Main.RANDOM) {
 						peer_port = Main.RANDOM.nextInt(5000) + 1500;
-						Main.println("[GInterface " + id + "] Autoset peerport=" + peer_port);
+						Main.println(7, "[GInterface " + id + "] Autoset peerport=" + peer_port);
 					}
 				}
 				
@@ -252,14 +252,14 @@ public class GarenaInterface {
 			}
 
 			if(peer_socket.getInetAddress() instanceof Inet6Address) {
-				Main.println("[GInterface " + id + "] Warning: binded to IPv6 address: " + peer_socket.getInetAddress());
+				Main.println(7, "[GInterface " + id + "] Warning: binded to IPv6 address: " + peer_socket.getInetAddress());
 			}
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Unable to establish peer socket on port " + peer_port + ": " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Unable to establish peer socket on port " + peer_port + ": " + ioe.getLocalizedMessage());
 			return false;
 		}
 		
@@ -267,7 +267,7 @@ public class GarenaInterface {
 	}
 
 	public boolean initRoom() {
-		Main.println("[GInterface " + id + "] Connecting to room...");
+		Main.println(5, "[GInterface " + id + "] Connecting to room...");
 
 		//update room_id in case this is called from !room command
 		room_id = GCBConfig.configuration.getInt("garena" + id + "_roomid", -1);
@@ -275,19 +275,19 @@ public class GarenaInterface {
 
 		//see if we should check by name instead
 		if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
-			Main.println("[GInterface " + id + "] Automatically searching for roomid and roomhost...");
+			Main.println(7, "[GInterface " + id + "] Automatically searching for roomid and roomhost...");
 
 			String roomName = GCBConfig.configuration.getString("garena" + id + "_roomname", null);
 
 			if(roomName == null) {
-				Main.println("[GInterface " + id + "] Error: no room name set; shutting down!");
+				Main.println(6, "[GInterface " + id + "] Error: no room name set; shutting down!");
 				return false;
 			}
 
 			File roomFile = new File("gcbrooms.txt");
 
 			if(!roomFile.exists()) {
-				Main.println("[GInterface " + id + "] Error: " + roomFile.getAbsolutePath() + " does not exist!");
+				Main.println(6, "[GInterface " + id + "] Error: " + roomFile.getAbsolutePath() + " does not exist!");
 				return false;
 			}
 
@@ -303,7 +303,7 @@ public class GarenaInterface {
 						room_id = Integer.parseInt(parts[1]);
 						room_hostname = parts[3];
 
-						Main.println("[GInterface " + id + "] Autoset found match; name is [" + parts[0] + "],"
+						Main.println(7, "[GInterface " + id + "] Autoset found match; name is [" + parts[0] + "],"
 								+ " id is [" + room_id + "]" + ", host is [" + room_hostname + "],"
 								+ " and game is [" + parts[5] + "]");
 						
@@ -314,7 +314,7 @@ public class GarenaInterface {
 				in.close();
 
 				if(room_id == -1 || room_hostname == null || room_hostname.trim().equals("")) {
-					Main.println("[GInterface " + id + "] Error: no matches found; exiting...");
+					Main.println(6, "[GInterface " + id + "] Error: no matches found; exiting...");
 					return false;
 				}
 			} catch(IOException ioe) {
@@ -322,14 +322,14 @@ public class GarenaInterface {
 					ioe.printStackTrace();
 				}
 				
-				Main.println("[GInterface " + id + "] Error during autosearch: " + ioe.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] Error during autosearch: " + ioe.getLocalizedMessage());
 				return false;
 			}
 		}
 
 		InetAddress address = null;
 		//hostname lookup
-		Main.println("[GInterface " + id + "] Conducting hostname lookup...");
+		Main.println(7, "[GInterface " + id + "] Conducting hostname lookup...");
 		try {
 			address = InetAddress.getByName(room_hostname);
 		} catch(UnknownHostException uhe) {
@@ -337,21 +337,21 @@ public class GarenaInterface {
 				uhe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Unable to locate room host: " + uhe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Unable to locate room host: " + uhe.getLocalizedMessage());
 			return false;
 		}
 
 		//connect
-		Main.println("[GInterface " + id + "] Connecting to " + address.getHostAddress() + "...");
+		Main.println(5, "[GInterface " + id + "] Connecting to " + address.getHostAddress() + "...");
 		try {
 			room_socket = new Socket(address, 8687);
-			Main.println("[GInterface " + id + "] Using local port: " + room_socket.getLocalPort());
+			Main.println(7, "[GInterface " + id + "] Using local port: " + room_socket.getLocalPort());
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Error while connecting to room host: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error while connecting to room host: " + ioe.getLocalizedMessage());
 			return false;
 		}
 
@@ -363,7 +363,7 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
-			Main.println("[GInterface " + id + "] Error(2) while connecting to room host: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error(2) while connecting to room host: " + ioe.getLocalizedMessage());
 			return false;
 		}
 
@@ -376,10 +376,10 @@ public class GarenaInterface {
 	}
 
 	public void disconnectRoom() {
-		Main.println("[GInterface " + id + "] Disconnecting from room...");
+		Main.println(5, "[GInterface " + id + "] Disconnecting from room...");
 
 		//send GCRP part
-		Main.println("[GInterface " + id + "] Sending GCRP PART...");
+		Main.println(7, "[GInterface " + id + "] Sending GCRP PART...");
 		
 		ByteBuffer lbuf = ByteBuffer.allocate(9);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
@@ -413,7 +413,7 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGSPSessionInit() {
-		Main.println("[GInterface " + id + "] Sending GSP session init...");
+		Main.println(7, "[GInterface " + id + "] Sending GSP session init...");
 
 		ByteBuffer block = ByteBuffer.allocate(50);
 		block.order(ByteOrder.LITTLE_ENDIAN);
@@ -433,20 +433,20 @@ public class GarenaInterface {
 			lbuf.putShort((short) 0x00AD);
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPSessionInit: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPSessionInit: " + e.getLocalizedMessage());
 		}
 
 		try {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionInit: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in sendGSPSessionInit: " + ioe.getLocalizedMessage());
 			return false;
 		}
 	}
 
 	public boolean readGSPSessionInitReply() {
-		Main.println("[GInterface " + id + "] Reading GSP session init reply...");
+		Main.println(7, "[GInterface " + id + "] Reading GSP session init reply...");
 
 		try {
 			byte[] size_bytes = new byte[3];
@@ -455,7 +455,7 @@ public class GarenaInterface {
 
 			//next byte should be 1
 			if(in.read() != 1) {
-				Main.println("[GInterface " + id + "] Warning in readGSPSessionInitReply: invalid data from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning in readGSPSessionInitReply: invalid data from Garena server");
 			}
 
 			byte[] bb = new byte[size];
@@ -463,23 +463,23 @@ public class GarenaInterface {
 			byte[] data = crypt.aesDecrypt(bb);
 
 			if(data[0] == -82 || data[0] == 174) { //-82 since byte is always signed and 174 is over max
-				Main.println("[GInterface " + id + "] GSP session init reply received!");
+				Main.println(6, "[GInterface " + id + "] GSP session init reply received!");
 			} else {
-				Main.println("[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
 			}
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionInitReply: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in readGSPSessionInitReply: " + ioe.getLocalizedMessage());
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionInitReply: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Decryption error in readGSPSessionInitReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
 
 	public boolean sendGSPSessionHello() {
-		Main.println("[GInterface " + id + "] Sending GSP session hello...");
+		Main.println(7, "[GInterface " + id + "] Sending GSP session hello...");
 
 		ByteBuffer block = ByteBuffer.allocate(7);
 		block.order(ByteOrder.LITTLE_ENDIAN);
@@ -504,7 +504,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPSessionHello: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPSessionHello: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -512,13 +512,13 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionHello: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in sendGSPSessionHello: " + ioe.getLocalizedMessage());
 			return false;
 		}
 	}
 
 	public boolean readGSPSessionHelloReply() {
-		Main.println("[GInterface " + id + "] Reading GSP session hello reply...");
+		Main.println(7, "[GInterface " + id + "] Reading GSP session hello reply...");
 
 		try {
 			byte[] size_bytes = new byte[3];
@@ -527,7 +527,7 @@ public class GarenaInterface {
 
 			//next byte should be 1
 			if(in.read() != 1) {
-				Main.println("[GInterface " + id + "] Warning: invalid data from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning: invalid data from Garena server");
 			}
 
 			byte[] bb = new byte[size];
@@ -535,23 +535,23 @@ public class GarenaInterface {
 			byte[] data = crypt.aesDecrypt(bb);
 
 			if(data[0] == -45 || data[0] == 211) {
-				Main.println("[GInterface " + id + "] GSP session hello reply received!");
+				Main.println(6, "[GInterface " + id + "] GSP session hello reply received!");
 			} else {
-				Main.println("[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
 			}
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionHelloReply: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in readGSPSessionHelloReply: " + ioe.getLocalizedMessage());
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionHelloReply: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Decryption error in readGSPSessionHelloReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
 
 	public boolean sendGSPSessionLogin() {
-		Main.println("[GInterface " + id + "] Sending GSP session login...");
+		Main.println(7, "[GInterface " + id + "] Sending GSP session login...");
 		String username = GCBConfig.configuration.getString("garena" + id + "_username");
 		String password = GCBConfig.configuration.getString("garena" + id + "_password");
 
@@ -568,7 +568,7 @@ public class GarenaInterface {
 
 			byte[] username_bytes = username.getBytes("UTF-8");
 			if(username_bytes.length > 16) {
-				Main.println("[GInterface " + id + "] Fatal error: your username is much too long.");
+				Main.println(6, "[GInterface " + id + "] Fatal error: your username is much too long.");
 				System.exit(-1);
 			}
 
@@ -576,7 +576,7 @@ public class GarenaInterface {
 			System.arraycopy(username_bytes, 0, username_buf, 0, username_bytes.length);
 			block.put(username_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Fatal error in sendGSPSessionLogin: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Fatal error in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -592,7 +592,7 @@ public class GarenaInterface {
 		try {
 			byte[] password_bytes = password_hash.getBytes("UTF-8");
 			if(password_bytes.length > 33) {
-				Main.println("[GInterface " + id + "] Fatal error in sendGSPSessionLogin: password hash is much too long!");
+				Main.println(6, "[GInterface " + id + "] Fatal error in sendGSPSessionLogin: password hash is much too long!");
 				System.exit(-1);
 			}
 
@@ -600,7 +600,7 @@ public class GarenaInterface {
 			System.arraycopy(password_bytes, 0, password_buf, 0, password_bytes.length);
 			block.put(password_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Fatal error(2) in sendGSPSessionLogin: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Fatal error(2) in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -629,7 +629,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPSessionLogin: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPSessionLogin: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -637,13 +637,13 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in sendGSPSessionLogin: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in sendGSPSessionLogin: " + ioe.getLocalizedMessage());
 			return false;
 		}
 	}
 
 	public boolean readGSPSessionLoginReply() {
-		Main.println("[GInterface " + id + "] Reading GSP session login reply...");
+		Main.println(7, "[GInterface " + id + "] Reading GSP session login reply...");
 
 		try {
 			byte[] size_bytes = new byte[3];
@@ -652,7 +652,7 @@ public class GarenaInterface {
 
 			//next byte should be 1
 			if(in.read() != 1) {
-				Main.println("[GInterface " + id + "] Warning: invalid data from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning: invalid data from Garena server");
 			}
 
 			byte[] bb = new byte[size];
@@ -660,12 +660,12 @@ public class GarenaInterface {
 			byte[] data = crypt.aesDecrypt(bb);
 
 			if(data[0] == -187 || data[0] == 69) {
-				Main.println("[GInterface " + id + "] Successfully logged in!");
+				Main.println(7, "[GInterface " + id + "] Successfully logged in!");
 			} else if(data[0] == -210 || data[0] == 46) {
-				Main.println("[GInterface " + id + "] Invalid username or password.");
+				Main.println(6, "[GInterface " + id + "] Invalid username or password.");
 				return false;
 			} else {
-				Main.println("[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
+				Main.println(6, "[GInterface " + id + "] Warning: invalid type " + data[0] + " from Garena server");
 				return false;
 			}
 
@@ -675,10 +675,10 @@ public class GarenaInterface {
 
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O Error in readGSPSessionLoginReply: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O Error in readGSPSessionLoginReply: " + ioe.getLocalizedMessage());
 			return false;
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Decryption error in readGSPSessionLoginReply: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Decryption error in readGSPSessionLoginReply: " + e.getLocalizedMessage());
 			return false;
 		}
 	}
@@ -689,20 +689,20 @@ public class GarenaInterface {
 		buf.put(array);
 
 		user_id = buf.getInt(0);
-		Main.println("[GInterface " + id + "] Server says your ID is: " + user_id);
+		Main.println(8, "[GInterface " + id + "] Server says your ID is: " + user_id);
 
 		byte[] str_bytes = new byte[16];
 		buf.position(4);
 		buf.get(str_bytes);
-		Main.println("[GInterface " + id + "] Server says your username is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your username is: " + (crypt.strFromBytes(str_bytes)));
 
 		str_bytes = new byte[2];
 		buf.position(20);
 		buf.get(str_bytes);
-		Main.println("[GInterface " + id + "] Server says your country is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your country is: " + (crypt.strFromBytes(str_bytes)));
 
 		unknown1 = buf.get(24);
-		Main.println("[GInterface " + id + "] Server says your experience is: " + GarenaEncrypt.unsignedByte(buf.get(25)));
+		Main.println(8, "[GInterface " + id + "] Server says your experience is: " + GarenaEncrypt.unsignedByte(buf.get(25)));
 		unknown2 = buf.get(26);
 
 		/* get ports through lookup method
@@ -722,7 +722,7 @@ public class GarenaInterface {
 		str_bytes = new byte[array.length - 92];
 		buf.position(92);
 		buf.get(str_bytes);
-		Main.println("[GInterface " + id + "] Server says your email address is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your email address is: " + (crypt.strFromBytes(str_bytes)));
 	}
 
 	public void readGSPLoop() {
@@ -737,10 +737,10 @@ public class GarenaInterface {
 				int size = GarenaEncrypt.byteArrayToIntLittleLength(size_bytes, 0, 3);
 
 				if(in.read() != 1) {
-					Main.println("[GInterface " + id + "] GSPLoop: warning: invalid data from Garena server");
+					Main.println(6, "[GInterface " + id + "] GSPLoop: warning: invalid data from Garena server");
 				}
 
-				Main.println("[GInterface " + id + "] GSPLoop: received " + size + " bytes of encrypted data");
+				Main.println(10, "[GInterface " + id + "] GSPLoop: received " + size + " bytes of encrypted data");
 
 				byte[] bb = new byte[size];
 				in.readFully(bb);
@@ -752,13 +752,13 @@ public class GarenaInterface {
 				if(data[0] == 68) {
 					processQueryResponse(data);
 				} else {
-					Main.debug("[GInterface " + id + "] GSPLoop: unknown type received: " + data[0]);
+					Main.println(10, "[GInterface " + id + "] GSPLoop: unknown type received: " + data[0]);
 				}
 			} catch(SocketTimeoutException ste) {
 				//ignore, only matters on startup
 				continue;
 			} catch(IOException ioe) {
-				Main.println("[GInterface " + id + "] GSPLoop: error: " + ioe.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] GSPLoop: error: " + ioe.getLocalizedMessage());
 				disconnected(GARENA_MAIN, true);
 				return;
 			} catch(Exception e) {
@@ -766,18 +766,18 @@ public class GarenaInterface {
 					e.printStackTrace();
 				}
 
-				Main.println("[GInterface " + id + "] GSPLoop: error: " + e.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] GSPLoop: error: " + e.getLocalizedMessage());
 			}
 		}
 	}
 
 	public void processQueryResponse(byte[] data) throws IOException {
 		int id = GarenaEncrypt.byteArrayToIntLittle(data, 1);
-		Main.println("[GInterface " + id + "] Query response: user ID is " + id);
+		Main.println(5, "[GInterface " + id + "] Query response: user ID is " + id);
 	}
 
 	public boolean sendGSPQueryUser(String username) {
-		Main.println("[GInterface " + id + "] Querying by name: " + username);
+		Main.println(5, "[GInterface " + id + "] Querying by name: " + username);
 
 		byte[] username_bytes = username.getBytes();
 
@@ -800,7 +800,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPQueryUser: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPQueryUser: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -808,7 +808,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O error in sendGSPQueryUser: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPQueryUser: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN, false);
 			return false;
 		}
@@ -817,7 +817,7 @@ public class GarenaInterface {
 	//username is requester username, sent with friend request
 	//message is the one sent with friend request that requested user will read
 	public boolean sendGSPRequestFriend(int id, String username, String message) {
-		Main.println("[GInterface " + id + "] Friend requesting: " + id);
+		Main.println(5, "[GInterface " + id + "] Friend requesting: " + id);
 
 		byte[] username_bytes = username.getBytes();
 		byte[] message_bytes = message.getBytes();
@@ -850,7 +850,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPRequestFriend: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPRequestFriend: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -858,7 +858,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O error in sendGSPRequestFriend: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPRequestFriend: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN, false);
 			return false;
 		}
@@ -886,7 +886,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPJoinedRoom: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPJoinedRoom: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -894,7 +894,7 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O error in sendGSPJoinedRoom: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPJoinedRoom: " + ioe.getLocalizedMessage());
 			return false;
 		}
 	}
@@ -923,7 +923,7 @@ public class GarenaInterface {
 
 			lbuf.put(encrypted);
 		} catch(Exception e) {
-			Main.println("[GInterface " + id + "] Encryption error in sendGSPXP: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Encryption error in sendGSPXP: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -931,18 +931,18 @@ public class GarenaInterface {
 			out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O error in sendGSPXP: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPXP: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_MAIN, false);
 			return false;
 		}
 	}
 
 	public boolean sendGCRPMeJoin() {
-		Main.println("[GInterface " + id + "] Sending GCRP me join...");
+		Main.println(7, "[GInterface " + id + "] Sending GCRP me join...");
 		
 		//make sure we got myinfo from main server first
 		if(myinfo == null) {
-			Main.println("[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
+			Main.println(6, "[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
 			return false;
 		}
 		
@@ -983,7 +983,7 @@ public class GarenaInterface {
 
 		//add myinfo
 		byte[] deflated = crypt.deflate(myinfo);
-		Main.println("[GInterface " + id + "] deflated myinfo block from " + myinfo.length + " bytes to " + deflated.length + " bytes");
+		Main.println(7, "[GInterface " + id + "] deflated myinfo block from " + myinfo.length + " bytes to " + deflated.length + " bytes");
 
 		buf.putInt(deflated.length + 66); //message size
 		buf.put((byte) 0x22); //JOIN message identifier
@@ -1019,7 +1019,7 @@ public class GarenaInterface {
 				buf.put(remainder); //values in byte arrays default to zero
 			}
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPMeJoin: " + e.getLocalizedMessage() + "; ignoring room password");
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPMeJoin: " + e.getLocalizedMessage() + "; ignoring room password");
 
 			buf.putInt(0);
 			buf.putInt(0);
@@ -1033,7 +1033,7 @@ public class GarenaInterface {
 		try {
 			byte[] password_bytes = password_hash.getBytes("UTF-8");
 			if(password_bytes.length > 33) {
-				Main.println("[GInterface " + id + "] Fatal error in sendGCRPMeJoin: password hash is much too long!");
+				Main.println(6, "[GInterface " + id + "] Fatal error in sendGCRPMeJoin: password hash is much too long!");
 				System.exit(-1);
 			}
 
@@ -1042,7 +1042,7 @@ public class GarenaInterface {
 
 			buf.put(password_buf);
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Fatal error in sendGCRPMeJoin: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Fatal error in sendGCRPMeJoin: " + e.getLocalizedMessage());
 			System.exit(-1);
 		}
 
@@ -1052,7 +1052,7 @@ public class GarenaInterface {
 			rout.write(buf.array(), buf.arrayOffset(), buf.position());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] I/O error in sendGCRPMeJoin: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] I/O error in sendGCRPMeJoin: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
@@ -1081,7 +1081,7 @@ public class GarenaInterface {
 				} else if(type == 34) {
 					//JOIN message
 					MemberInfo added = readMemberInfo(size - 1, lbuf);
-					Main.println("[GInterface " + id + "] New member joined: " + added.username + " (" + added.country + ") with id " + added.userID);
+					Main.println(9, "[GInterface " + id + "] New member joined: " + added.username + " (" + added.country + ") with id " + added.userID);
 
 					synchronized(listeners) {
 						for(GarenaListener listener : listeners) {
@@ -1121,7 +1121,7 @@ public class GarenaInterface {
 							error_string = "unknown";
 					}
 
-					Main.println("[GInterface " + id + "] Error received: id: " + error_id + "; means: " + error_string);
+					Main.println(6, "[GInterface " + id + "] Error received: id: " + error_id + "; means: " + error_string);
 					disconnected(GARENA_ROOM, true);
 					return;
 				} else {
@@ -1130,7 +1130,7 @@ public class GarenaInterface {
 						return;
 					}
 
-					Main.debug("[GInterface " + id + "] GCRPLoop: unknown type received: " + type + "; size is: " + size);
+					Main.println(10, "[GInterface " + id + "] GCRPLoop: unknown type received: " + type + "; size is: " + size);
 
 					//make sure we read it all anyway
 					if(size < 1000000000 && size >= 2) {
@@ -1146,7 +1146,7 @@ public class GarenaInterface {
 					ioe.printStackTrace();
 				}
 				
-				Main.println("[GInterface " + id + "] GCRP loop IO error: " + ioe.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] GCRP loop IO error: " + ioe.getLocalizedMessage());
 				disconnected(GARENA_ROOM, true);
 				return;
 			} catch(Exception e) {
@@ -1154,7 +1154,7 @@ public class GarenaInterface {
 					e.printStackTrace();
 				}
 
-				Main.println("[GInterface " + id + "] GCRP loop error: " + e.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] GCRP loop error: " + e.getLocalizedMessage());
 			}
 		}
 	}
@@ -1170,7 +1170,7 @@ public class GarenaInterface {
 		byte[] str_bytes = new byte[packet_size - 4];
 		rin.readFully(str_bytes);
 		String welcome_str = crypt.strFromBytes16(str_bytes);
-		Main.println("[GInterface " + id + "] Server says: " + welcome_str + " (reports roomid=" + serverRoomId + ")");
+		Main.println(8, "[GInterface " + id + "] Server says: " + welcome_str + " (reports roomid=" + serverRoomId + ")");
 	}
 
 	public void processMemberList(int packet_size, ByteBuffer lbuf) throws IOException {
@@ -1183,11 +1183,11 @@ public class GarenaInterface {
 		int cRoom_id = lbuf.getInt(0);
 
 		if(cRoom_id != room_id) {
-			Main.println("[GInterface " + id + "] Server says room ID is " + cRoom_id + "; tried to join room " + room_id);
+			Main.println(8, "[GInterface " + id + "] Server says room ID is " + cRoom_id + "; tried to join room " + room_id);
 		}
 
 		int num_members = lbuf.getInt(4);
-		Main.println("[GInterface " + id + "] There are " + num_members + " members in this room");
+		Main.println(8, "[GInterface " + id + "] There are " + num_members + " members in this room");
 		
 		//in case we are reconnecting after a disconnect
 		// we don't want to keep the old member list
@@ -1245,7 +1245,7 @@ public class GarenaInterface {
 		try {
 			member.externalIP = InetAddress.getByAddress(external_bytes);
 		} catch(UnknownHostException e) {
-			Main.println("[GInterface " + id + "] Error in readMemberInfo: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in readMemberInfo: " + e.getLocalizedMessage());
 			return member;
 		}
 
@@ -1257,7 +1257,7 @@ public class GarenaInterface {
 		try {
 			member.internalIP = InetAddress.getByAddress(internal_bytes);
 		} catch(UnknownHostException e) {
-			Main.println("[GInterface " + id + "] Error in readMemberInfo: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in readMemberInfo: " + e.getLocalizedMessage());
 			return member;
 		}
 
@@ -1339,9 +1339,9 @@ public class GarenaInterface {
 		}
 
 		if(member != null) {
-			Main.println("[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has left the room");
+			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has left the room");
 		} else {
-			Main.println("[GInterface " + id + "] Unlisted member " + user_id + " has left the room");
+			Main.println(9, "[GInterface " + id + "] Unlisted member " + user_id + " has left the room");
 		}
 
 		synchronized(listeners) {
@@ -1363,9 +1363,9 @@ public class GarenaInterface {
 
 		if(member != null) {
 			member.playing = true;
-			Main.println("[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has started playing");
+			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has started playing");
 		} else {
-			Main.println("[GInterface " + id + "] Unlisted member " + user_id + " has started playing");
+			Main.println(9, "[GInterface " + id + "] Unlisted member " + user_id + " has started playing");
 		}
 
 		synchronized(listeners) {
@@ -1387,9 +1387,9 @@ public class GarenaInterface {
 
 		if(member != null) {
 			member.playing = false;
-			Main.println("[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has stopped playing");
+			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + " has stopped playing");
 		} else {
-			Main.println("[GInterface " + id + "] Unlisted member " + user_id + " has stopped playing");
+			Main.println(9, "[GInterface " + id + "] Unlisted member " + user_id + " has stopped playing");
 		}
 
 		for(GarenaListener listener : listeners) {
@@ -1413,9 +1413,9 @@ public class GarenaInterface {
 		String chat_string = crypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
-			Main.println("[GInterface " + id + "] " + member.username + " with ID " + member.userID + " whispers: " + chat_string);
+			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + " whispers: " + chat_string);
 		} else {
-			Main.println("[GInterface " + id + "] Unlisted member " + user_id + " whispers: " + chat_string);
+			Main.println(9, "[GInterface " + id + "] Unlisted member " + user_id + " whispers: " + chat_string);
 		}
 
 		synchronized(listeners) {
@@ -1435,7 +1435,7 @@ public class GarenaInterface {
 		int cRoom_id = lbuf.getInt(0);
 
 		if(cRoom_id != room_id) {
-			Main.println("[GInterface " + id + "] Server says room ID is " + cRoom_id + "; tried to join room " + room_id);
+			Main.println(8, "[GInterface " + id + "] Server says room ID is " + cRoom_id + "; tried to join room " + room_id);
 		}
 
 		int user_id = lbuf.getInt(4);
@@ -1447,9 +1447,9 @@ public class GarenaInterface {
 		String chat_string = crypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
-			Main.println("[GInterface " + id + "] " + member.username + " with ID " + member.userID + ": " + chat_string);
+			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + ": " + chat_string);
 		} else {
-			Main.println("[GInterface " + id + "] Unlisted member " + user_id + ": " + chat_string);
+			Main.println(9, "[GInterface " + id + "] Unlisted member " + user_id + ": " + chat_string);
 		}
 
 		synchronized(listeners) {
@@ -1460,14 +1460,14 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGCRPChat(String text) {
-		Main.println("[GInterface " + id + "] Sending message: " + text);
+		Main.println(5, "[GInterface " + id + "] Sending message: " + text);
 
 		byte[] chat_bytes = null;
 
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPChat: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPChat: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1485,21 +1485,21 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPChat: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPChat: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
 
 	public boolean sendGCRPAnnounce(String text) {
-		Main.println("[GInterface " + id + "] Sending announce: " + text);
+		Main.println(5, "[GInterface " + id + "] Sending announce: " + text);
 
 		byte[] chat_bytes = null;
 
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPAnnounce: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPAnnounce: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1515,7 +1515,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPAnnounce: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPAnnounce: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
@@ -1523,14 +1523,14 @@ public class GarenaInterface {
 
 	public boolean ban(String username, int hours) {
 		int seconds = hours * 3600;
-		Main.println("[GInterface " + id + "] Banning " + username + " for " + seconds + " seconds");
+		Main.println(5, "[GInterface " + id + "] Banning " + username + " for " + seconds + " seconds");
 
 		byte[] username_bytes = null;
 
 		try {
 			username_bytes = username.getBytes("UTF-8");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in ban: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in ban: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1547,7 +1547,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in ban: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in ban: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
@@ -1562,14 +1562,14 @@ public class GarenaInterface {
 	}
 
 	public boolean kick(MemberInfo member, String reason) {
-		Main.println("[GInterface " + id + "] Kicking " + member.username + " with user ID " + member.userID + "; reason: " + reason);
+		Main.println(5, "[GInterface " + id + "] Kicking " + member.username + " with user ID " + member.userID + "; reason: " + reason);
 
 		byte[] reason_bytes = null;
 
 		try {
 			reason_bytes = reason.getBytes("UTF-8");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in kick: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in kick: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1588,14 +1588,14 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in kick: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in kick: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
 	}
 	
 	public void startPlaying() {
-		Main.println("[GInterface " + id + "] Sending GCRP START...");
+		Main.println(7, "[GInterface " + id + "] Sending GCRP START...");
 
 		ByteBuffer lbuf = ByteBuffer.allocate(9);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
@@ -1606,13 +1606,13 @@ public class GarenaInterface {
 		try {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in startPlaying: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in startPlaying: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 		}
 	}
 
 	public void stopPlaying() {
-		Main.println("[GInterface " + id + "] Sending GCRP STOP...");
+		Main.println(5, "[GInterface " + id + "] Sending GCRP STOP...");
 
 		ByteBuffer lbuf = ByteBuffer.allocate(9);
 		lbuf.order(ByteOrder.LITTLE_ENDIAN);
@@ -1623,20 +1623,20 @@ public class GarenaInterface {
 		try {
 			rout.write(lbuf.array());
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in stopPlaying: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in stopPlaying: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 		}
 	}
 
 	public boolean sendGCRPWhisper(int target_user, String text) {
-		Main.println("[GInterface " + id + "] Sending whisper to " + target_user + ": " + text);
+		Main.println(5, "[GInterface " + id + "] Sending whisper to " + target_user + ": " + text);
 
 		byte[] chat_bytes = null;
 
 		try {
 			chat_bytes = text.getBytes("UnicodeLittleUnmarked");
 		} catch(UnsupportedEncodingException e) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPWhisper: " + e.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPWhisper: " + e.getLocalizedMessage());
 			return false;
 		}
 
@@ -1653,7 +1653,7 @@ public class GarenaInterface {
 			rout.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Error in sendGCRPWhisper: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Error in sendGCRPWhisper: " + ioe.getLocalizedMessage());
 			disconnected(GARENA_ROOM, false);
 			return false;
 		}
@@ -1708,12 +1708,12 @@ public class GarenaInterface {
 							"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
 							"." + GarenaEncrypt.unsignedByte(iExternal[3]);
 
-					Main.println("[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
+					Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
 				} else if(buf_array[0] == 0x3F) {
 					int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
 					int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
 
-					Main.println("[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
+					Main.println(7, "[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
 
 					for(int i = 0; i < num_rooms; i++) {
 						RoomInfo room = new RoomInfo();
@@ -1750,9 +1750,9 @@ public class GarenaInterface {
 
 					MemberInfo member = memberFromID(remote_id);
 					if(member != null) {
-						Main.println("[GInterface " + id + "] Starting TCP connection with " +  member.username);
+						Main.println(5, "[GInterface " + id + "] Starting TCP connection with " +  member.username);
 					} else {
-						Main.println("[GInterface " + id + "] Starting TCP connection with " +  remote_id);
+						Main.println(5, "[GInterface " + id + "] Starting TCP connection with " +  remote_id);
 					}
 					
 					GarenaTCP tcp_connection = new GarenaTCP(this);
@@ -1760,7 +1760,7 @@ public class GarenaInterface {
 
 					synchronized(tcp_connections) {
 						if(tcp_connections.containsKey(conn_id)) {
-							Main.println("[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
+							Main.println(6, "[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
 							tcp_connections.get(conn_id).end(true);
 						}
 
@@ -1782,7 +1782,7 @@ public class GarenaInterface {
 					int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 8);
 
 					if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
-						Main.debug("[GInterface " + id + "] Warning: CONN packet received from user " +
+						Main.println(10, "[GInterface " + id + "] Warning: CONN packet received from user " +
 								remote_id + " at " + packet.getAddress() +
 								", but connection " + conn_id + " not started with user");
 						continue;
@@ -1798,12 +1798,12 @@ public class GarenaInterface {
 					} else if(buf_array[1] == 0x0E) { //CONN ACK
 						tcp_connection.connAck(seq, ack);
 					} else if(buf_array[1] == 0x01) {
-						Main.println("[GInterface " + id + "] User requested termination on connection " + conn_id);
+						Main.println(5, "[GInterface " + id + "] User requested termination on connection " + conn_id);
 						// tcp_connections will be updated by GarenaTCP
 						// so just call end
 						tcp_connection.end(true);
 					} else {
-						Main.debug("[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
+						Main.println(10, "[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
 					}
 				} else if(buf_array[0] == 0x01) {
 					int senderId = lbuf.getInt(4);
@@ -1826,11 +1826,11 @@ public class GarenaInterface {
 						wc3i.receivedUDP(this, lbuf, packet.getAddress(), packet.getPort(), senderId);
 					}
 				} else {
-					Main.debug("[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
+					Main.println(10, "[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
 				}
 			} catch(IOException ioe) {
-				Main.println("[GInterface " + id + "] PeerLoop: error: " + ioe.getLocalizedMessage());
-				Main.println("[GInterface " + id + "] PeerLoop: peer socket failed!");
+				Main.println(6, "[GInterface " + id + "] PeerLoop: error: " + ioe.getLocalizedMessage());
+				Main.println(6, "[GInterface " + id + "] PeerLoop: peer socket failed!");
 				ioe.printStackTrace();
 				
 				disconnected(GARENA_PEER, true);
@@ -1849,7 +1849,7 @@ public class GarenaInterface {
 		try {
 			peer_socket.send(packet);
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Failed to send lookup: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Failed to send lookup: " + ioe.getLocalizedMessage());
 			ioe.printStackTrace();
 		}
 	}
@@ -1867,7 +1867,7 @@ public class GarenaInterface {
 		try {
 			peer_socket.send(packet);
 		} catch(IOException ioe) {
-			Main.println("[GInterface " + id + "] Failed to room usage check: " + ioe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Failed to room usage check: " + ioe.getLocalizedMessage());
 			ioe.printStackTrace();
 		}
 	}
@@ -1886,7 +1886,7 @@ public class GarenaInterface {
 							target.correctIP = InetAddress.getByName(GCBConfig.configuration.getString("gcb_lanfix_ip", "192.168.1.2"));
 							target.correctPort = GCBConfig.configuration.getInt("gcb_lanfix_port", 1513);
 						} catch(IOException ioe) {
-							Main.println("[GInterface " + id + "] LAN FIX error: " + ioe.getLocalizedMessage());
+							Main.println(6, "[GInterface " + id + "] LAN FIX error: " + ioe.getLocalizedMessage());
 							ioe.printStackTrace();
 						}
 					}
@@ -2019,7 +2019,7 @@ public class GarenaInterface {
 			byte[] loopbackBytes = InetAddress.getLocalHost().getAddress();
 			tbuf.put(loopbackBytes);
 		} catch(UnknownHostException uhe) {
-			Main.println("[GInterface " + id + "] Failed to identify local host at sendTCPInit: " + uhe.getLocalizedMessage());
+			Main.println(6, "[GInterface " + id + "] Failed to identify local host at sendTCPInit: " + uhe.getLocalizedMessage());
 			uhe.printStackTrace();
 		}
 
@@ -2041,14 +2041,14 @@ public class GarenaInterface {
 
 		MemberInfo member = memberFromID(remote_id);
 		if(member != null) {
-			Main.println("[GInterface " + id + "] Starting reverse TCP connection with " +  member.username);
+			Main.println(5, "[GInterface " + id + "] Starting reverse TCP connection with " +  member.username);
 		} else {
-			Main.println("[GInterface " + id + "] Starting reverse TCP connection with " +  remote_id);
+			Main.println(5, "[GInterface " + id + "] Starting reverse TCP connection with " +  remote_id);
 		}
 
 		synchronized(tcp_connections) {
 			if(tcp_connections.containsKey(conn_id)) {
-				Main.println("[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
+				Main.println(6, "[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
 			}
 
 			tcp_connections.put(conn_id, tcp_connection);
@@ -2213,7 +2213,7 @@ public class GarenaInterface {
 				GarenaTCP connection = tcp_connections.get(x);
 
 				if(connection.isTimeout()) {
-					Main.println("[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
+					Main.println(5, "[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
 
 					//using end(true) would remove the connection, but
 					// since we're currently iterating over it that
@@ -2288,7 +2288,7 @@ public class GarenaInterface {
 					System.currentTimeMillis() - lastRoomReceivedTime > 60000 * 10 ||
 					peer_socket == null || !peer_socket.isBound()) {
 				//reconnect to Garena room
-				Main.println("[GInterface " + id + "] Reconnecting to Garena room");
+				Main.println(5, "[GInterface " + id + "] Reconnecting to Garena room");
 				disconnectRoom();
 	
 				//room loop should take care of actual reconnection

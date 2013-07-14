@@ -31,13 +31,35 @@ import java.util.TimerTask;
  */
 public class Main {
 	public static String VERSION = "gcb 1.0.0-dev";
-	public static boolean DEBUG = false;
+	public static boolean DEBUG;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static Timer TIMER;
 	public static Random RANDOM;
 	
 	static boolean log;
 	static boolean logCommands;
+	
+	/* 
+	 * logLevel determines what messages will be printed/discarded
+	 * it uses a binary flag system, flags can be added to produce desired result:
+	 *  1 (2^0) - uncategorized system messages (should be enabled)
+	 *  2 (2^1) - uncategorized error messages (should be enabled)
+	 *  4 (2^2) - logging-related notifications
+	 *  8 (2^3) - startup-related messages (can be disabled, since errors will be logged under 2^1)
+	 *  16 (2^4) - unimportant system messages
+	 *  32 (2^5) - uncategorized room messages (should be enabled)
+	 *  64 (2^6) - uncategorized room messages (should be enabled)
+	 *  128 (2^7) - unimportant room messages (includes many room connection messages)
+	 *  256 (2^8) - room messages that come from the Garena server
+	 *  512 (2^9) - room messages that come from other players
+	 *  1024 (2^10) - debug room messages
+	 *  2048 (2^11) - debug system messages
+	 *  4096 (2^12) - TCP debug messages (should be disabled except for debugging)
+	 * WARNING: in the source code, println method uses the x in 2^x to identify the different logging levels,
+	 *  while in configuration you should add the 1, 2, 4, 8, etc. values
+	 */
+	static int logLevel;
+	
 	boolean botDisable;
 	boolean reverse;
 	long lastLog; //when the log file(s) were created
@@ -74,9 +96,11 @@ public class Main {
 		loadRcon = GCBConfig.configuration.getBoolean("gcb_rcon", false);
 		botDisable = GCBConfig.configuration.getBoolean("gcb_bot_disable", true);
 		reverse = GCBConfig.configuration.getBoolean("gcb_reverse", false);
+		
 		log = GCBConfig.configuration.getBoolean("gcb_log", false);
 		logCommands = GCBConfig.configuration.getBoolean("gcb_log_commands", false);
 		newLogInterval = GCBConfig.configuration.getInt("gcb_log_new_file", 86400000);
+		logLevel = GCBConfig.configuration.getInt("gcb_loglevel", 1023);
 
 		//first load all the defaults
 		loadPlugins = true;
@@ -170,7 +194,7 @@ public class Main {
 			try {
 				rcon = new GCBRcon(this);
 			} catch(IOException ioe) {
-				println("[Main] Error: failed to load rcon server: " + ioe.getLocalizedMessage());
+				println(1, "[Main] Error: failed to load rcon server: " + ioe.getLocalizedMessage());
 			}
 		}
 
@@ -235,7 +259,7 @@ public class Main {
 					//lookup
 					garena.sendPeerLookup();
 
-					Main.println("[Main] Waiting for lookup response on connection " + garena.id + "...");
+					Main.println(0, "[Main] Waiting for lookup response on connection " + garena.id + "...");
 
 					int counter = 0; //resend lookup every second
 
@@ -246,12 +270,12 @@ public class Main {
 
 						counter++;
 						if(counter % 10 == 0) {
-							Main.println("[Main] Resending lookup on connection " + garena.id);
+							Main.println(0, "[Main] Resending lookup on connection " + garena.id);
 							garena.sendPeerLookup();
 						}
 					}
 
-					Main.println("[Main] Received lookup response!");
+					Main.println(0, "[Main] Received lookup response!");
 				}
 			}
 		}
@@ -323,7 +347,7 @@ public class Main {
 					String currentDate = date();
 					
 					if(log_out != null) {
-						println("[Main] Closing old log file and creating new log file");
+						println(2, "[Main] Closing old log file and creating new log file");
 						log_out.close();
 						File log_directory = new File("log/");
 						if(!log_directory.exists()) {
@@ -338,7 +362,7 @@ public class Main {
 							if(DEBUG) {
 								e.printStackTrace();
 							}
-							println("[Main] Failed to change log file date: " + e.getLocalizedMessage());
+							println(2, "[Main] Failed to change log file date: " + e.getLocalizedMessage());
 						}
 					}
 					
@@ -357,7 +381,7 @@ public class Main {
 							if(DEBUG) {
 								e.printStackTrace();
 							}
-							println("[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
+							println(2, "[Main] Failed to change cmd log file date: " + e.getLocalizedMessage());
 						}
 					}
 					lastLog = System.currentTimeMillis();
@@ -365,7 +389,7 @@ public class Main {
 				try {
 					Thread.sleep(10000);
 				} catch(InterruptedException e) {
-					println("[Main] New day loop sleep interrupted");
+					println(2, "[Main] New day loop sleep interrupted");
 				}
 			}
 		}
@@ -457,7 +481,13 @@ public class Main {
 		main.newLogLoop();
 	}
 
-	public static synchronized void println(String str) {
+	public static synchronized void println(int level, String str) {
+		//don't output this message if we're not at the correct log level
+		//note that here, level is the base (2^level is the flag value)
+		if((logLevel & (1 << level)) == 0) {
+			return;
+		}
+		
 		Date date = new Date();
 		String dateString = DateFormat.getDateTimeInstance().format(date);
 		
@@ -489,12 +519,6 @@ public class Main {
 		
 		if(log_cmd_out != null) {
 			log_cmd_out.println("[" + dateString + "] " + str);
-		}
-	}
-
-	public static void debug(String str) {
-		if(Main.DEBUG) {
-			println(str);
 		}
 	}
 	
@@ -572,7 +596,7 @@ public class Main {
 					users,
 					uptimeString);
 			
-			Main.println(statusString);
+			Main.println(0, statusString);
 		}
 	}
 }

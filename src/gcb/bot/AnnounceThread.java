@@ -82,7 +82,7 @@ public class AnnounceThread extends Thread {
 			try {
 				Thread.sleep(interval);
 			} catch(InterruptedException e) {
-				Main.println("[AnnounceThread] Run sleep was interrupted: " + e.getLocalizedMessage());
+				Main.println(11, "[AnnounceThread] Run sleep was interrupted: " + e.getLocalizedMessage());
 			}
 		}
 	}
