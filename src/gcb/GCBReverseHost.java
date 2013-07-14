@@ -41,7 +41,7 @@ public class GCBReverseHost {
 		buf = ByteBuffer.allocate(4096);
 
 		//config
-		reversePort = GCBConfig.configuration.getInteger("gcb_reverse_port", 6112);
+		reversePort = GCBConfig.configuration.getInteger("gcb_reverse_port", 0);
 		reverseNum = GCBConfig.configuration.getInteger("gcb_reverse_num", 5); //number of servers to host
 		udpPort = GCBConfig.configuration.getInteger("gcb_broadcastport", 6112);
 
@@ -63,10 +63,18 @@ public class GCBReverseHost {
 	public void init() {
 		servers = new ReverseServer[reverseNum];
 
-		for(int port = reversePort; port < reversePort + reverseNum; port++) {
-			Main.println("[GCBReverseHost] Initiating on port " + port);
+		for(int i = 0; i < reverseNum; i++) {
+			//if reversePort is 0, let OS decide the port
+			int port = reversePort == 0 ? 0 : reversePort + i;
+			
+			if(port == 0) {
+				Main.println("[GCBReverseHost] Initiating server instance " + i);
+			} else {
+				Main.println("[GCBReverseHost] Initiating on port " + port);
+			}
+			
 			try {
-				servers[port - reversePort] = new ReverseServer(garena, port);
+				servers[i] = new ReverseServer(garena, port);
 			} catch(IOException ioe) {
 				if(Main.DEBUG) {
 					ioe.printStackTrace();
@@ -193,7 +201,7 @@ public class GCBReverseHost {
 		DatagramPacket packet = new DatagramPacket(packetBytes, packetBytes.length, udpTarget, udpPort);
 
 		Main.println("[GCBReverseHost] Broadcasting with gamename [" + gamename + "]; version: " + version +
-				"; productid: " + productid + "; senderport: " + senderPort);
+				"; productid: " + productid + "; senderport: " + senderPort + "; serverport: " + server.port);
 		try {
 			udpSocket.send(packet);
 		} catch(IOException ioe) {
@@ -220,6 +228,10 @@ class ReverseServer extends Thread {
 		this.garena = garena;
 		this.port = port;
 		server = new ServerSocket(port);
+		
+		if(this.port == 0) {
+			this.port = server.getLocalPort();
+		}
 	}
 
 	public void update(InetAddress addr, int port, int id, int dest) {
