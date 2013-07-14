@@ -164,7 +164,7 @@ public class GarenaInterface {
 
 		//hostname lookup
 		try {
-			String main_hostname = GCBConfig.configuration.getString("garena" + id + "_mainhost", "con2.garenaconnect.com");
+			String main_hostname = GCBConfig.configuration.getString("garena" + id + "_mainhost", "con3.garenaconnect.com");
 			main_address = InetAddress.getByName(main_hostname);
 		} catch(UnknownHostException uhe) {
 			if(Main.DEBUG) {
