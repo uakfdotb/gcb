@@ -203,7 +203,7 @@ public class GarenaInterface {
 		}
 		
 		//try init reverse host
-		if(reverseEnabled) {
+		if(reverseEnabled && reverseHost == null) {
 			reverseHost = new GCBReverseHost(this);
 			reverseHost.init();
 			reverseHost.start();
