@@ -10,13 +10,14 @@
     (this is now the default option)
 * TCP connection pruning is enabled (timeout on Garena TCP)
    (there is an odd bug where connection inexplicably is not terminated after GHost times out;
-    while this resolves the1 symptoms of that issue, the issue itself likely remains)
+    while this resolves the symptoms of that issue, the issue itself likely remains)
 * other minor changes are listed below
 - added periodic gcb status message
 - added feature to rewrite gamename, for adding prefix or suffix (ex: colored gamenames)
 - updated library dependencies to newest versions as of April 18
 - save memory with smaller buffers in Garena TCP and enforcing packet size limits
 - logging when a single log file is used will be done without file locking (new stream initialized for each out line)
+- tweak REVERSE settings to allow more games, and change port away from 6112
 - fix: unknown type messages only show in debug mode
 - fix: old games still removed even if no more UDP packets are received
 - fix: avoid crash when invalid packets received on broadcast port
@@ -29,6 +30,9 @@
 - fix: might resolve issue where multiple games do not appear on the LAN gamelist
 - fix: multiply smoothed RTT time by two in addition to current standard retransmission timeout
 - fix: bug with REVERSE after the 0g update involving Garena Interface reading the wrong configuration value
+- fix: con2.garenaconnect.com is outdated, updated to con3
+- fix: srttg is now actually the clock granularity (interval that packets are checked for retransmission)
+- fix: bug when we continuously disconnect from a room that causes continously increasing thread count
 
 0g
 * multiple Garena connections can be specified in the configuration file to broadcast games to multiple rooms
