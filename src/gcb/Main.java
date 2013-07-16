@@ -77,6 +77,8 @@ public class Main {
 	SQLThread sqlthread;
 	GarenaReconnect reconnect;
 	GCBRcon rcon;
+	
+	ConnectWorkerPool connectPool;
 
 	//determine what will be loaded, what won't be loaded
 	boolean loadBot;
@@ -147,6 +149,10 @@ public class Main {
 
 	//garena is null when first starting
 	public boolean initGarenaAll(boolean restart) {
+		if(connectPool == null) {
+			connectPool = new ConnectWorkerPool(this);
+		}
+		
 		if(loadWC3 && !restart) {
 			//setup wc3 broadcast reader
 			wc3i = new WC3Interface(garenaConnections);
@@ -167,17 +173,17 @@ public class Main {
 					GarenaInterface garena = new GarenaInterface(plugins, i);
 					garena.registerListener(reconnect);
 					
-					if(!initGarena(garena, false)) {
-						//startup failed, so restart at a later time
-						garena.disconnected(GarenaInterface.GARENA_MAIN, true);
-					}
-					
 					synchronized(garenaConnections) {
 						garenaConnections.put(i, garena);
 					}
+					
+					connectPool.push(0, garena);
 				}
 			}
 		}
+		
+		//wait for all connection jobs to finish
+		connectPool.waitFor();
 		
 		if(loadChat && !restart) {
 			chatthread = new ChatThread(garenaConnections);
@@ -202,6 +208,21 @@ public class Main {
 		lookup();
 
 		return true;
+	}
+	
+	public void initRoomAll() {
+		synchronized(garenaConnections) {
+			Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+			
+			while(it.hasNext()) {
+				GarenaInterface garena = it.next();
+				connectPool.push(1, garena);
+			}
+		}
+		
+		//wait for connection jobs to finish, then close the worker pool
+		connectPool.waitFor();
+		connectPool.close();
 	}
 	
 	public boolean initGarena(GarenaInterface garena, boolean restart) {
@@ -463,17 +484,7 @@ public class Main {
 			return;
 		}
 		
-		synchronized(main.garenaConnections) {
-			Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
-			
-			while(it.hasNext()) {
-				GarenaInterface garena = it.next();
-				
-				if(!main.initRoom(garena, false)) {
-					garena.disconnected(GarenaInterface.GARENA_ROOM, true);
-				}
-			}
-		}
+		main.initRoomAll();
 		
 		main.initBot();
 		main.loadPlugins();
