@@ -1,3 +1,9 @@
+1.0.1
+* on startup, multithreaded room connection instead of previous sequential connection method
+* introduce flag-based log level to allow user to decide which messages to log
+* other minor changes are listed below
+- REVERSE by default will use any free port rather than specific ports
+
 1.0.0
 * LAN list is updated using REFRESHGAME and DECREATEGAME packets
 * option to reconnect only when gcb detects room is idle
