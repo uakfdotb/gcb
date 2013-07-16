@@ -30,7 +30,7 @@ import java.util.TimerTask;
  * @author wizardus
  */
 public class Main {
-	public static String VERSION = "gcb 1.0.0-dev";
+	public static String VERSION = "gcb 1.0.0";
 	public static boolean DEBUG = false;
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static Timer TIMER;
