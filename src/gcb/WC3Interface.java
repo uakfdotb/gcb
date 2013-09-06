@@ -355,7 +355,10 @@ public class WC3Interface {
 										removeOldGames();
 									
 										//create and broadcast the W3GS_REFRESHGAME packet
-										ByteBuffer refreshPacket = ByteBuffer.allocate(16);
+										//this is currently disabled pending investigation into
+										// whether or not it actually works and why it results in
+										// so many packets being sent
+										/*ByteBuffer refreshPacket = ByteBuffer.allocate(16);
 										refreshPacket.order(ByteOrder.LITTLE_ENDIAN);
 										refreshPacket.put((byte) Constants.W3GS_HEADER_CONSTANT);
 										refreshPacket.put((byte) Constants.W3GS_REFRESHGAME);
@@ -371,7 +374,7 @@ public class WC3Interface {
 												//use BROADCAST_PORT instead of broadcast_port in case the latter is customized with rebroadcast
 												it.next().broadcastUDPEncap(BROADCAST_PORT, BROADCAST_PORT, refreshPacket.array(), 0, 8);
 											}
-										}
+										}*/
 									} else {
 										//we must broadcast immediately if we didn't cache the packet
 										broadcastImmediately = true;
