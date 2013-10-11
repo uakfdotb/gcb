@@ -17,10 +17,13 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -458,5 +461,50 @@ public class GarenaEncrypt {
 		buf.position(end); //skip terminator
 
 		return bytes;
+	}
+	
+	public static ByteBuffer decodeStatString( byte[] data ) {
+		byte Mask = 0;
+		ByteBuffer result = ByteBuffer.allocate(data.length);
+
+		for(int i = 0; i < data.length; i++) {
+			if( ( i % 8 ) == 0 )
+				Mask = data[i];
+			else {
+				if( ( Mask & ( 1 << ( i % 8 ) ) ) == 0 )
+					result.put( (byte) (data[i] - 1) );
+				else
+					result.put( data[i] );
+			}
+		}
+		
+		return result;
+	}
+	
+	public static Map<String, String> extractStatString(byte[] data) {
+		Map<String, String> map = new HashMap<String, String>();
+		ByteBuffer buf = decodeStatString(data);
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+		int length = buf.position();
+		buf.position(0);
+		
+		if(length >= 14) {
+			int i = 13;
+			map.put("flags", buf.getInt() + "");
+			buf.get();
+			map.put("width", buf.getShort() + "");
+			map.put("height", buf.getShort() + "");
+			map.put("crc", buf.getInt() + "");
+			String mapPath = getTerminatedString(buf);
+			i += mapPath.length() + 1;
+			map.put("path", mapPath);
+			
+			if(length >= i + 1) {
+				buf.position(i);
+				map.put("host", getTerminatedString(buf));
+			}
+		}
+		
+		return map;
 	}
 }

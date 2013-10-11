@@ -176,7 +176,8 @@ public class WC3Interface {
 					byte[] data = game.rawPacket;
 					
 					//Warcraft clients always listen on BROADCAST_PORT
-					garena.sendUDPEncap(address, port, game.gameport, BROADCAST_PORT, data, 0, data.length);
+					if(garena.shouldBroadcastMap(game.mapname))
+						garena.sendUDPEncap(address, port, game.gameport, BROADCAST_PORT, data, 0, data.length);
 				}
 			}
 		}
@@ -264,7 +265,9 @@ public class WC3Interface {
 								newPacket.put((byte) 0); //null terminator for gamename
 								
 								newPacket.put(buf.get()); //skip game password
-								newPacket.put(GarenaEncrypt.getTerminatedArray(buf)); //skip statstring
+								byte[] statstring = GarenaEncrypt.getTerminatedArray(buf);
+								String mapname = GarenaEncrypt.extractStatString(statstring).get("map");
+								newPacket.put(statstring); //skip statstring
 								newPacket.put((byte) 0); //null terminator for stats string
 								
 								System.arraycopy(buf.array(), buf.position(), newPacket.array(), newPacket.position(), 12);
@@ -319,7 +322,7 @@ public class WC3Interface {
 										if(garenaEntryKey == null) {
 											//generate a new entry key and put into hashmap
 											garenaEntryKey = random.nextInt();
-											game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey);
+											game = new WC3GameIdentifier(gamename, port, ghostEntryKey, ghostHostCounter, garenaEntryKey, mapname);
 
 											Main.println(4, "[WC3Interface] Detected new game with name " + gamename +
 													"; generated entry key: " + garenaEntryKey + " (original: " + ghostEntryKey + ")");
@@ -512,19 +515,21 @@ class WC3GameIdentifier {
 	int gameport;
 	Integer garenaEntryKey; //null if gcb_broadcastfilter_key is off
 	int hostCounter;
+	String mapname;
 	
 	byte[] rawPacket; //packet to easily forward to clients
 
 	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, int hostCounter) {
-		this(gamename, gameport, ghostEntryKey, hostCounter, null);
+		this(gamename, gameport, ghostEntryKey, hostCounter, null, null);
 	}
 
-	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, int hostCounter, Integer garenaEntryKey) {
+	public WC3GameIdentifier(String gamename, int gameport, int ghostEntryKey, int hostCounter, Integer garenaEntryKey, String mapname) {
 		this.gamename = gamename;
 		this.gameport = gameport;
 		this.ghostEntryKey = ghostEntryKey;
 		this.hostCounter = hostCounter;
 		this.garenaEntryKey = garenaEntryKey;
+		this.mapname = mapname;
 
 		//update with a default array
 		update(new byte[] {}, 0, 0);

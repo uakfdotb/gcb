@@ -108,6 +108,9 @@ public class GarenaInterface {
 	//last time we received something from room, for idle checking
 	long lastRoomReceivedTime = 0;
 
+	//list of maps we want to broadcast to this room
+	List<String> maps;
+	
 	public GarenaInterface(PluginManager plugins, int id) {
 		this.id = id;
 		this.plugins = plugins;
@@ -140,6 +143,12 @@ public class GarenaInterface {
 			synchronized(Main.TIMER) {
 				Main.TIMER.schedule(new ReconnectTask(), 60000 * reconnectInterval, 60000 * reconnectInterval);
 			}
+		}
+		
+		maps = new ArrayList<String>();
+		String[] mapsString = GCBConfig.configuration.getStringArray("garena" + id + "_maps");
+		for(String map : mapsString) {
+			maps.add(map);
 		}
 	}
 	
@@ -2235,6 +2244,16 @@ public class GarenaInterface {
 				disconnected(GARENA_PEER, false);
 			}
 		}
+	}
+	
+	public boolean shouldBroadcastMap(String map) {
+		for(String i : maps) {
+			if(map.toLowerCase().contains(i.toLowerCase())) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	class RetransmitTask extends TimerTask {
