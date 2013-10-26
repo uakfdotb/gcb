@@ -176,7 +176,7 @@ public class WC3Interface {
 					byte[] data = game.rawPacket;
 					
 					//Warcraft clients always listen on BROADCAST_PORT
-					if(garena.shouldBroadcastMap(game.mapname))
+					if(game.mapname != null && garena.shouldBroadcastMap(game.mapname))
 						garena.sendUDPEncap(address, port, game.gameport, BROADCAST_PORT, data, 0, data.length);
 				}
 			}
@@ -266,7 +266,7 @@ public class WC3Interface {
 								
 								newPacket.put(buf.get()); //skip game password
 								byte[] statstring = GarenaEncrypt.getTerminatedArray(buf);
-								String mapname = GarenaEncrypt.extractStatString(statstring).get("map");
+								String mapname = GarenaEncrypt.extractStatString(statstring).get("path");
 								newPacket.put(statstring); //skip statstring
 								newPacket.put((byte) 0); //null terminator for stats string
 								
