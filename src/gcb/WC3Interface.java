@@ -429,8 +429,24 @@ public class WC3Interface {
 			//always rebroadcast packets: other gcb instances may be using different TCP ports
 			for(int port : rebroadcastPorts) {
 				Main.println(11, "[WC3Interface] Retransmitting packet to port " + port);
-				DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
-				socket.send(retransmitPacket);
+				String broadcastTarget = GCBConfig.getString("udp_broadcasttarget");
+				
+				if(broadcastTarget == null) {
+					broadcastTarget = "both";
+				}
+				
+				if(broadcastTarget.equals("both") || broadcastTarget.equals("localhost")) {
+					DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getLocalHost(), port);
+					socket.send(retransmitPacket);
+					
+					if(broadcastTarget.equals("both")) {
+						retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getByName("255.255.255.255"), port);
+						socket.send(retransmitPacket);
+					}
+				} else {
+					DatagramPacket retransmitPacket = new DatagramPacket(data, offset, length, InetAddress.getByName(broadcastTarget), port);
+					socket.send(retransmitPacket);
+				}
 			}
 
 		} catch(IOException ioe) {
