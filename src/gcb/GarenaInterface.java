@@ -2247,13 +2247,26 @@ public class GarenaInterface {
 	}
 	
 	public boolean shouldBroadcastMap(String map) {
+		//we only return false from this function if the user has specified to broadcast a certain map
+		boolean included = false;
+		
 		for(String i : maps) {
+			boolean exclude = false;
+			
+			//a caret as first character indicates an exclusion rule
+			if(i.charAt(0) == '^') {
+				i = i.substring(1);
+				exclude = true;
+			} else {
+				included = true;
+			}
+			
 			if(map.toLowerCase().contains(i.toLowerCase())) {
-				return true;
+				return !exclude;
 			}
 		}
 		
-		return false;
+		return !included;
 	}
 	
 	class RetransmitTask extends TimerTask {
