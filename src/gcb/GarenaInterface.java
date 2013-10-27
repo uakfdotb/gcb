@@ -554,6 +554,11 @@ public class GarenaInterface {
 		Main.println(7, "[GInterface " + id + "] Sending GSP session login...");
 		String username = GCBConfig.configuration.getString("garena" + id + "_username");
 		String password = GCBConfig.configuration.getString("garena" + id + "_password");
+		
+		if(GCBConfig.configuration.getString("garena_username") != null && GCBConfig.configuration.getString("garena_password") != null) {
+			username = GCBConfig.configuration.getString("garena_username");
+			password = GCBConfig.configuration.getString("garena_password");
+		}
 
 		ByteBuffer block = ByteBuffer.allocate(69);
 		block.order(ByteOrder.LITTLE_ENDIAN);
