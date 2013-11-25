@@ -549,11 +549,35 @@ public class GarenaInterface {
 			return false;
 		}
 	}
+	
+	public String getUsername() {
+		if(GCBConfig.configuration.getString("garena_username") != null) {
+			return GCBConfig.configuration.getString("garena_username");
+		} else if(GCBConfig.configuration.getString("garena" + id + "_username") != null) {
+			return GCBConfig.configuration.getString("garena" + id + "_username");
+		} else {
+			Main.println(6, "[GInterface " + id + "] Fatal error: username for this connection is not set.");
+			System.exit(-1);
+			return null;
+		}
+	}
+	
+	public String getPassword() {
+		if(GCBConfig.configuration.getString("garena_password") != null) {
+			return GCBConfig.configuration.getString("garena_password");
+		} else if(GCBConfig.configuration.getString("garena" + id + "_password") != null) {
+			return GCBConfig.configuration.getString("garena" + id + "_password");
+		} else {
+			Main.println(6, "[GInterface " + id + "] Fatal error: password for this connection is not set.");
+			System.exit(-1);
+			return null;
+		}
+	}
 
 	public boolean sendGSPSessionLogin() {
 		Main.println(7, "[GInterface " + id + "] Sending GSP session login...");
-		String username = GCBConfig.configuration.getString("garena" + id + "_username");
-		String password = GCBConfig.configuration.getString("garena" + id + "_password");
+		String username = getUsername();
+		String password = getPassword();
 
 		ByteBuffer block = ByteBuffer.allocate(69);
 		block.order(ByteOrder.LITTLE_ENDIAN);
@@ -946,7 +970,7 @@ public class GarenaInterface {
 			return false;
 		}
 		
-		String password = GCBConfig.configuration.getString("garena" + id + "_password");
+		String password = getPassword();
 		String roomPassword = GCBConfig.configuration.getString("garena" + id + "_roompassword", "");
 		
 		ByteBuffer buf = ByteBuffer.allocate(4096);
