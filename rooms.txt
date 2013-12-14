@@ -2358,7 +2358,6 @@ name: Custom Map Divide and Fight ROOM 09       id:1114076 sid:16  server:123.30
 name: Vietnam DotA LoD ROOM 18 v1.24e           id:1114077 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA LoD ROOM 19 v1.24e           id:1114078 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA LoD ROOM 20 v1.24e           id:1114079 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:10 
-name: Clan I.Max                                id:1114083 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 175 v1.24e              id:1114084 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 174 v1.24e              id:1114085 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 173 v1.24e              id:1114086 sid:16  server:123.30.104.107  gid:1001  game:WC3/RPG       ml:1  
@@ -2587,8 +2586,6 @@ name: Vietnam DotA ROOM 164 v1.24e              id:1179600 sid:17  server:123.30
 name: Vietnam DotA ROOM 163 v1.24e              id:1179601 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 162 v1.24e              id:1179602 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 161 v1.24e              id:1179603 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
-name: Clan Combat.Army                          id:1179604 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
-name: Clan Ex ROOM v1.24e                       id:1179605 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Divide and Fight ROOM 20       id:1179606 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Divide and Fight ROOM 19       id:1179607 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Custom Map Divide and Fight ROOM 18       id:1179608 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
@@ -2613,8 +2610,7 @@ name: AOE I : Ha Noi Room 19                    id:1179627 sid:17  server:123.30
 name: Vietnam DotA LoD ROOM 16 v1.24e           id:1179628 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA LoD ROOM 17 v1.24e           id:1179629 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:10 
 name: Vietnam DotA Pro Skynet ROOM v1.24e       id:1179630 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:20 
-name: Alo DotA Clan League                      id:1179631 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
-name: Clan SCVG v1.24e                          id:1179632 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: AOE I: Hoa Binh Room 01                   id:1179632 sid:17  server:123.30.104.108  gid:1020  game:AOE I         ml:1  
 name: Vietnam DotA ROOM 158 v1.24e              id:1179633 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 157 v1.24e              id:1179634 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA ROOM 156 v1.24e              id:1179635 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
@@ -2623,6 +2619,7 @@ name: Vietnam DotA ROOM 154 v1.24e              id:1179637 sid:17  server:123.30
 name: AoE I: Cao Bằng Room 01                   id:1179638 sid:17  server:123.30.104.108  gid:1020  game:AOE I         ml:1  
 name: Vietnam DotA Tournament room 02 v1.24e    id:1179639 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DotA Tournament room 01 v1.24e    id:1179640 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
+name: Vietnam Dota room Clan.HuyenThoai         id:1179641 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:3  
 name: Clan HGTDVN Room v1.24e                   id:1179642 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: Vietnam DDay clan Hellboys v1.23          id:1179643 sid:17  server:123.30.104.108  gid:1001  game:WC3/RPG       ml:1  
 name: AoE1: Phu Tho ROOM 01                     id:1179644 sid:17  server:123.30.104.108  gid:1020  game:AOE I         ml:1  
