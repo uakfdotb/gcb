@@ -28,7 +28,7 @@ public class ConnectWorkerPool {
 		connectQueue = new LinkedList<ConnectJob>();
 		numActiveWorkers = 0;
 		
-		for(int i = 0; i < GCBConfig.configuration.getInt("gcb_connectworkers", 4); i++) {
+		for(int i = 0; i < GCBConfig.configuration.getInt("gcb_connectworkers", 8); i++) {
 			new ConnectWorker().start();
 		}
 	}

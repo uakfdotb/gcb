@@ -251,7 +251,7 @@ public class Main {
 		if(restart) {
 			//make sure we get correct external ip/port; do on restart in case they changed
 			//if this is initial load, this will be done elsewhere
-			lookup();
+			garena.sendPeerLookup();
 		}
 		
 		return true;
@@ -268,35 +268,50 @@ public class Main {
 		
 		return true;
 	}
+	
+	public void lookup(GarenaInterface garena) {
+		//only lookup if this garena connection has peer initiated
+		if(garena.peer_socket == null) {
+			return;
+		}
+
+		Main.println(0, "[Main] Waiting for lookup response on connection " + garena.id + "...");
+		int counter = 0; //resend lookup every second
+
+		while(garena.iExternal == null) {
+			try {
+				Thread.sleep(100);
+			} catch(InterruptedException e) {}
+
+			counter++;
+			if(counter % 4 == 0) {
+				Main.println(0, "[Main] Resending lookup on connection " + garena.id);
+				garena.sendPeerLookup();
+			}
+		}
+
+		Main.println(0, "[Main] Received lookup response!");
+	}
 
 	public void lookup() {
+		//send lookup packets
 		synchronized(garenaConnections) {
 			if(loadPL && !garenaConnections.isEmpty()) {
 				Iterator<GarenaInterface> it = garenaConnections.values().iterator();
 				
 				while(it.hasNext()) {
-					GarenaInterface garena = it.next();
-
-					//lookup
-					garena.sendPeerLookup();
-
-					Main.println(0, "[Main] Waiting for lookup response on connection " + garena.id + "...");
-
-					int counter = 0; //resend lookup every second
-
-					while(garena.iExternal == null) {
-						try {
-							Thread.sleep(100);
-						} catch(InterruptedException e) {}
-
-						counter++;
-						if(counter % 10 == 0) {
-							Main.println(0, "[Main] Resending lookup on connection " + garena.id);
-							garena.sendPeerLookup();
-						}
-					}
-
-					Main.println(0, "[Main] Received lookup response!");
+					it.next().sendPeerLookup();
+				}
+			}
+		}
+		
+		//wait for lookup response (and send more packets if needed)
+		synchronized(garenaConnections) {
+			if(loadPL && !garenaConnections.isEmpty()) {
+				Iterator<GarenaInterface> it = garenaConnections.values().iterator();
+				
+				while(it.hasNext()) {
+					lookup(it.next());
 				}
 			}
 		}
