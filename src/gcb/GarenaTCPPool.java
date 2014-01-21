@@ -34,7 +34,7 @@ public class GarenaTCPPool extends Thread {
 		}
 		
 		//configuration
-		connectionsPerWorker = GCBConfig.configuration.getInt("tcp_connectionsperworker", 5);
+		connectionsPerWorker = GCBConfig.configuration.getInt("gcb_tcp_connectionsperworker", 5);
 	}
 	
 	public void enqueue(GarenaInterface garena, InetAddress address, int port, byte[] bytes) {
