@@ -27,9 +27,9 @@ import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.TimerTask;
 import java.util.zip.CRC32;
 
@@ -73,7 +73,6 @@ public class GarenaInterface {
 	List<MemberInfo> members;
 	List<RoomInfo> rooms;
 	List<GarenaListener> listeners;
-	HashMap<Integer, GarenaTCP> tcp_connections;
 	
 	//our user ID
 	int user_id;
@@ -107,6 +106,12 @@ public class GarenaInterface {
 	
 	//last time we received something from room, for idle checking
 	long lastRoomReceivedTime = 0;
+	
+	//worker instance to handle peer packets
+	PeerLoopWorker peerLoopWorker;
+	
+	//TCP connection pool manager
+	GarenaTCPPool tcpPool;
 
 	public GarenaInterface(PluginManager plugins, int id) {
 		this.id = id;
@@ -116,15 +121,12 @@ public class GarenaInterface {
 		members = new ArrayList<MemberInfo>();
 		rooms = new ArrayList<RoomInfo>();
 		listeners = new ArrayList<GarenaListener>();
-		tcp_connections = new HashMap<Integer, GarenaTCP>();
 		exitingNicely = false;
 
 		synchronized(Main.TIMER) {
-			Main.TIMER.schedule(new RetransmitTask(), 20000, (int) Math.ceil(GCBConfig.configuration.getDouble("gcb_tcp_srttg", 20)));
 			Main.TIMER.schedule(new HelloTask(), 1000, 10000); //send hello to all room peers every 10 seconds
 			Main.TIMER.schedule(new PlayTask(), 1000, 60000); //this is used simply as a keep-alive
 			Main.TIMER.schedule(new ExperienceTask(), 1000, 60000 * 15); //experience packet every 15 minutes
-			Main.TIMER.schedule(new CleanTask(), 1000, 300000); //clean TCP connections every five minutes
 		}
 		
 		//configuration
@@ -155,6 +157,10 @@ public class GarenaInterface {
 
 	public WC3Interface getWC3Interface() {
 		return wc3i;
+	}
+	
+	public void setGarenaTCPPool(GarenaTCPPool tcpPool) {
+		this.tcpPool = tcpPool;
 	}
 
 	public boolean init() {
@@ -261,6 +267,12 @@ public class GarenaInterface {
 
 			Main.println(6, "[GInterface " + id + "] Unable to establish peer socket on port " + peer_port + ": " + ioe.getLocalizedMessage());
 			return false;
+		}
+		
+		//start up peer loop worker, if not already
+		if(peerLoopWorker == null) {
+			peerLoopWorker = new PeerLoopWorker();
+			peerLoopWorker.start();
 		}
 		
 		return true;
@@ -1696,18 +1708,9 @@ public class GarenaInterface {
 	}
 
 	public void readPeerLoop() {
-		//in case we're restarting peer loop, erase old TCP connections
-		synchronized(tcp_connections) {
-			tcp_connections.clear();
-		}
-		
 		byte[] buf_array = new byte[65536];
-		ByteBuffer lbuf = ByteBuffer.allocate(65536);
 
 		while(true) {
-			lbuf.clear();
-			lbuf.order(ByteOrder.LITTLE_ENDIAN);
-
 			try {
 				DatagramPacket packet = new DatagramPacket(buf_array, buf_array.length);
 				peer_socket.receive(packet);
@@ -1716,139 +1719,20 @@ public class GarenaInterface {
 				plugins.onPacket(GARENA_PEER, -1, buf_array, packet.getOffset(), packet.getLength());
 
 				int length = packet.getLength();
-				lbuf.put(buf_array, 0, length);
+				
+				if(length == 0) {
+					continue;
+				}
+				
+				byte[] bytes = new byte[length];
+				System.arraycopy(buf_array, 0, bytes, 0, length);
 
-				if(buf_array[0] == 0x06) {
-					iExternal = new byte[4];
-					lbuf.position(8);
-					lbuf.get(iExternal);
-
-					lbuf.order(ByteOrder.BIG_ENDIAN);
-					pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
-					lbuf.order(ByteOrder.LITTLE_ENDIAN);
-
-					String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[3]);
-
-					Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
-				} else if(buf_array[0] == 0x3F) {
-					int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
-					int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
-
-					Main.println(7, "[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
-
-					for(int i = 0; i < num_rooms; i++) {
-						RoomInfo room = new RoomInfo();
-						int suffix = GarenaEncrypt.unsignedByte(lbuf.get(4 + i * 2));
-						room.roomId = room_prefix * 256 + suffix;
-						room.numUsers = GarenaEncrypt.unsignedByte(lbuf.get(5 + i * 2));
-						
-						synchronized(rooms) {
-							rooms.add(room);
-						}
-					}
-				} else if(buf_array[0] == 0x0F) {
-					int id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
-					MemberInfo member = memberFromID(id);
-
-					if(member != null) {
-						member.correctIP = packet.getAddress();
-						member.correctPort = packet.getPort();
-					}
-				} else if(buf_array[0] == 0x02) {
-					int id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
-					MemberInfo member = memberFromID(id);
-
-					if(member != null) {
-						member.correctIP = packet.getAddress();
-						member.correctPort = packet.getPort();
-
-						sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
-					}
+				if(buf_array[0] == 0x06 || buf_array[0] == 0x3F || buf_array[0] == 0x0F || buf_array[0] == 0x02 || buf_array[0] == 0x01) {
+					peerLoopWorker.append(packet.getAddress(), packet.getPort(), bytes);
 				} else if(buf_array[0] == 0x0B && !exitingNicely) { //initconn, don't accept if we're exiting though
-					int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
-					int conn_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 8);
-					int destination = GarenaEncrypt.byteArrayToIntLittle(buf_array, 16); //little endian short followed by two zeroes
-
-					MemberInfo member = memberFromID(remote_id);
-					if(member != null) {
-						Main.println(5, "[GInterface " + id + "] Starting TCP connection with " +  member.username);
-					} else {
-						Main.println(5, "[GInterface " + id + "] Starting TCP connection with " +  remote_id);
-					}
-					
-					GarenaTCP tcp_connection = new GarenaTCP(this);
-					tcp_connection.init(packet.getAddress(), packet.getPort(), remote_id, conn_id, destination, member);
-
-					synchronized(tcp_connections) {
-						if(tcp_connections.containsKey(conn_id)) {
-							Main.println(6, "[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
-							tcp_connections.get(conn_id).end(true);
-						}
-
-						tcp_connections.put(conn_id, tcp_connection);
-					}
+					tcpPool.enqueue(this, packet.getAddress(), packet.getPort(), bytes);
 				} else if(buf_array[0] == 0x0D) {
-					int conn_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 4);
-
-					if(conn_id == 0) {
-						continue; //happens sometimes
-					}
-
-					GarenaTCP tcp_connection;
-					
-					synchronized(tcp_connections) {
-						tcp_connection = tcp_connections.get(conn_id);
-					}
-
-					int remote_id = GarenaEncrypt.byteArrayToIntLittle(buf_array, 8);
-
-					if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
-						Main.println(10, "[GInterface " + id + "] Warning: CONN packet received from user " +
-								remote_id + " at " + packet.getAddress() +
-								", but connection " + conn_id + " not started with user");
-						continue;
-					}
-
-					int seq = GarenaEncrypt.byteArrayToIntLittle(buf_array, 12);
-					int ack = GarenaEncrypt.byteArrayToIntLittle(buf_array, 16);
-
-					//CONN ACK, CONN DATA, or CONN FIN?
-
-					if(buf_array[1] == 0x14) { //CONN DATA
-						tcp_connection.data(seq, ack, buf_array, 20, length - 20);
-					} else if(buf_array[1] == 0x0E) { //CONN ACK
-						tcp_connection.connAck(seq, ack);
-					} else if(buf_array[1] == 0x01) {
-						Main.println(5, "[GInterface " + id + "] User requested termination on connection " + conn_id);
-						// tcp_connections will be updated by GarenaTCP
-						// so just call end
-						tcp_connection.end(true);
-					} else {
-						Main.println(10, "[GInterface " + id + "] PeerLoop: unknown CONN type received: " + buf_array[1]);
-					}
-				} else if(buf_array[0] == 0x01) {
-					int senderId = lbuf.getInt(4);
-					
-					lbuf.order(ByteOrder.BIG_ENDIAN);
-					lbuf.order(ByteOrder.LITTLE_ENDIAN);
-
-					lbuf.position(16);
-
-					//if we are using reverse, we simply forward the UDP packet to
-					// the Warcraft client
-					if(reverseEnabled) {
-						reverseHost.receivedUDP(lbuf, packet.getAddress(), packet.getPort(), senderId);
-					}
-					
-					//otherwise, we want to check if this is a SEARCHGAME packet and
-					// then send all of our cached GAMEINFO packets to the client
-					// (depending on gcb configuration)
-					else {
-						wc3i.receivedUDP(this, lbuf, packet.getAddress(), packet.getPort(), senderId);
-					}
+					tcpPool.enqueue(this, packet.getAddress(), packet.getPort(), bytes);
 				} else {
 					Main.println(10, "[GInterface " + id + "] PeerLoop: unknown type received: " + buf_array[0] + "; size is: " + length);
 				}
@@ -2062,7 +1946,7 @@ public class GarenaInterface {
 		}
 
 		//init the GarenaTCP connection
-		GarenaTCP tcp_connection = new GarenaTCP(this);
+		GarenaTCP tcp_connection = new GarenaTCP(this, null);
 		tcp_connection.initReverse(address, port, remote_id, conn_id, socket);
 
 		MemberInfo member = memberFromID(remote_id);
@@ -2072,14 +1956,7 @@ public class GarenaInterface {
 			Main.println(5, "[GInterface " + id + "] Starting reverse TCP connection with " +  remote_id);
 		}
 
-		synchronized(tcp_connections) {
-			if(tcp_connections.containsKey(conn_id)) {
-				Main.println(6, "[GInterface " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
-			}
-
-			tcp_connections.put(conn_id, tcp_connection);
-		}
-
+		tcpPool.registerConnection(conn_id, tcp_connection);
 		return tcp_connection;
 	}
 
@@ -2175,22 +2052,6 @@ public class GarenaInterface {
 		return exitingNicely;
 	}
 	
-	public boolean hasExited() {
-		if(exitingNicely) {
-			synchronized(tcp_connections) {
-				return tcp_connections.isEmpty();
-			}
-		} else {
-			return false;
-		}
-	}
-	
-	public int numConnected() {
-		synchronized(tcp_connections) {
-			return tcp_connections.size();
-		}
-	}
-	
 	public int numRoomUsers() {
 		synchronized(members) {
 			return members.size();
@@ -2229,48 +2090,125 @@ public class GarenaInterface {
 
 		plugins.onDisconnect(x);
 	}
-
-	public void cleanTCPConnections() {
-		synchronized(tcp_connections) {
-			Iterator<Integer> connectionIterator = tcp_connections.keySet().iterator();
-
-			while(connectionIterator.hasNext()) {
-				int x = connectionIterator.next();
-				GarenaTCP connection = tcp_connections.get(x);
-
-				if(connection.isTimeout()) {
-					Main.println(5, "[GInterface " + id + "] Disconnecting connection " + x + " due to timeout.");
-
-					//using end(true) would remove the connection, but
-					// since we're currently iterating over it that
-					// would cause a concurrent modification exception
-					//so instead we remove it from here
-					connection.end(false);
-					connectionIterator.remove();
-				}
-			}
-		}
-	}
-
-	public void removeTCPConnection(int conn_id) {
-		synchronized(tcp_connections) {
-			tcp_connections.remove(conn_id);
-			
-			//if we're exiting nicely and we've finished exiting, then unbind UDP
-			if(hasExited()) {
-				disconnected(GARENA_PEER, false);
-			}
-		}
-	}
 	
-	class RetransmitTask extends TimerTask {
+	class PeerLoopWorker extends Thread {
+		//this class handles peer packets relating to the GarenaInterface (not relating to TCP connection)
+		// we do this in a separate thread due to efficiency concerns
+		Queue<PeerLoopWorkerPacket> packets;
+		
+		public PeerLoopWorker() {
+			packets = new LinkedList<PeerLoopWorkerPacket>();
+		}
+		
+		public void append(InetAddress address, int port, byte[] bytes) {
+			synchronized(packets) {
+				packets.add(new PeerLoopWorkerPacket(address, port, bytes));
+				packets.notifyAll();
+			}
+		}
+		
 		public void run() {
-			synchronized(tcp_connections) {
-				Iterator<GarenaTCP> connection_it = tcp_connections.values().iterator();
+			ByteBuffer lbuf = ByteBuffer.allocate(65536);
+			
+			while(true) {
+				PeerLoopWorkerPacket packet;
 				
-				while(connection_it.hasNext()) {
-					connection_it.next().standardRetransmission();
+				synchronized(packets) {
+					while(packets.isEmpty()) {
+						try {
+							packets.wait();
+						} catch(InterruptedException ie) {}
+					}
+					
+					packet = packets.poll();
 				}
+				
+				lbuf.clear();
+				lbuf.put(packet.bytes);
+				lbuf.order(ByteOrder.LITTLE_ENDIAN);
+				
+				if(packet.bytes[0] == 0x06) {
+					iExternal = new byte[4];
+					lbuf.position(8);
+					lbuf.get(iExternal);
+
+					lbuf.order(ByteOrder.BIG_ENDIAN);
+					pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
+					lbuf.order(ByteOrder.LITTLE_ENDIAN);
+
+					String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
+							"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
+							"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
+							"." + GarenaEncrypt.unsignedByte(iExternal[3]);
+
+					Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
+				} else if(packet.bytes[0] == 0x3F) {
+					int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
+					int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
+
+					Main.println(7, "[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
+
+					for(int i = 0; i < num_rooms; i++) {
+						RoomInfo room = new RoomInfo();
+						int suffix = GarenaEncrypt.unsignedByte(lbuf.get(4 + i * 2));
+						room.roomId = room_prefix * 256 + suffix;
+						room.numUsers = GarenaEncrypt.unsignedByte(lbuf.get(5 + i * 2));
+						
+						synchronized(rooms) {
+							rooms.add(room);
+						}
+					}
+				} else if(packet.bytes[0] == 0x0F) {
+					int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
+					MemberInfo member = memberFromID(id);
+
+					if(member != null) {
+						member.correctIP = packet.address;
+						member.correctPort = packet.port;
+					}
+				} else if(packet.bytes[0] == 0x02) {
+					int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
+					MemberInfo member = memberFromID(id);
+
+					if(member != null) {
+						member.correctIP = packet.address;
+						member.correctPort = packet.port;
+
+						sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
+					}
+				} else if(packet.bytes[0] == 0x01) {
+					int senderId = lbuf.getInt(4);
+					
+					lbuf.order(ByteOrder.BIG_ENDIAN);
+					lbuf.order(ByteOrder.LITTLE_ENDIAN);
+
+					lbuf.position(16);
+
+					//if we are using reverse, we simply forward the UDP packet to
+					// the Warcraft client
+					if(reverseEnabled) {
+						reverseHost.receivedUDP(lbuf, packet.address, packet.port, senderId);
+					}
+					
+					//otherwise, we want to check if this is a SEARCHGAME packet and
+					// then send all of our cached GAMEINFO packets to the client
+					// (depending on gcb configuration)
+					else {
+						wc3i.receivedUDP(GarenaInterface.this, lbuf, packet.address, packet.port, senderId);
+					}
+				}
+			}
+		}
+	
+		class PeerLoopWorkerPacket {
+			InetAddress address;
+			int port;
+			byte[] bytes;
+			
+			public PeerLoopWorkerPacket(InetAddress address, int port, byte[] bytes) {
+				this.address = address;
+				this.port = port;
+				this.bytes = bytes;
 			}
 		}
 	}
@@ -2319,12 +2257,6 @@ public class GarenaInterface {
 	
 				//room loop should take care of actual reconnection
 			}
-		}
-	}
-	
-	class CleanTask extends TimerTask {
-		public void run() {
-			cleanTCPConnections();
 		}
 	}
 }

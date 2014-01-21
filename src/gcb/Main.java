@@ -79,6 +79,7 @@ public class Main {
 	GCBRcon rcon;
 	
 	ConnectWorkerPool connectPool;
+	GarenaTCPPool tcpPool;
 
 	//determine what will be loaded, what won't be loaded
 	boolean loadBot;
@@ -153,6 +154,11 @@ public class Main {
 			connectPool = new ConnectWorkerPool(this);
 		}
 		
+		if(tcpPool == null) {
+			tcpPool = new GarenaTCPPool();
+			tcpPool.start();
+		}
+		
 		if(loadWC3 && !restart) {
 			//setup wc3 broadcast reader
 			wc3i = new WC3Interface(garenaConnections);
@@ -172,6 +178,7 @@ public class Main {
 						GCBConfig.configuration.containsKey("garena" + i + "_roomname")) {
 					GarenaInterface garena = new GarenaInterface(plugins, i);
 					garena.registerListener(reconnect);
+					garena.setGarenaTCPPool(tcpPool);
 					
 					synchronized(garenaConnections) {
 						garenaConnections.put(i, garena);
@@ -569,11 +576,7 @@ public class Main {
 
 	class StatusTask extends TimerTask {
 		public void run() {
-			int numTCPConnections = 0;
-			
-			int mostPopularId = 0;
-			int maxTCPConnections = 0;
-			
+			int numTCPConnections = tcpPool.count();
 			int rooms = 0;
 			int users = 0;
 			
@@ -581,17 +584,8 @@ public class Main {
 				Iterator<GarenaInterface> it = garenaConnections.values().iterator();
 				
 				while(it.hasNext()) {
-					GarenaInterface garena = it.next();
-					int connected = garena.numConnected();
-					numTCPConnections += connected;
-					
-					if(connected > maxTCPConnections) {
-						maxTCPConnections = connected;
-						mostPopularId = garena.id;
-					}
-					
 					rooms++;
-					users += garena.numRoomUsers();
+					users += it.next().numRoomUsers();
 				}
 			}
 			
@@ -612,10 +606,8 @@ public class Main {
 			uptimeString += upSeconds + "s";
 			
 			String statusString = String.format(
-					"[STATUS] connected: %d (max: %d/%d); mem: %d KB; threads: %d; rooms/users: %d/%d; up: %s",
+					"[STATUS] connected: %d; mem: %d KB; threads: %d; rooms/users: %d/%d; up: %s",
 					numTCPConnections,
-					mostPopularId,
-					maxTCPConnections,
 					memory,
 					threads,
 					rooms,

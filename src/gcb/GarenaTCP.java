@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ public class GarenaTCP extends Thread {
 	String[] reservedNames;
 
 	GarenaInterface garena;
+	TCPWorker worker;
 	Socket socket;
 	DataOutputStream out;
 	DataInputStream in;
@@ -77,8 +77,9 @@ public class GarenaTCP extends Thread {
 	int maxUDPSize; //limits the size of UDP packets
 	int maxTCPSize; //limits the size of TCP packets
 
-	public GarenaTCP(GarenaInterface garena) {
+	public GarenaTCP(GarenaInterface garena, TCPWorker worker) {
 		this.garena = garena;
+		this.worker = worker;
 		packets = new ArrayList<GarenaTCPPacket>();
 		packetRetransmitQueue = new PriorityQueue<GarenaTCPPacket>();
 		out_packets = new HashMap<Integer, GarenaTCPPacket>();
@@ -151,6 +152,10 @@ public class GarenaTCP extends Thread {
 		
 		rttMade = false;
 		retransmissionTimeout = standardDelay;
+	}
+	
+	public void setWorker(TCPWorker worker) {
+		this.worker = worker;
 	}
 
 	public String getPortHost(int port) {
@@ -566,18 +571,8 @@ public class GarenaTCP extends Thread {
 	public void run() {
 		byte[] rbuf = new byte[maxTCPSize];
 		ByteBuffer lbuf = ByteBuffer.allocate(maxTCPSize);
-		
-		try {
-			socket.setSoTimeout(soTimeout);
-		} catch(IOException e) {
-			//not a major problem, this is only necessary in special circumstances
-			Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": setting soTimeout failed, but continuing");
-		}
 
 		while(!terminated) {
-			//do standard retransmission every now and then
-			standardRetransmission();
-			
 			try {
 				int len;
 				
@@ -610,8 +605,6 @@ public class GarenaTCP extends Thread {
 				
 				Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": " + conn_id + " new packet from local: " + seq + " (len=" + len + ")");
 				handleLocalPacket(data, lbuf);
-			} catch(SocketTimeoutException e) {
-				//continue loop with standard retransmission
 			} catch(IOException ioe) {
 				end(true);
 				
@@ -683,7 +676,7 @@ public class GarenaTCP extends Thread {
 		return -1; //todo: implement timestamp correctly in GarenaInterface
 	}
 
-	public void end(boolean removeGarenaInterface) {
+	public void end(boolean removeWorker) {
 		Main.println(6, "[GarenaTCP " + conn_id + "] Terminating connection " + conn_id + " with " + remote_address + " (" + remote_username + ")");
 		terminated = true;
 		//allocate a new buffer so we don't do anything thread-unsafe
@@ -703,9 +696,9 @@ public class GarenaTCP extends Thread {
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 		garena.sendTCPFin(remote_address, remote_port, conn_id, last_time, tbuf);
 
-		if(removeGarenaInterface) {
+		if(removeWorker && worker != null) {
 			//remove connection from GarenaInterface map
-			garena.removeTCPConnection(conn_id);
+			worker.removeTCPConnection(conn_id);
 		}
 	}
 

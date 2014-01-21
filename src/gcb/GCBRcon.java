@@ -149,6 +149,10 @@ public class GCBRcon implements Runnable {
 							}
 						}
 						
+						if(main.tcpPool != null) {
+							main.tcpPool.exitNicely();
+						}
+						
 						if(main.wc3i != null) {
 							main.wc3i.exitNicely();
 						}
@@ -181,20 +185,7 @@ public class GCBRcon implements Runnable {
 	
 	class ExitTask extends TimerTask {
 		public void run() {
-			boolean exited = true;
-			
-			synchronized(main.garenaConnections) {
-				Iterator<GarenaInterface> it = main.garenaConnections.values().iterator();
-				
-				while(it.hasNext()) {
-					GarenaInterface garena = it.next();
-					exited = exited && garena.hasExited();
-					
-					if(!exited) break;
-				}
-			}
-			
-			if(exited) {
+			if(main.tcpPool.count() == 0) {
 				System.exit(0);
 			}
 		}
