@@ -1,5 +1,5 @@
-gcb 1.0.1
----------
+gcb 1.0.2-dev
+-------------
 
 gcb (formerly Garena Client Broadcast) facilitates connections between Garena clients and a Warcraft III server (theoretically, it should be possible to configure other games by altering certain configuration options, but this has not been tested).
 
