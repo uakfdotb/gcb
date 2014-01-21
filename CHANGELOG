@@ -1,8 +1,11 @@
 1.0.1
 * on startup, multithreaded room connection instead of previous sequential connection method
 * introduce flag-based log level to allow user to decide which messages to log
+* username and password for room connections can be set on a global level
 * other minor changes are listed below
 - REVERSE by default will use any free port rather than specific ports
+- allow multiple broadcast targets to be set
+- update references from codelain.com to ghostpp.com
 
 1.0.0
 * LAN list is updated using REFRESHGAME and DECREATEGAME packets

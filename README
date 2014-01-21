@@ -1,7 +1,7 @@
-gcb (Garena Client Broadcast) 1.0.1-dev
----------------------------------------
+gcb 1.0.1
+---------
 
-gcb facilitates connections between Garena clients and a Warcraft III server (theoretically, it should be possible to configure other games by altering certain configuration options, but this has not been tested).
+gcb (formerly Garena Client Broadcast) facilitates connections between Garena clients and a Warcraft III server (theoretically, it should be possible to configure other games by altering certain configuration options, but this has not been tested).
 
 First, gcb listens to broadcasts to UDP port 6112, and then forwards these game broadcasts via Garena's encapsulated UDP protocol. Then, eventually a user should join the game; gcb will receive a TCP connection request over Garena's virtual TCP protocol, and will begin relaying packets between the Garena client and a Warcraft III server (the server hostname and port are preset; multiple connection ports can be specified). Note that any Warcraft III server over LAN can be used, including GHost (and, of course, normal Warcraft III LAN hosting).
 

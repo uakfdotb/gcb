@@ -1327,7 +1327,7 @@ public class GChatBot implements GarenaListener {
 				}
 				return sqlthread.getKickInfo(payload);
 			} else if(command.equals("creater")) {
-				return "Garena Client Broadcaster (GCB) is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
+				return "gcb is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
 			} else if(command.equals("alias")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("")) {
@@ -1353,7 +1353,7 @@ public class GChatBot implements GarenaListener {
 			} else if(command.equals("help")) {
 				payload = removeSpaces(payload);
 				if(payload.equals("")) {
-					return "General help info: Command trigger is \"" + trigger + "\". Use " + trigger + "help [command] for help about a specific command. For a list of valid commands use " + trigger + "commands. For a list of aliases of a specific command use " + trigger + "alias [command]. If you whisper a command to the bot, it will respond in a whisper if possible. PRO TIP: nearly every command has a short form! Garena Client Broadcaster is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
+					return "General help info: Command trigger is \"" + trigger + "\". Use " + trigger + "help [command] for help about a specific command. For a list of valid commands use " + trigger + "commands. For a list of aliases of a specific command use " + trigger + "alias [command]. If you whisper a command to the bot, it will respond in a whisper if possible. PRO TIP: nearly every command has a short form! gcb is developed by uakf.b. Chat bot is developed by GG.Dragon aka XIII.Dragon";
 				}
 				String cmd = processAlias(payload.toLowerCase()); //converts payload to alias
 				if(cmd.equals("exit")) {
