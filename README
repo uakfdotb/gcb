@@ -42,11 +42,7 @@ Configuration
 
 Most variables that may need to be configured can be configured in gcb.cfg. See that file, bin/gcb.cfg, for deatils; each key should have a short description of how to determine it's appropriate value.
 
-The keys that you need to set are: gcb_username, your Garena username; gcb_password, your Garena password; gcb_roomid, the ID of the room you wish to join; and gcb_roomhost, the hostname of the room you wish to join.
-
-To set "gcb_roomid" and "gcb_roomhost", open rooms.txt and search for the room name you are looking for (for example: USA DotA Room 01). Then, write the id on that line for "gcb_roomid" and the server for "gcb_roomhost". See the ID from RoomEN.dat section later for details on how to generate rooms.txt or retrieve the ID/IP address manually in case the included rooms.txt goes out of date (Garena frequently updates its rooms).
-
-Alternatively, you can set "gcb_roomname" (case insensitive), which well then try to find a match in gcbrooms.txt. However, be aware that there are rooms with the same name.
+The keys that you need to set are: garena_username, your Garena username; garena_password, your Garena password; garena1_roomname, the name of the room that you want to join (alternative, set garena1_roomid, the ID of the room you wish to join, and garena1_roomhost, the hostname of the room you wish to join; if you set the name of the room, these values are autodetected).
 
 Running
 -------
@@ -95,13 +91,13 @@ To retrieve the ID, you can either manually use an sqlite client like the one ab
 The Room ID and Server ID can be found by searching the table named "RoomTab". For example:
 
 SELECT RoomID, ServerId FROM RoomTab WHERE RoomName=' WC3 ROC USA Room'
-        
+
 Note the space preceeding the room name. The Room ID should be recorded as "gcb_roomid".
 
 To find the Room IP address, execute:
 
 SELECT IP FROM RoomServerTab WHERE ServerId=<server_id>
-        
+
 Were <server_id> is the Server ID you found earlier.
 
 The IP address is stored as an integer. It can be converted into an actual address: it is the integer representation of the IP address stored in little endian. This tool may help you: http://www.silisoftware.com/tools/ipconverter.php. To use it with the integer from the SQLite database, type the integer in for "Integer IP". You will receive the four parts under "Decimal IP". Reverse these parts (1.2.3.4 -> 4.3.2.1) to retrieve the original IP address.
