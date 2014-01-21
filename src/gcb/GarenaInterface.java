@@ -1968,9 +1968,11 @@ public class GarenaInterface {
 	}
 
 	public MemberInfo memberFromID(int id) {
-		for(int i = 0; i < members.size(); i++) {
-			if(members.get(i).userID == id) {
-				return members.get(i);
+		synchronized(members) {
+			for(MemberInfo member : members) {
+				if(member.userID == id) {
+					return member;
+				}
 			}
 		}
 
