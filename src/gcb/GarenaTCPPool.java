@@ -47,7 +47,7 @@ public class GarenaTCPPool extends Thread {
 	public void registerConnection(int conn_id, TCPWorker worker, GarenaTCP tcp) {
 		synchronized(tcpConnections) {
 			if(tcpConnections.containsKey(conn_id)) {
-				Main.println(6, "[GarenaTCPPool] Warning: duplicate TCP connection ID; overwriting previous");
+				Main.println(1, "[GarenaTCPPool] Warning: duplicate TCP connection ID; overwriting previous");
 				tcpConnections.get(conn_id).end(true);
 			}
 			
@@ -71,16 +71,13 @@ public class GarenaTCPPool extends Thread {
 					break;
 				}
 			}
-			
-			if(assigned_worker == null) {
-				TCPWorker worker = new TCPWorker(this, workerNextId++);
-				worker.start();
-				workers.add(worker);
-				worker.registerConnection(conn_id, tcp);
-				assigned_worker = worker;
-			}
 		}
-			
+		
+		if(assigned_worker == null) {
+			assigned_worker = allocateWorker();
+			assigned_worker.registerConnection(conn_id, tcp);
+		}
+		
 		registerConnection(conn_id, assigned_worker, tcp);
 	}
 	
@@ -114,7 +111,7 @@ public class GarenaTCPPool extends Thread {
 				GarenaTCP connection = tcpConnections.get(x);
 
 				if(connection.isTimeout()) {
-					Main.println(5, "[GarenaTCPPool] Disconnecting connection " + x + " due to timeout.");
+					Main.println(1, "[GarenaTCPPool] Disconnecting connection " + x + " due to timeout.");
 
 					//using end(true) would remove the connection, but
 					// since we're currently iterating over it that
@@ -129,6 +126,18 @@ public class GarenaTCPPool extends Thread {
 	
 	public void exitNicely() {
 		exitingNicely = true;
+	}
+	
+	public TCPWorker allocateWorker() {
+		TCPWorker worker = new TCPWorker(this, workerNextId++);
+		worker.start();
+		
+		synchronized(workers) {
+			workers.add(worker);
+			Main.println(4, "[GarenaTCPPool] Allocated a new worker thread (count=" + workers.size() + ", id=" + (workerNextId - 1) + ")");
+		}
+		
+		return worker;
 	}
 	
 	public void run() {
@@ -154,8 +163,9 @@ public class GarenaTCPPool extends Thread {
 				}
 				
 				//find a worker to allocate this connection initiation to
+				boolean assigned = false;
+				
 				synchronized(workers) {
-					boolean assigned = false;
 					
 					for(TCPWorker worker : workers) {
 						if(worker.count() < connectionsPerWorker) {
@@ -164,13 +174,10 @@ public class GarenaTCPPool extends Thread {
 							break;
 						}
 					}
+				}
 					
-					if(!assigned) {
-						TCPWorker worker = new TCPWorker(this, workerNextId++);
-						worker.start();
-						workers.add(worker);
-						worker.enqueue(packet);
-					}
+				if(!assigned) {
+					allocateWorker().enqueue(packet);
 				}
 			} else if(packet.bytes[0] == 0x0D) {
 				int conn_id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
@@ -262,9 +269,9 @@ class TCPWorker extends Thread {
 
 				MemberInfo member = packet.garena.memberFromID(remote_id);
 				if(member != null) {
-					Main.println(5, "[TCPWorker " + id + "] Starting TCP connection with " +  member.username);
+					Main.println(4, "[TCPWorker " + id + "] Starting TCP connection with " +  member.username);
 				} else {
-					Main.println(5, "[TCPWorker " + id + "] Starting TCP connection with " +  remote_id);
+					Main.println(4, "[TCPWorker " + id + "] Starting TCP connection with " +  remote_id);
 				}
 				
 				GarenaTCP tcp_connection = new GarenaTCP(packet.garena, this);
@@ -272,7 +279,7 @@ class TCPWorker extends Thread {
 
 				synchronized(tcpConnections) {
 					if(tcpConnections.containsKey(conn_id)) {
-						Main.println(6, "[Worker " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
+						Main.println(1, "[Worker " + id + "] Warning: duplicate TCP connection ID; overwriting previous");
 						tcpConnections.get(conn_id).end(true);
 					}
 
@@ -296,7 +303,7 @@ class TCPWorker extends Thread {
 				int remote_id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 8);
 
 				if(tcp_connection == null || tcp_connection.remote_id != remote_id) {
-					Main.println(10, "[TCPWorker " + id + "] Warning: CONN packet received from user " +
+					Main.println(11, "[TCPWorker " + id + "] Warning: CONN packet received from user " +
 							remote_id + " at " + packet.address +
 							", but connection " + conn_id + " not started with user");
 					continue;
@@ -312,12 +319,12 @@ class TCPWorker extends Thread {
 				} else if(packet.bytes[1] == 0x0E) { //CONN ACK
 					tcp_connection.connAck(seq, ack);
 				} else if(packet.bytes[1] == 0x01) {
-					Main.println(5, "[TCPWorker " + id + "] User requested termination on connection " + conn_id);
+					Main.println(4, "[TCPWorker " + id + "] User requested termination on connection " + conn_id);
 					// tcp_connections will be updated by GarenaTCP
 					// so just call end
 					tcp_connection.end(true);
 				} else {
-					Main.println(10, "[TCPWorker " + id + "] PeerLoop: unknown CONN type received: " + packet.bytes[1]);
+					Main.println(11, "[TCPWorker " + id + "] PeerLoop: unknown CONN type received: " + packet.bytes[1]);
 				}
 			}
 		}
