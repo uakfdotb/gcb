@@ -158,7 +158,7 @@ public class GarenaEncrypt {
 	}
 
 	//code from http://www.exampledepot.com/egs/java.util.zip/CompArray.html
-	public byte[] deflate(byte[] input) {
+	public static byte[] deflate(byte[] input) {
 		// Create the compressor
 		Deflater compressor = new Deflater();
 
@@ -187,7 +187,7 @@ public class GarenaEncrypt {
 		return bos.toByteArray();
 	}
 
-	public byte[] expand(byte[] input) {
+	public static byte[] expand(byte[] input) {
 		// Create the decompressor and give it the data to compress
 		Inflater decompressor = new Inflater();
 		decompressor.setInput(input);
@@ -213,11 +213,11 @@ public class GarenaEncrypt {
 		return bos.toByteArray();
 	}
 
-	public String strFromBytes(byte[] input) {
+	public static String strFromBytes(byte[] input) {
 		return strFromBytes(input, "UTF-8");
 	}
 
-	public String strFromBytes(byte[] input, String charset) {
+	public static String strFromBytes(byte[] input, String charset) {
 		//find null byte
 		int null_index = input.length;
 		for(int i = 0; i < input.length; i++) {
@@ -235,7 +235,7 @@ public class GarenaEncrypt {
 		}
 	}
 
-	public String strFromBytes16(byte[] input) throws IOException {
+	public static String strFromBytes16(byte[] input) throws IOException {
 		//find null byte
 		int null_index = input.length;
 		for(int i = 0; i < input.length - 1; i+=2) {

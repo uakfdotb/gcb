@@ -718,12 +718,12 @@ public class GarenaInterface {
 		byte[] str_bytes = new byte[16];
 		buf.position(4);
 		buf.get(str_bytes);
-		Main.println(8, "[GInterface " + id + "] Server says your username is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your username is: " + (GarenaEncrypt.strFromBytes(str_bytes)));
 
 		str_bytes = new byte[2];
 		buf.position(20);
 		buf.get(str_bytes);
-		Main.println(8, "[GInterface " + id + "] Server says your country is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your country is: " + (GarenaEncrypt.strFromBytes(str_bytes)));
 
 		unknown1 = buf.get(24);
 		Main.println(8, "[GInterface " + id + "] Server says your experience is: " + GarenaEncrypt.unsignedByte(buf.get(25)));
@@ -746,7 +746,7 @@ public class GarenaInterface {
 		str_bytes = new byte[array.length - 92];
 		buf.position(92);
 		buf.get(str_bytes);
-		Main.println(8, "[GInterface " + id + "] Server says your email address is: " + (crypt.strFromBytes(str_bytes)));
+		Main.println(8, "[GInterface " + id + "] Server says your email address is: " + (GarenaEncrypt.strFromBytes(str_bytes)));
 	}
 
 	public void readGSPLoop() {
@@ -1006,7 +1006,7 @@ public class GarenaInterface {
 		myinfo[43] = (byte) port[1];
 
 		//add myinfo
-		byte[] deflated = crypt.deflate(myinfo);
+		byte[] deflated = GarenaEncrypt.deflate(myinfo);
 		Main.println(7, "[GInterface " + id + "] deflated myinfo block from " + myinfo.length + " bytes to " + deflated.length + " bytes");
 
 		buf.putInt(deflated.length + 66); //message size
@@ -1193,7 +1193,7 @@ public class GarenaInterface {
 
 		byte[] str_bytes = new byte[packet_size - 4];
 		rin.readFully(str_bytes);
-		String welcome_str = crypt.strFromBytes16(str_bytes);
+		String welcome_str = GarenaEncrypt.strFromBytes16(str_bytes);
 		Main.println(8, "[GInterface " + id + "] Server says: " + welcome_str + " (reports roomid=" + serverRoomId + ")");
 	}
 
@@ -1250,13 +1250,13 @@ public class GarenaInterface {
 		lbuf.position(4);
 		byte[] username_bytes = new byte[16];
 		lbuf.get(username_bytes);
-		member.username = crypt.strFromBytes(username_bytes);
+		member.username = GarenaEncrypt.strFromBytes(username_bytes);
 
 		//country string
 		lbuf.position(20);
 		byte[] country_bytes = new byte[2];
 		lbuf.get(country_bytes);
-		member.country = crypt.strFromBytes(country_bytes);
+		member.country = GarenaEncrypt.strFromBytes(country_bytes);
 
 		member.experience = GarenaEncrypt.unsignedByte(lbuf.get(25));
 		member.playing = (lbuf.get(27)) == 1;
@@ -1434,7 +1434,7 @@ public class GarenaInterface {
 		lbuf.position(8);
 		byte[] chat_bytes = new byte[packet_size - 8];
 		lbuf.get(chat_bytes);
-		String chat_string = crypt.strFromBytes16(chat_bytes);
+		String chat_string = GarenaEncrypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
 			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + " whispers: " + chat_string);
@@ -1468,7 +1468,7 @@ public class GarenaInterface {
 		lbuf.position(12);
 		byte[] chat_bytes = new byte[packet_size - 12];
 		lbuf.get(chat_bytes);
-		String chat_string = crypt.strFromBytes16(chat_bytes);
+		String chat_string = GarenaEncrypt.strFromBytes16(chat_bytes);
 
 		if(member != null) {
 			Main.println(9, "[GInterface " + id + "] " + member.username + " with ID " + member.userID + ": " + chat_string);
