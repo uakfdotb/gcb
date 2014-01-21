@@ -1,5 +1,8 @@
 <?php
 
+# this is an example of how to use gcb's basic rcon feature
+# you must set $service_port to rcon_port and replace password with your rcon_password setting
+
 $address = "127.0.0.1";
 $service_port = 7464;
 $in = "password\nexit nicely\n";
