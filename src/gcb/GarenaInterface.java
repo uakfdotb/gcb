@@ -2111,91 +2111,97 @@ public class GarenaInterface {
 			ByteBuffer lbuf = ByteBuffer.allocate(65536);
 			
 			while(true) {
-				PeerLoopWorkerPacket packet;
-				
-				synchronized(packets) {
-					while(packets.isEmpty()) {
-						try {
-							packets.wait();
-						} catch(InterruptedException ie) {}
+				try {
+					PeerLoopWorkerPacket packet;
+					
+					synchronized(packets) {
+						while(packets.isEmpty()) {
+							try {
+								packets.wait();
+							} catch(InterruptedException ie) {}
+						}
+						
+						packet = packets.poll();
 					}
 					
-					packet = packets.poll();
-				}
-				
-				lbuf.clear();
-				lbuf.put(packet.bytes);
-				lbuf.order(ByteOrder.LITTLE_ENDIAN);
-				
-				if(packet.bytes[0] == 0x06) {
-					iExternal = new byte[4];
-					lbuf.position(8);
-					lbuf.get(iExternal);
-
-					lbuf.order(ByteOrder.BIG_ENDIAN);
-					pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
+					lbuf.clear();
+					lbuf.put(packet.bytes);
 					lbuf.order(ByteOrder.LITTLE_ENDIAN);
-
-					String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
-							"." + GarenaEncrypt.unsignedByte(iExternal[3]);
-
-					Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
-				} else if(packet.bytes[0] == 0x3F) {
-					int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
-					int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
-
-					Main.println(7, "[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
-
-					for(int i = 0; i < num_rooms; i++) {
-						RoomInfo room = new RoomInfo();
-						int suffix = GarenaEncrypt.unsignedByte(lbuf.get(4 + i * 2));
-						room.roomId = room_prefix * 256 + suffix;
-						room.numUsers = GarenaEncrypt.unsignedByte(lbuf.get(5 + i * 2));
+					
+					if(packet.bytes[0] == 0x06) {
+						iExternal = new byte[4];
+						lbuf.position(8);
+						lbuf.get(iExternal);
+	
+						lbuf.order(ByteOrder.BIG_ENDIAN);
+						pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
+						lbuf.order(ByteOrder.LITTLE_ENDIAN);
+	
+						String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
+								"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
+								"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
+								"." + GarenaEncrypt.unsignedByte(iExternal[3]);
+	
+						Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
+					} else if(packet.bytes[0] == 0x3F) {
+						int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
+						int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
+	
+						Main.println(7, "[GInterface " + id + "] Receiving " + num_rooms + " rooms with prefix " + room_prefix);
+	
+						for(int i = 0; i < num_rooms; i++) {
+							RoomInfo room = new RoomInfo();
+							int suffix = GarenaEncrypt.unsignedByte(lbuf.get(4 + i * 2));
+							room.roomId = room_prefix * 256 + suffix;
+							room.numUsers = GarenaEncrypt.unsignedByte(lbuf.get(5 + i * 2));
+							
+							synchronized(rooms) {
+								rooms.add(room);
+							}
+						}
+					} else if(packet.bytes[0] == 0x0F) {
+						int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
+						MemberInfo member = memberFromID(id);
+	
+						if(member != null) {
+							member.correctIP = packet.address;
+							member.correctPort = packet.port;
+						}
+					} else if(packet.bytes[0] == 0x02) {
+						int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
+						MemberInfo member = memberFromID(id);
+	
+						if(member != null) {
+							member.correctIP = packet.address;
+							member.correctPort = packet.port;
+	
+							sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
+						}
+					} else if(packet.bytes[0] == 0x01) {
+						int senderId = lbuf.getInt(4);
 						
-						synchronized(rooms) {
-							rooms.add(room);
+						lbuf.order(ByteOrder.BIG_ENDIAN);
+						lbuf.order(ByteOrder.LITTLE_ENDIAN);
+	
+						lbuf.position(16);
+	
+						//if we are using reverse, we simply forward the UDP packet to
+						// the Warcraft client
+						if(reverseEnabled) {
+							reverseHost.receivedUDP(lbuf, packet.address, packet.port, senderId);
+						}
+						
+						//otherwise, we want to check if this is a SEARCHGAME packet and
+						// then send all of our cached GAMEINFO packets to the client
+						// (depending on gcb configuration)
+						else {
+							wc3i.receivedUDP(GarenaInterface.this, lbuf, packet.address, packet.port, senderId);
 						}
 					}
-				} else if(packet.bytes[0] == 0x0F) {
-					int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
-					MemberInfo member = memberFromID(id);
-
-					if(member != null) {
-						member.correctIP = packet.address;
-						member.correctPort = packet.port;
-					}
-				} else if(packet.bytes[0] == 0x02) {
-					int id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
-					MemberInfo member = memberFromID(id);
-
-					if(member != null) {
-						member.correctIP = packet.address;
-						member.correctPort = packet.port;
-
-						sendPeerHelloReply(member.userID, member.correctIP, member.correctPort, lbuf);
-					}
-				} else if(packet.bytes[0] == 0x01) {
-					int senderId = lbuf.getInt(4);
-					
-					lbuf.order(ByteOrder.BIG_ENDIAN);
-					lbuf.order(ByteOrder.LITTLE_ENDIAN);
-
-					lbuf.position(16);
-
-					//if we are using reverse, we simply forward the UDP packet to
-					// the Warcraft client
-					if(reverseEnabled) {
-						reverseHost.receivedUDP(lbuf, packet.address, packet.port, senderId);
-					}
-					
-					//otherwise, we want to check if this is a SEARCHGAME packet and
-					// then send all of our cached GAMEINFO packets to the client
-					// (depending on gcb configuration)
-					else {
-						wc3i.receivedUDP(GarenaInterface.this, lbuf, packet.address, packet.port, senderId);
-					}
+				} catch(Exception e) {
+					Main.println(1, "[GInterface " + id + "] CRITICAL ERROR: caught in loop:" + e.getLocalizedMessage());
+					System.err.println("[GInterface " + id + "] CRITICAL ERROR: caught in loop: " + e.getLocalizedMessage());
+					e.printStackTrace();
 				}
 			}
 		}
