@@ -166,7 +166,6 @@ public class GarenaTCPPool extends Thread {
 				boolean assigned = false;
 				
 				synchronized(workers) {
-					
 					for(TCPWorker worker : workers) {
 						if(worker.count() < connectionsPerWorker) {
 							worker.enqueue(packet);
