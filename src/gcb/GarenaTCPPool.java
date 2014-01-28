@@ -181,8 +181,10 @@ public class GarenaTCPPool extends Thread {
 			} else if(packet.bytes[0] == 0x0D) {
 				int conn_id = GarenaEncrypt.byteArrayToIntLittle(packet.bytes, 4);
 				
-				if(workerMap.containsKey(conn_id)) {
-					workerMap.get(conn_id).enqueue(packet);
+				synchronized(workerMap) {
+					if(workerMap.containsKey(conn_id)) {
+						workerMap.get(conn_id).enqueue(packet);
+					}
 				}
 			}
 		}
