@@ -99,8 +99,6 @@
  Argentina DotA Room 03 [Moderada]**130917**1**203.117.124.14**1001**WC3/RPG**7
  Algeria DotA Room 02**130924**1**203.117.124.14**1001**WC3/RPG**1
  The Black Road Room 01**130928**1**203.117.124.14**1012**WC3/RPG***1
- Brazil DotA Eventos Room**130948**1**203.117.124.14**1001**WC3/RPG**1
- Brazil DotA Ladder Room 01 [Moderada]**130949**1**203.117.124.14**1001**WC3/RPG**5
  Russia FarEast DotA Room 01 (1.26a)**130951**3**203.117.124.12**1001**WC3/RPG**1
  Ecuador RPG Room 01**130952**1**203.117.124.14**1001**WC3/RPG**1
  sP DotA League Room**130958**3**203.117.124.12**1001**WC3/RPG**1
@@ -129,8 +127,6 @@
  UAE DotA Tournaments Room**131029**1**203.117.124.14**1001**WC3/RPG**1
  Brazil WhatsApp DotA Room**131034**1**203.117.124.14**1001**WC3/RPG**1
  International Gaming Dota League Room**131035**1**203.117.124.14**1001**WC3/RPG**1
- DotA MonsterKill PVP Room BR**131042**1**203.117.124.14**1001**WC3/RPG**20
- Brazil DotA Ladder Room 03 [Moderada]**131043**1**203.117.124.14**1001**WC3/RPG**5
  Georgia DotA Room 04**131044**1**203.117.124.14**1001**WC3/RPG**1
  Brazil RPG Room 05**131045**1**203.117.124.14**1001**WC3/RPG**5
  saP DotA League - Testgames Room**131046**1**203.117.124.14**1001**WC3/RPG**1
@@ -182,7 +178,6 @@
  Brazil DotA Room 22**131455**2**203.117.124.15**1001**WC3/RPG**1
  Brazil DotA Room 21**131456**2**203.117.124.15**1001**WC3/RPG**1
  Brazil DotA High Level Room 01**131457**2**203.117.124.15**1001**WC3/RPG**22
- Brazil DotA Clan War Room 01**131458**2**203.117.124.15**1001**WC3/RPG**1
  Greece DotA High Level Room 01**131461**2**203.117.124.15**1012**WC3/RPG***10
  Angola DotA Room**131463**2**203.117.124.15**1001**WC3/RPG**1
  Iran DotA High Level Room 04**196433**2**203.117.124.15**1001**WC3/RPG**16
@@ -235,25 +230,23 @@
  DotA.by Tournaments Room**196488**3**203.117.124.12**1001**WC3/RPG**1
  DotA Tournaments Room**196489**3**203.117.124.12**1000**WC3/TFT**1
  Colombia DotA Clan War Room 01**196490**2**203.117.124.15**1001**WC3/RPG**1
- Russia LoD DotA Room 01 (1.26a) [Moderated]**196493**3**203.117.124.12**1001**WC3/RPG**10
+ Russia LoD DotA Room 01 (1.26a) [Moderated]**196493**3**203.117.124.12**1001**WC3/RPG**13
  Pakistan Master DotA League**196502**2**203.117.124.15**1001**WC3/RPG**1
  Bulgaria RPG Room 02**196510**2**203.117.124.15**1001**WC3/RPG**1
  Mongolia DotA Room 18**196514**2**203.117.124.15**1001**WC3/RPG**1
  Kazakhstan DotA High Level Room 03 (1.26a)**196520**3**203.117.124.12**1001**WC3/RPG**6
  Mongolia DotA Room 21**196521**2**203.117.124.15**1001**WC3/RPG**1
  Bulgaria DotA Room 20**196522**2**203.117.124.15**1012**WC3/RPG***1
- Ecuador DotA Room 03 [Moderada]**196523**2**203.117.124.15**1001**WC3/RPG**2
+ Ecuador DotA Room 03 [Moderada]**196523**2**203.117.124.15**1001**WC3/RPG**3
  MYM Prime Defending Room**196524**2**203.117.124.15**1001**WC3/RPG**1
  Mongolia DotA Room 20**196576**2**203.117.124.15**1001**WC3/RPG**1
  Poland DotA Room 05**196579**2**203.117.124.15**1012**WC3/RPG***1
  Mongolia DotA Room 19**196580**2**203.117.124.15**1001**WC3/RPG**1
  Iran RPG Room + HostBot**196582**2**203.117.124.15**1001**WC3/RPG**1
  Iran DotA Clan War Room 01 [Moderated]**196583**2**203.117.124.15**1001**WC3/RPG**1
- Brazil DotA Ladder Eventos Room**196589**2**203.117.124.15**1001**WC3/RPG**1
  Iran DotA Room 11**196590**2**203.117.124.15**1001**WC3/RPG**1
  Greece DotA Room 02**196591**2**203.117.124.15**1001**WC3/RPG**1
  Iran DotA Room 10**196592**2**203.117.124.15**1001**WC3/RPG**1
- Brazil DotA Ladder Room 02 [Moderada]**196593**2**203.117.124.15**1001**WC3/RPG**5
  Brazil DotA Facebook Room 01**196594**2**203.117.124.15**1001**WC3/RPG**1
  Brazil RPG Room 04**196597**2**203.117.124.15**1001**WC3/RPG**1
  Argentina Dota Tournaments and Events**196599**2**203.117.124.15**1001**WC3/RPG**1
@@ -270,17 +263,17 @@
  Russia DotA Room 013 (1.26a)**196613**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 012 (1.26a)**196614**3**203.117.124.12**1001**WC3/RPG**1
  Russia DotA Room 011 (1.26a)**196615**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 010 (1.26a)**196616**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 009 (1.26a)**196617**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 008 (1.26a)**196618**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 007 (1.26a)**196619**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 006 (1.26a)**196629**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 005 (1.26a)**196630**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 004 (1.26a)**196631**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 003 (1.26a)**196632**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 002 (1.26a)**196633**3**203.117.124.12**1001**WC3/RPG**1
+ Russia DotA Room 010 (1.26a)**196616**3**203.117.124.12**1001**WC3/RPG**2
+ Russia DotA Room 009 (1.26a)**196617**3**203.117.124.12**1001**WC3/RPG**2
+ Russia DotA Room 008 (1.26a)**196618**3**203.117.124.12**1001**WC3/RPG**2
+ Russia DotA Room 007 (1.26a)**196619**3**203.117.124.12**1001**WC3/RPG**4
+ Russia DotA Room 006 (1.26a)**196629**3**203.117.124.12**1001**WC3/RPG**4
+ Russia DotA Room 005 (1.26a)**196630**3**203.117.124.12**1001**WC3/RPG**5
+ Russia DotA Room 004 (1.26a)**196631**3**203.117.124.12**1001**WC3/RPG**5
+ Russia DotA Room 003 (1.26a)**196632**3**203.117.124.12**1001**WC3/RPG**5
+ Russia DotA Room 002 (1.26a)**196633**3**203.117.124.12**1001**WC3/RPG**5
  Russia LoD DotA Room 02 (1.26a)**196655**3**203.117.124.12**1001**WC3/RPG**1
- Russia DotA Room 001 (1.26a)**196656**3**203.117.124.12**1001**WC3/RPG**1
+ Russia DotA Room 001 (1.26a)**196656**3**203.117.124.12**1001**WC3/RPG**5
  Russia DotA Clanwar Room 01 (1.26a)**196664**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 04 (1.26a)**196671**3**203.117.124.12**1001**WC3/RPG**1
  Russia LoD DotA Room 03 (1.26a)**196685**3**203.117.124.12**1001**WC3/RPG**1
@@ -309,10 +302,8 @@
  Russia TD Room 05 (1.26a)**196799**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 03 (1.26a)**196800**3**203.117.124.12**1001**WC3/RPG**1
  Russia TD Room 02 (1.26a)**196801**3**203.117.124.12**1001**WC3/RPG**1
- Russia TD Room 01 (1.26a)**196802**3**203.117.124.12**1001**WC3/RPG**1
- Russia RPG Room 18 (Dday) (1.26a)**196803**3**203.117.124.12**1001**WC3/RPG**1
- Russia RPG Room 17 (Dday) (1.26a)**196804**3**203.117.124.12**1001**WC3/RPG**1
- Russia RPG Room 15 (Castle Fight) (1.26a)**196805**3**203.117.124.12**1001**WC3/RPG**1
+ Russia TD Room 01 (1.26a) [no hostbots]**196802**3**203.117.124.12**1001**WC3/RPG**1
+ Russia RPG Room 14 (Dday) (1.26a)**196804**3**203.117.124.12**1001**WC3/RPG**1
  Russia RPG Room 12 (Naruto) (1.26a)**196806**3**203.117.124.12**1001**WC3/RPG**1
  Russia RPG Room 10 (1.26a)**196807**3**203.117.124.12**1001**WC3/RPG**1
  Russia RPG Room 09 (1.26a)**196808**3**203.117.124.12**1001**WC3/RPG**1
@@ -323,14 +314,13 @@
  Russia RPG Room 04 (1.26a)**196814**3**203.117.124.12**1001**WC3/RPG**2
  Russia RPG Room 03 (1.26a)**196815**3**203.117.124.12**1001**WC3/RPG**2
  Russia RPG Room 02 (1.26a)**196816**3**203.117.124.12**1001**WC3/RPG**2
- Russia RPG Room 01 (1.26a)**196817**3**203.117.124.12**1001**WC3/RPG**3
- Russia RPG Room 19 (Blood Way) (1.26a)**196818**3**203.117.124.12**1001**WC3/RPG**1
+ Russia RPG Room 01 (1.26a) [no hostbots]**196817**3**203.117.124.12**1001**WC3/RPG**5
+ Russia RPG Room 15 (Blood Way) (1.26a)**196818**3**203.117.124.12**1001**WC3/RPG**1
  Russia Petrosanshina Room 03 (1.26a)**196821**3**203.117.124.12**1001**WC3/RPG**1
  Russia Petrosanshina Room 02 (1.26a)**196828**3**203.117.124.12**1001**WC3/RPG**1
  Russia Petrosanshina Room 01 (1.26a)**196829**3**203.117.124.12**1001**WC3/RPG**2
  Russia Imba DotA Room 03 (1.26a)**196830**3**203.117.124.12**1001**WC3/RPG**1
- Russia Imba DotA Room 02 (1.26a)**196831**3**203.117.124.12**1001**WC3/RPG**2
- Russia RPG Room 14 (Castle Fight) (1.26a)**196835**3**203.117.124.12**1001**WC3/RPG**3
+ Russia Imba DotA Room 02 (1.26a) [moderated]**196831**3**203.117.124.12**1001**WC3/RPG**5
  Russia DotA High Level Room 05 (1.26a)**262013**3**203.117.124.12**1001**WC3/RPG**14
  Russia DotA High Level Room 04 (1.26a)**262014**3**203.117.124.12**1001**WC3/RPG**16
  Russia DotA High Level Room 03 (1.26a)**262015**3**203.117.124.12**1001**WC3/RPG**20
@@ -345,8 +335,7 @@
  Kazakhstan RPG Room 2 (1.26a)**262134**3**203.117.124.12**1001**WC3/RPG**1
  Ukraine OMG DotA Room 01 (1.26a)**262137**3**203.117.124.12**1001**WC3/RPG**1
  DotA.by Tournaments Room**262139**2**203.117.124.15**1012**WC3/RPG***2
- Russia RPG Room 11 (Naruto) (1.26a)**262140**3**203.117.124.12**1001**WC3/RPG**1
- Russia RPG Room 16 (Warlocks) (1.26a)**262141**3**203.117.124.12**1001**WC3/RPG**1
+ Russia RPG Room 11 (Naruto) (1.26a) [moderated]**262140**3**203.117.124.12**1001**WC3/RPG**5
  Malaysia DotA ROOM 10 (v1.24e)**262145**6**203.117.124.16**1001**WC3/RPG**10
  Malaysia DotA ROOM 11 (v1.24e)**262146**6**203.117.124.16**1001**WC3/RPG**10
  Malaysia DotA ROOM 12 (v1.24e)**262147**6**203.117.124.16**1001**WC3/RPG**8
@@ -470,7 +459,7 @@
  USA DotA Room 08**262542**1**203.117.124.14**1001**WC3/RPG**10
  USA DotA Room 06**262546**1**203.117.124.14**1001**WC3/RPG**1
  Turkey DotA League Room**262558**1**203.117.124.14**1001**WC3/RPG**1
- Australia DotA Room 03**262578**1**203.117.124.14**1001**WC3/RPG**1
+ Australia DotA Room 03**262578**1**203.117.124.14**1001**WC3/RPG**2
  Peru DotA Room 05 (1.24b)**262580**1**203.117.124.14**1001**WC3/RPG**1
  DBZ Tribute Room**262583**1**203.117.124.14**1012**WC3/RPG***1
  Element TD Room**262586**1**203.117.124.14**1012**WC3/RPG***1
@@ -509,7 +498,7 @@
  GCA: Shiawase Internet Cafe**327647**3**203.117.124.12**1001**WC3/RPG**1
  Cyberstar Room**327648**6**203.117.124.16**1001**WC3/RPG**5
  Denmark DotA Room 01**327649**1**203.117.124.14**1001**WC3/RPG**1
- Ukraine RPG High Level Room 01 (1.26a)**327650**3**203.117.124.12**1001**WC3/RPG**5
+ Ukraine RPG Room 01 (1.26a)**327650**3**203.117.124.12**1001**WC3/RPG**2
  GCA: MFF Computer Shop**327652**3**203.117.124.12**1001**WC3/RPG**1
  Bosnia and Herzegovina DotA Room 02 [Moderated]**327653**1**203.117.124.14**1001**WC3/RPG**7
  Castle Fight room**327656**1**203.117.124.14**1000**WC3/TFT**1
@@ -766,7 +755,7 @@
  TGL Tournament Room 2**458778**2**203.117.124.15**1000**WC3/TFT**1
  TGL Tournament Room 3**458779**2**203.117.124.15**1000**WC3/TFT**1
  Iran DotA Room 03**458781**2**203.117.124.15**1001**WC3/RPG**1
- Australia DotA Room 01**458789**2**203.117.124.15**1001**WC3/RPG**1
+ Australia DotA Room 01**458789**2**203.117.124.15**1001**WC3/RPG**5
  Indonesia DotA Room 02**458792**6**203.117.124.16**1001**WC3/RPG**10
  Mongolia DotA Room 14**458794**2**203.117.124.15**1001**WC3/RPG**1
  Pakistan DotA Room 02**458795**2**203.117.124.15**1001**WC3/RPG**1
@@ -837,12 +826,11 @@
  USA DotA Room 09**458995**2**203.117.124.15**1001**WC3/RPG**10
  Romania DotA Room 09**459075**3**203.117.124.12**1001**WC3/RPG**1
  Iran DotA Room 02**459097**2**203.117.124.15**1001**WC3/RPG**1
- Ecuador DotA Room 02 [Moderada]**459102**2**203.117.124.15**1001**WC3/RPG**3
+ Ecuador DotA Room 02 [Moderada]**459102**2**203.117.124.15**1001**WC3/RPG**5
  Colombia DotA Room 02 [Moderada]**459106**2**203.117.124.15**1001**WC3/RPG**4
- Australia DotA Room 02**459113**2**203.117.124.15**1001**WC3/RPG**1
+ Australia DotA Room 02**459113**2**203.117.124.15**1001**WC3/RPG**3
  Argentina DotA Room 01**459115**2**203.117.124.15**1001**WC3/RPG**1
  Arabian DotA Room 02**459116**2**203.117.124.15**1001**WC3/RPG**5
- DotA Ladder by DotA Mania BR**524131**2**203.117.124.15**1001**WC3/RPG**11
  Cambodia DotA Room 02**524135**2**203.117.124.15**1001**WC3/RPG**1
  Hi-Gaming League Room**524136**2**203.117.124.15**1012**WC3/RPG***1
  Nemesis Dota League Room**524140**2**203.117.124.15**1012**WC3/RPG***1
@@ -1356,8 +1344,8 @@
  Partners: Mineski Infinity HLR Chix Gamers -AP**786565**12**203.117.124.13**1001**WC3/RPG**3
  Partners: Mineski Infinity Room -cm www.mineski.net**786566**12**203.117.124.13**1001**WC3/RPG**7
  Partners: Mineski Infinity HLR 01 Pubgame -AP**786567**12**203.117.124.13**1001**WC3/RPG**7
- Partners: PinoyGG BAYANTEL Room**786568**12**203.117.124.13**1001**WC3/RPG**1
- Partners: PinoyGG PLDT Room**786569**12**203.117.124.13**1001**WC3/RPG**1
+ Partners: PinoyGG PLDT DotA Room 02 (-AP)**786568**12**203.117.124.13**1001**WC3/RPG**1
+ Partners: PinoyGG PLDT DotA Room 01 (-AP)**786569**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA High Level ROOM 01 (v1.26a)**786570**12**203.117.124.13**1001**WC3/RPG**5
  Philippines BayanTel: DotA ROOM 01 (v1.26a)**786571**12**203.117.124.13**1001**WC3/RPG**1
  Philippines BayanTel: DotA ROOM 02 (v1.26a)**786572**12**203.117.124.13**1001**WC3/RPG**1
@@ -1530,11 +1518,11 @@
  Greece DotA Tournaments Room**917498**2**203.117.124.15**1001**WC3/RPG**1
  Partners: Mindanao DotA League ROOM (v1.24e)**917499**12**203.117.124.13**1001**WC3/RPG**1
  Partners: Mindanao Gaming ROOM (v1.24e)**917500**12**203.117.124.13**1001**WC3/RPG**1
- Partners: PinoyGG DotA Havoc Room**917501**12**203.117.124.13**1001**WC3/RPG**5
+ Partners: PinoyGG Havoc DotA Room (-CM)**917501**12**203.117.124.13**1001**WC3/RPG**3
  Partners: Drop Dead Gorgeous (DDG) VIP Lounge**917502**12**203.117.124.13**1001**WC3/RPG**1
  GCA: I.T. Log Park Summer Open Tournament - MAY 15**917503**12**203.117.124.13**1001**WC3/RPG**1
- Ukraine DotA Room 01 (1.26a)**982958**3**203.117.124.12**1001**WC3/RPG**1
- Ukraine DotA Room 02 (1.26a)**982959**3**203.117.124.12**1001**WC3/RPG**1
+ Ukraine DotA Room 01 (1.26a) [moderated]**982958**3**203.117.124.12**1001**WC3/RPG**5
+ Ukraine DotA Room 02 (1.26a) [moderated]**982959**3**203.117.124.12**1001**WC3/RPG**3
  Ukraine DotA Room 03 (1.26a)**982960**3**203.117.124.12**1001**WC3/RPG**1
  Ukraine DotA Room 04 (1.26a)**982961**3**203.117.124.12**1001**WC3/RPG**1
  Ukraine DotA Room 05 (1.26a)**982962**3**203.117.124.12**1001**WC3/RPG**1
@@ -1549,10 +1537,6 @@
  Ukraine DotA Room 14 (1.26a)**982971**3**203.117.124.12**1001**WC3/RPG**1
  Ukraine DotA Room 15 (1.26a)**982972**3**203.117.124.12**1001**WC3/RPG**1
  Ukraine DotA Room 16 (1.26a)**982973**3**203.117.124.12**1001**WC3/RPG**1
- Ukraine DotA Room 17 (1.26a)**982974**3**203.117.124.12**1001**WC3/RPG**1
- Ukraine DotA Room 18 (1.26a)**982975**3**203.117.124.12**1001**WC3/RPG**1
- Ukraine DotA Room 19 (1.26a)**982976**3**203.117.124.12**1001**WC3/RPG**1
- Ukraine DotA Room 20 (1.26a)**982977**3**203.117.124.12**1001**WC3/RPG**1
  Kazakhstan DotA Clan War Room (1.26a)**982998**3**203.117.124.12**1001**WC3/RPG**1
  Kazakhstan DotA Room 01 (1.26a)**983000**3**203.117.124.12**1001**WC3/RPG**2
  Kazakhstan DotA Room 02 (1.26a)**983001**3**203.117.124.12**1001**WC3/RPG**1

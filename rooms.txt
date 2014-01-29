@@ -201,8 +201,6 @@ name: ASEAN Room 01                             id:130939  sid:1   server:203.11
 name: Korea Room 01                             id:130940  sid:1   server:203.117.124.14  gid:1034  game:unknown       ml:1  
 name: South America Room 01                     id:130941  sid:1   server:203.117.124.14  gid:1034  game:unknown       ml:1  
 name: Europe Room 01                            id:130942  sid:1   server:203.117.124.14  gid:1034  game:unknown       ml:1  
-name: Brazil DotA Eventos Room                  id:130948  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Brazil DotA Ladder Room 01 [Moderada]     id:130949  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:5  
 name: Russia FarEast DotA Room 01 (1.26a)       id:130951  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ecuador RPG Room 01                       id:130952  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine Room 1                            id:130956  sid:1   server:203.117.124.14  gid:1036  game:Left 4 Dead 2 ml:1  
@@ -272,8 +270,6 @@ name: Japan Room 01                             id:131038  sid:1   server:203.11
 name: Japan Room 01                             id:131039  sid:1   server:203.117.124.14  gid:1016  game:CS Source     ml:1  
 name: Japan Room 01                             id:131040  sid:1   server:203.117.124.14  gid:1003  game:CS 1.6        ml:1  
 name: Japan Room 01                             id:131041  sid:1   server:203.117.124.14  gid:1029  game:Left 4 Dead   ml:1  
-name: DotA MonsterKill PVP Room BR              id:131042  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:20 
-name: Brazil DotA Ladder Room 03 [Moderada]     id:131043  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:5  
 name: Georgia DotA Room 04                      id:131044  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Brazil RPG Room 05                        id:131045  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:5  
 name: saP DotA League - Testgames Room          id:131046  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
@@ -350,7 +346,6 @@ name: Brazil RPG Room 01                        id:131439  sid:2   server:203.11
 name: Brazil DotA Room 22                       id:131455  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Brazil DotA Room 21                       id:131456  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Brazil DotA High Level Room 01            id:131457  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:22 
-name: Brazil DotA Clan War Room 01              id:131458  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Greece DotA High Level Room 01            id:131461  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:10 
 name: ASEAN Room 03                             id:131462  sid:2   server:203.117.124.15  gid:1036  game:Left 4 Dead 2 ml:1  
 name: Angola DotA Room                          id:131463  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
@@ -412,7 +407,7 @@ name: DotA Tournaments Room                     id:196489  sid:3   server:203.11
 name: Colombia DotA Clan War Room 01            id:196490  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: CS1.6 Balkan Room                         id:196491  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: Europe Room 03                            id:196492  sid:2   server:203.117.124.15  gid:1036  game:Left 4 Dead 2 ml:1  
-name: Russia LoD DotA Room 01 (1.26a) [Moderated] id:196493  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:10 
+name: Russia LoD DotA Room 01 (1.26a) [Moderated] id:196493  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:13 
 name: CS 1.6 Ukraine Room 02                    id:196495  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 Ukraine Room 01                    id:196496  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: Europe Room 07                            id:196497  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
@@ -437,7 +432,7 @@ name: ChinaNet Room 02                          id:196519  sid:2   server:203.11
 name: Kazakhstan DotA High Level Room 03 (1.26a) id:196520  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:6  
 name: Mongolia DotA Room 21                     id:196521  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Bulgaria DotA Room 20                     id:196522  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
-name: Ecuador DotA Room 03 [Moderada]           id:196523  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:2  
+name: Ecuador DotA Room 03 [Moderada]           id:196523  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:3  
 name: MYM Prime Defending Room                  id:196524  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: USA Room 01                               id:196525  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: Brazil Room 01                            id:196526  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
@@ -498,11 +493,9 @@ name: Mongolia DotA Room 19                     id:196580  sid:2   server:203.11
 name: Europe Room 02                            id:196581  sid:2   server:203.117.124.15  gid:1034  game:unknown       ml:1  
 name: Iran RPG Room + HostBot                   id:196582  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Iran DotA Clan War Room 01 [Moderated]    id:196583  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Brazil DotA Ladder Eventos Room           id:196589  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Iran DotA Room 11                         id:196590  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Greece DotA Room 02                       id:196591  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Iran DotA Room 10                         id:196592  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Brazil DotA Ladder Room 02 [Moderada]     id:196593  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:5  
 name: Brazil DotA Facebook Room 01              id:196594  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Europe Room 01                            id:196595  sid:2   server:203.117.124.15  gid:1035  game:COD6          ml:1  
 name: Europe Room 01                            id:196596  sid:2   server:203.117.124.15  gid:1036  game:Left 4 Dead 2 ml:3  
@@ -523,17 +516,17 @@ name: Russia DotA Room 014 (1.26a)              id:196612  sid:3   server:203.11
 name: Russia DotA Room 013 (1.26a)              id:196613  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia DotA Room 012 (1.26a)              id:196614  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia DotA Room 011 (1.26a)              id:196615  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 010 (1.26a)              id:196616  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 009 (1.26a)              id:196617  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 008 (1.26a)              id:196618  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 007 (1.26a)              id:196619  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 006 (1.26a)              id:196629  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 005 (1.26a)              id:196630  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 004 (1.26a)              id:196631  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 003 (1.26a)              id:196632  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 002 (1.26a)              id:196633  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia DotA Room 010 (1.26a)              id:196616  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
+name: Russia DotA Room 009 (1.26a)              id:196617  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
+name: Russia DotA Room 008 (1.26a)              id:196618  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
+name: Russia DotA Room 007 (1.26a)              id:196619  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:4  
+name: Russia DotA Room 006 (1.26a)              id:196629  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:4  
+name: Russia DotA Room 005 (1.26a)              id:196630  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Russia DotA Room 004 (1.26a)              id:196631  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Russia DotA Room 003 (1.26a)              id:196632  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Russia DotA Room 002 (1.26a)              id:196633  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
 name: Russia LoD DotA Room 02 (1.26a)           id:196655  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia DotA Room 001 (1.26a)              id:196656  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia DotA Room 001 (1.26a)              id:196656  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
 name: Russia DotA Clanwar Room 01 (1.26a)       id:196664  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: AOE: The Rise of Rome Europe 1v1 Room 08  id:196667  sid:2   server:203.117.124.15  gid:1020  game:AOE I         ml:1  
 name: Russia TD Room 04 (1.26a)                 id:196671  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -563,10 +556,8 @@ name: Russia TD Room 06 (1.26a)                 id:196798  sid:3   server:203.11
 name: Russia TD Room 05 (1.26a)                 id:196799  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia TD Room 03 (1.26a)                 id:196800  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia TD Room 02 (1.26a)                 id:196801  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia TD Room 01 (1.26a)                 id:196802  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia RPG Room 18 (Dday) (1.26a)         id:196803  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia RPG Room 17 (Dday) (1.26a)         id:196804  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia RPG Room 15 (Castle Fight) (1.26a) id:196805  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia TD Room 01 (1.26a) [no hostbots]   id:196802  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia RPG Room 14 (Dday) (1.26a)         id:196804  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia RPG Room 12 (Naruto) (1.26a)       id:196806  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia RPG Room 10 (1.26a)                id:196807  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia RPG Room 09 (1.26a)                id:196808  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -577,14 +568,13 @@ name: Russia RPG Room 05 (1.26a)                id:196813  sid:3   server:203.11
 name: Russia RPG Room 04 (1.26a)                id:196814  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: Russia RPG Room 03 (1.26a)                id:196815  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: Russia RPG Room 02 (1.26a)                id:196816  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
-name: Russia RPG Room 01 (1.26a)                id:196817  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:3  
-name: Russia RPG Room 19 (Blood Way) (1.26a)    id:196818  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia RPG Room 01 (1.26a) [no hostbots]  id:196817  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Russia RPG Room 15 (Blood Way) (1.26a)    id:196818  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia Petrosanshina Room 03 (1.26a)      id:196821  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia Petrosanshina Room 02 (1.26a)      id:196828  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Russia Petrosanshina Room 01 (1.26a)      id:196829  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: Russia Imba DotA Room 03 (1.26a)          id:196830  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia Imba DotA Room 02 (1.26a)          id:196831  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
-name: Russia RPG Room 14 (Castle Fight) (1.26a) id:196835  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:3  
+name: Russia Imba DotA Room 02 (1.26a) [moderated] id:196831  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
 name: Russia DotA High Level Room 05 (1.26a)    id:262013  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:14 
 name: Russia DotA High Level Room 04 (1.26a)    id:262014  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:16 
 name: Russia DotA High Level Room 03 (1.26a)    id:262015  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:20 
@@ -601,8 +591,7 @@ name: Kazakhstan Room 01                        id:262133  sid:2   server:203.11
 name: Kazakhstan RPG Room 2 (1.26a)             id:262134  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine OMG DotA Room 01 (1.26a)          id:262137  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: DotA.by Tournaments Room                  id:262139  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:2  
-name: Russia RPG Room 11 (Naruto) (1.26a)       id:262140  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Russia RPG Room 16 (Warlocks) (1.26a)     id:262141  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Russia RPG Room 11 (Naruto) (1.26a) [moderated] id:262140  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
 name: Malaysia DotA ROOM 10 (v1.24e)            id:262145  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:10 
 name: Malaysia DotA ROOM 11 (v1.24e)            id:262146  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:10 
 name: Malaysia DotA ROOM 12 (v1.24e)            id:262147  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:8  
@@ -775,7 +764,7 @@ name: DotA Room 01 (MyGarena.com)               id:262519  sid:6   server:203.11
 name: USA DotA Room 08                          id:262542  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:10 
 name: USA DotA Room 06                          id:262546  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: Turkey DotA League Room                   id:262558  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Australia DotA Room 03                    id:262578  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
+name: Australia DotA Room 03                    id:262578  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:2  
 name: Peru DotA Room 05 (1.24b)                 id:262580  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
 name: DBZ Tribute Room                          id:262583  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
 name: Element TD Room                           id:262586  sid:1   server:203.117.124.14  gid:1012  game:WC3/RPG*      ml:1  
@@ -823,7 +812,7 @@ name: Russia Room 08                            id:327646  sid:3   server:203.11
 name: GCA: Shiawase Internet Cafe               id:327647  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Cyberstar Room                            id:327648  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:5  
 name: Denmark DotA Room 01                      id:327649  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine RPG High Level Room 01 (1.26a)    id:327650  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Ukraine RPG Room 01 (1.26a)               id:327650  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: Argentina Room 01                         id:327651  sid:1   server:203.117.124.14  gid:1029  game:Left 4 Dead   ml:1  
 name: GCA: MFF Computer Shop                    id:327652  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Bosnia and Herzegovina DotA Room 02 [Moderated] id:327653  sid:1   server:203.117.124.14  gid:1001  game:WC3/RPG       ml:7  
@@ -1086,7 +1075,7 @@ name: TGL Tournament Room 1                     id:458777  sid:2   server:203.11
 name: TGL Tournament Room 2                     id:458778  sid:2   server:203.117.124.15  gid:1000  game:WC3/TFT       ml:1  
 name: TGL Tournament Room 3                     id:458779  sid:2   server:203.117.124.15  gid:1000  game:WC3/TFT       ml:1  
 name: Iran DotA Room 03                         id:458781  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
-name: Australia DotA Room 01                    id:458789  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
+name: Australia DotA Room 01                    id:458789  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:5  
 name: Indonesia DotA Room 02                    id:458792  sid:6   server:203.117.124.16  gid:1001  game:WC3/RPG       ml:10 
 name: Mongolia DotA Room 14                     id:458794  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Pakistan DotA Room 02                     id:458795  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
@@ -1166,16 +1155,15 @@ name: Europe Room 06                            id:459098  sid:2   server:203.11
 name: Europe Room 05                            id:459099  sid:2   server:203.117.124.15  gid:1029  game:Left 4 Dead   ml:1  
 name: Europe Room 04                            id:459100  sid:2   server:203.117.124.15  gid:1029  game:Left 4 Dead   ml:1  
 name: Europe Room 03                            id:459101  sid:2   server:203.117.124.15  gid:1029  game:Left 4 Dead   ml:1  
-name: Ecuador DotA Room 02 [Moderada]           id:459102  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:3  
+name: Ecuador DotA Room 02 [Moderada]           id:459102  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:5  
 name: CS 1.6 South America Room                 id:459103  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 Singapore Room 02                  id:459104  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: CS 1.6 Singapore Room                     id:459105  sid:2   server:203.117.124.15  gid:1003  game:CS 1.6        ml:1  
 name: Colombia DotA Room 02 [Moderada]          id:459106  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:4  
-name: Australia DotA Room 02                    id:459113  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
+name: Australia DotA Room 02                    id:459113  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:3  
 name: ASEAN Room 01                             id:459114  sid:2   server:203.117.124.15  gid:1029  game:Left 4 Dead   ml:1  
 name: Argentina DotA Room 01                    id:459115  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Arabian DotA Room 02                      id:459116  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:5  
-name: DotA Ladder by DotA Mania BR              id:524131  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:11 
 name: Competitive Nations DotA League           id:524134  sid:3   server:203.117.124.12  gid:1024  game:unknown       ml:1  
 name: Cambodia DotA Room 02                     id:524135  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Hi-Gaming League Room                     id:524136  sid:2   server:203.117.124.15  gid:1012  game:WC3/RPG*      ml:1  
@@ -1800,8 +1788,8 @@ name: Partners: Mineski Infinity HLR Chix Gamers 02 -AP id:786564  sid:12  serve
 name: Partners: Mineski Infinity HLR Chix Gamers -AP id:786565  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
 name: Partners: Mineski Infinity Room -cm www.mineski.net id:786566  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:7  
 name: Partners: Mineski Infinity HLR 01 Pubgame -AP id:786567  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:7  
-name: Partners: PinoyGG BAYANTEL Room           id:786568  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: PinoyGG PLDT Room               id:786569  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: PinoyGG PLDT DotA Room 02 (-AP) id:786568  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
+name: Partners: PinoyGG PLDT DotA Room 01 (-AP) id:786569  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Philippines BayanTel: DotA High Level ROOM 01 (v1.26a) id:786570  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
 name: Philippines BayanTel: DotA ROOM 01 (v1.26a) id:786571  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Philippines BayanTel: DotA ROOM 02 (v1.26a) id:786572  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
@@ -1980,11 +1968,11 @@ name: GCA: War of Warlords Internet Cafe        id:917497  sid:12  server:203.11
 name: Greece DotA Tournaments Room              id:917498  sid:2   server:203.117.124.15  gid:1001  game:WC3/RPG       ml:1  
 name: Partners: Mindanao DotA League ROOM (v1.24e) id:917499  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: Partners: Mindanao Gaming ROOM (v1.24e)   id:917500  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
-name: Partners: PinoyGG DotA Havoc Room         id:917501  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:5  
+name: Partners: PinoyGG Havoc DotA Room (-CM)   id:917501  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:3  
 name: Partners: Drop Dead Gorgeous (DDG) VIP Lounge id:917502  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
 name: GCA: I.T. Log Park Summer Open Tournament - MAY 15 id:917503  sid:12  server:203.117.124.13  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 01 (1.26a)              id:982958  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 02 (1.26a)              id:982959  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
+name: Ukraine DotA Room 01 (1.26a) [moderated]  id:982958  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:5  
+name: Ukraine DotA Room 02 (1.26a) [moderated]  id:982959  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:3  
 name: Ukraine DotA Room 03 (1.26a)              id:982960  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 04 (1.26a)              id:982961  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 05 (1.26a)              id:982962  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
@@ -1999,10 +1987,6 @@ name: Ukraine DotA Room 13 (1.26a)              id:982970  sid:3   server:203.11
 name: Ukraine DotA Room 14 (1.26a)              id:982971  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 15 (1.26a)              id:982972  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Ukraine DotA Room 16 (1.26a)              id:982973  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 17 (1.26a)              id:982974  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 18 (1.26a)              id:982975  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 19 (1.26a)              id:982976  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
-name: Ukraine DotA Room 20 (1.26a)              id:982977  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Kazakhstan DotA Clan War Room (1.26a)     id:982998  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
 name: Kazakhstan DotA Room 01 (1.26a)           id:983000  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:2  
 name: Kazakhstan DotA Room 02 (1.26a)           id:983001  sid:3   server:203.117.124.12  gid:1001  game:WC3/RPG       ml:1  
