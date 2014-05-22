@@ -650,7 +650,13 @@ public class GarenaInterface {
 		block.put((byte) 1);
 
 		//now we need to put internal IP
-		byte[] addr = GarenaEncrypt.internalAddress();
+		byte[] addr;
+		
+		if(bindAddress == null) {
+		    addr = GarenaEncrypt.internalAddress();
+		} else {
+		    addr = bindAddress.getAddress();
+		}
 		block.put(addr);
 
 		//external peer port
