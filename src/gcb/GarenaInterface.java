@@ -112,6 +112,9 @@ public class GarenaInterface {
 	
 	//TCP connection pool manager
 	GarenaTCPPool tcpPool;
+	
+	//bind address
+	InetAddress bindAddress;
 
 	public GarenaInterface(PluginManager plugins, int id) {
 		this.id = id;
@@ -143,6 +146,18 @@ public class GarenaInterface {
 				Main.TIMER.schedule(new ReconnectTask(), 60000 * reconnectInterval, 60000 * reconnectInterval);
 			}
 		}
+		
+        //determine bind address from configuration
+        bindAddress = null;
+        String bindAddressString = GCBConfig.configuration.getString("gcb_bindaddress", null);
+
+        try {
+            if(bindAddressString != null && !bindAddressString.trim().equals("")) {
+                bindAddress = InetAddress.getByName(bindAddressString);
+            }
+        } catch(IOException ioe) {
+            Main.println(6, "[GInterface " + id + "] Unable to identify bind address: " + ioe.getLocalizedMessage());
+        }
 	}
 	
 	public void clear() {
@@ -184,7 +199,7 @@ public class GarenaInterface {
 		//connect
 		Main.println(5, "[GInterface " + id + "] Connecting to " + main_address.getHostAddress() + "...");
 		try {
-			socket = new Socket(main_address, 7456);
+			socket = new Socket(main_address, 7456, bindAddress, 0);
 			Main.println(7, "[GInterface " + id + "] Using local port: " + socket.getLocalPort());
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
@@ -226,14 +241,6 @@ public class GarenaInterface {
 		
 		//init GP2PP socket
 		try {
-			//determine bind address from configuration
-			InetAddress bindAddress = null;
-			String bindAddressString = GCBConfig.configuration.getString("gcb_bindaddress", null);
-
-			if(bindAddressString != null && !bindAddressString.trim().equals("")) {
-				bindAddress = InetAddress.getByName(bindAddressString);
-			}
-
 			//if bindAddress unset, then use wildcard address; otherwise bind to specified address
 			//similarly, if peer port is 0, allow OS to determine port
 			if(bindAddress == null) {
@@ -356,7 +363,7 @@ public class GarenaInterface {
 		//connect
 		Main.println(5, "[GInterface " + id + "] Connecting to " + address.getHostAddress() + "...");
 		try {
-			room_socket = new Socket(address, 8687);
+			room_socket = new Socket(address, 8687, bindAddress, 0);
 			Main.println(7, "[GInterface " + id + "] Using local port: " + room_socket.getLocalPort());
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
