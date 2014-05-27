@@ -2142,14 +2142,29 @@ public class GarenaInterface {
 					lbuf.order(ByteOrder.LITTLE_ENDIAN);
 					
 					if(packet.bytes[0] == 0x06) {
-						iExternal = new byte[4];
-						lbuf.position(8);
-						lbuf.get(iExternal);
-	
-						lbuf.order(ByteOrder.BIG_ENDIAN);
-						pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
-						lbuf.order(ByteOrder.LITTLE_ENDIAN);
-	
+					    String externalAddressString = GCBConfig.configuration.getString("gcb_externaladdress");
+					    boolean fail = true;
+					    
+			            if(externalAddressString != null && !externalAddressString.trim().equals("")) {
+	                        try {
+	                            iExternal = InetAddress.getByName(externalAddressString).getAddress();
+	                            pExternal = peer_socket.getLocalPort();
+	                            fail = false;
+	                        } catch(IOException ioe) {
+	                            Main.println(6, "[GInterface " + id + "] Unable to identify bind address: " + ioe.getLocalizedMessage());
+	                        }
+			            }
+			            
+			            if(fail) {
+    						iExternal = new byte[4];
+    						lbuf.position(8);
+    						lbuf.get(iExternal);
+    	
+    						lbuf.order(ByteOrder.BIG_ENDIAN);
+    						pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
+    						lbuf.order(ByteOrder.LITTLE_ENDIAN);
+			            }
+    	
 						String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
 								"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
 								"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
