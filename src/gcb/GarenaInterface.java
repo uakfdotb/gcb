@@ -90,6 +90,9 @@ public class GarenaInterface {
 	//external and internal port, will be set later
 	int pExternal;
 	int pInternal;
+	
+	//whether external settings have been forced
+	boolean externalForced = false;
 
 	//myinfo block
 	byte[] myinfo;
@@ -281,6 +284,19 @@ public class GarenaInterface {
 			peerLoopWorker = new PeerLoopWorker();
 			peerLoopWorker.start();
 		}
+		
+		//force set external address if desired
+        String externalAddressString = GCBConfig.configuration.getString("gcb_externaladdress");
+        
+        if(externalAddressString != null && !externalAddressString.trim().equals("")) {
+            try {
+                iExternal = InetAddress.getByName(externalAddressString).getAddress();
+                pExternal = peer_socket.getLocalPort();
+                externalForced = true;
+            } catch(IOException ioe) {
+                Main.println(6, "[GInterface " + id + "] Unable to identify external address: " + ioe.getLocalizedMessage());
+            }
+        }
 		
 		return true;
 	}
@@ -2142,20 +2158,7 @@ public class GarenaInterface {
 					lbuf.order(ByteOrder.LITTLE_ENDIAN);
 					
 					if(packet.bytes[0] == 0x06) {
-					    String externalAddressString = GCBConfig.configuration.getString("gcb_externaladdress");
-					    boolean fail = true;
-					    
-			            if(externalAddressString != null && !externalAddressString.trim().equals("")) {
-	                        try {
-	                            iExternal = InetAddress.getByName(externalAddressString).getAddress();
-	                            pExternal = peer_socket.getLocalPort();
-	                            fail = false;
-	                        } catch(IOException ioe) {
-	                            Main.println(6, "[GInterface " + id + "] Unable to identify bind address: " + ioe.getLocalizedMessage());
-	                        }
-			            }
-			            
-			            if(fail) {
+					    if(!externalForced) {
     						iExternal = new byte[4];
     						lbuf.position(8);
     						lbuf.get(iExternal);
@@ -2163,15 +2166,15 @@ public class GarenaInterface {
     						lbuf.order(ByteOrder.BIG_ENDIAN);
     						pExternal = GarenaEncrypt.unsignedShort(lbuf.getShort(12));
     						lbuf.order(ByteOrder.LITTLE_ENDIAN);
-			            }
+    
+    						String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
+    								"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
+    								"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
+    								"." + GarenaEncrypt.unsignedByte(iExternal[3]);
     	
-						String str_external = GarenaEncrypt.unsignedByte(iExternal[0]) +
-								"." + GarenaEncrypt.unsignedByte(iExternal[1]) +
-								"." + GarenaEncrypt.unsignedByte(iExternal[2]) +
-								"." + GarenaEncrypt.unsignedByte(iExternal[3]);
-	
-						Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
-					} else if(packet.bytes[0] == 0x3F) {
+    						Main.println(7, "[GInterface " + id + "] PeerLoop: set address to " + str_external + " and port to " + pExternal);
+					    }
+				    } else if(packet.bytes[0] == 0x3F) {
 						int room_prefix = GarenaEncrypt.unsignedShort(lbuf.getShort(1));
 						int num_rooms = GarenaEncrypt.unsignedByte(lbuf.get(3));
 	
