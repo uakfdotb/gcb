@@ -1776,6 +1776,11 @@ public class GarenaInterface {
 	}
 
 	public void sendPeerLookup() {
+	    if(peer_socket == null) {
+            Main.println(6, "[GInterface " + id + "] Failed to send lookup: peer socket not initialized");
+	        return;
+	    }
+	    
 		//lookup external IP, port
 		byte[] tmp = new byte[8];
 		tmp[0] = 0x05;
