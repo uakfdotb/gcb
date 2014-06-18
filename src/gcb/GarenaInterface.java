@@ -27,10 +27,8 @@ import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
 import java.util.zip.CRC32;
@@ -44,9 +42,6 @@ public class GarenaInterface {
 	public static int GARENA_ROOM = 1;
 	public static int GARENA_PEER = 2;
 	public static final String TIME_FORMAT = "HH:mm:ss";
-	
-	//map for myinfo arrays
-	private static Map<String, byte[]> usernameToMyInfo = new HashMap<String, byte[]>();
 
 	//id in configuration
 	public int id; //TODO change this to private
@@ -81,6 +76,12 @@ public class GarenaInterface {
 	
 	//our user ID
 	int user_id;
+	
+	//unknown values in myinfo block
+	int unknown1;
+	int unknown2;
+	int unknown3;
+	int unknown4;
 
 	//external and internal IP address, will be set later
 	byte[] iExternal;
@@ -95,6 +96,9 @@ public class GarenaInterface {
 	
 	//whether we should avoid connections to main server
 	boolean avoidMain = true;
+
+	//myinfo block
+	byte[] myinfo;
 	
 	//reverse host, to broadcast Garena client hosted games to LAN
 	GCBReverseHost reverseHost;
@@ -180,37 +184,26 @@ public class GarenaInterface {
 	public void setGarenaTCPPool(GarenaTCPPool tcpPool) {
 		this.tcpPool = tcpPool;
 	}
-	
-	public boolean checkMyInfoLock() {
-		synchronized(usernameToMyInfo) {
-			if(usernameToMyInfo.containsKey(getUsername().toLowerCase())) {
-				return false;
-			} else {
-				usernameToMyInfo.put(getUsername().toLowerCase(), new byte[] {});
-				return true;
-			}
-		}
-	}
 
 	public boolean init() {
 		Main.println(5, "[GInterface " + id + "] Initializing...");
 		crypt.initAES();
 		crypt.initRSA();
-		
-		//hostname lookup
-		try {
-			String main_hostname = getStringConfig("mainhost", "con3.garenaconnect.com");
-			main_address = InetAddress.getByName(main_hostname);
-		} catch(UnknownHostException uhe) {
-			if(Main.DEBUG) {
-				uhe.printStackTrace();
+
+		if(!avoidMain || myinfo == null) {
+			//hostname lookup
+			try {
+				String main_hostname = getStringConfig("mainhost", "con3.garenaconnect.com");
+				main_address = InetAddress.getByName(main_hostname);
+			} catch(UnknownHostException uhe) {
+				if(Main.DEBUG) {
+					uhe.printStackTrace();
+				}
+	
+				Main.println(6, "[GInterface " + id + "] Unable to locate main host: " + uhe.getLocalizedMessage());
+				return false;
 			}
-
-			Main.println(6, "[GInterface " + id + "] Unable to locate main host: " + uhe.getLocalizedMessage());
-			return false;
-		}
-
-		if(!avoidMain || checkMyInfoLock()) {
+	
 			//connect
 			Main.println(5, "[GInterface " + id + "] Connecting to " + main_address.getHostAddress() + "...");
 			try {
@@ -237,14 +230,6 @@ public class GarenaInterface {
 				Main.println(6, "[GInterface " + id + "] Error(2) while connecting to main host: " + ioe.getLocalizedMessage());
 				return false;
 			}
-			
-			//authenticate with login server
-			if(!sendGSPSessionInit()) return false;
-			if(!readGSPSessionInitReply()) return false;
-			if(!sendGSPSessionHello()) return false;
-			if(!readGSPSessionHelloReply()) return false;
-			if(!sendGSPSessionLogin()) return false;
-			if(!readGSPSessionLoginReply()) return false;
 		}
 		
 		//try init reverse host
@@ -423,9 +408,11 @@ public class GarenaInterface {
 			return false;
 		}
 
-		//attempt to notify main server that we joined the room
-		//not a big deal if this fails
-		sendGSPJoinedRoom(user_id, room_id);
+		//notify main server that we joined the room
+		if(!sendGSPJoinedRoom(user_id, room_id)) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -467,6 +454,7 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGSPSessionInit() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Sending GSP session init...");
 
 		ByteBuffer block = ByteBuffer.allocate(50);
@@ -500,6 +488,7 @@ public class GarenaInterface {
 	}
 
 	public boolean readGSPSessionInitReply() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Reading GSP session init reply...");
 
 		try {
@@ -533,6 +522,7 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGSPSessionHello() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Sending GSP session hello...");
 
 		ByteBuffer block = ByteBuffer.allocate(7);
@@ -572,6 +562,7 @@ public class GarenaInterface {
 	}
 
 	public boolean readGSPSessionHelloReply() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Reading GSP session hello reply...");
 
 		try {
@@ -649,6 +640,7 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGSPSessionLogin() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Sending GSP session login...");
 		String username = getUsername();
 		String password = getPassword();
@@ -747,6 +739,7 @@ public class GarenaInterface {
 	}
 
 	public boolean readGSPSessionLoginReply() {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(7, "[GInterface " + id + "] Reading GSP session login reply...");
 
 		try {
@@ -773,14 +766,9 @@ public class GarenaInterface {
 				return false;
 			}
 
-			byte[] myinfo = new byte[data.length - 9];
+			myinfo = new byte[data.length - 9];
 			System.arraycopy(data, 9, myinfo, 0, data.length - 9);
 			processMyInfo(myinfo);
-			
-			synchronized(usernameToMyInfo) {
-				usernameToMyInfo.put(getUsername().toLowerCase(), myinfo);
-				usernameToMyInfo.notifyAll();
-			}
 
 			return true;
 		} catch(IOException ioe) {
@@ -809,7 +797,24 @@ public class GarenaInterface {
 		buf.position(20);
 		buf.get(str_bytes);
 		Main.println(8, "[GInterface " + id + "] Server says your country is: " + (GarenaEncrypt.strFromBytes(str_bytes)));
+
+		unknown1 = buf.get(24);
 		Main.println(8, "[GInterface " + id + "] Server says your experience is: " + GarenaEncrypt.unsignedByte(buf.get(25)));
+		unknown2 = buf.get(26);
+
+		/* get ports through lookup method
+		int b1 = (0x000000FF & ((int)buf.get(40))); //make sure it's unsigned
+		int b2 = (0x000000FF & ((int)buf.get(41)));
+		pExternal = b1 << 8 | b2;
+		Main.println("[GInterface " + id + "] Setting external peer port to " + pExternal);
+		//22 0's
+		b1 = (0x000000FF & ((int)buf.get(64)));
+		b2 = (0x000000FF & ((int)buf.get(65)));
+		pInternal = b1 << 8 | b2;
+		Main.println("[GInterface " + id + "] Setting internal peer port to " + pInternal); */
+		//19 0's
+		unknown3 = buf.get(85);
+		unknown4 = buf.get(88);
 
 		str_bytes = new byte[array.length - 92];
 		buf.position(92);
@@ -820,7 +825,7 @@ public class GarenaInterface {
 	public void readGSPLoop() {
 		ByteBuffer lbuf = ByteBuffer.allocate(2048);
 		while(true) {
-			if(avoidMain) {
+			if(avoidMain && myinfo != null) {
 				if(socket != null) {
 					try {
 						socket.close();
@@ -884,6 +889,7 @@ public class GarenaInterface {
 	}
 
 	public boolean sendGSPQueryUser(String username) {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(5, "[GInterface " + id + "] Querying by name: " + username);
 
 		byte[] username_bytes = username.getBytes();
@@ -924,6 +930,7 @@ public class GarenaInterface {
 	//username is requester username, sent with friend request
 	//message is the one sent with friend request that requested user will read
 	public boolean sendGSPRequestFriend(int id, String username, String message) {
+		if(avoidMain && myinfo != null) return true;
 		Main.println(5, "[GInterface " + id + "] Friend requesting: " + id);
 
 		byte[] username_bytes = username.getBytes();
@@ -973,7 +980,7 @@ public class GarenaInterface {
 
 	//sends message so main server knows we joined a room
 	public boolean sendGSPJoinedRoom(int userId, int roomId) {
-		if(socket == null) return false;
+		if(avoidMain && myinfo != null) return true;
 		ByteBuffer block = ByteBuffer.allocate(9);
 		block.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -1010,8 +1017,7 @@ public class GarenaInterface {
 	//only to be sent when connected to a room server
 	//should be sent every 15 minutes if connected to a room
 	public boolean sendGSPXP(int userId, int xpGain, int gameType) {
-		if(socket == null) return false;
-		
+		if(avoidMain && myinfo != null) return true;
 		ByteBuffer block = ByteBuffer.allocate(13);
 		block.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -1049,24 +1055,11 @@ public class GarenaInterface {
 
 	public boolean sendGCRPMeJoin() {
 		Main.println(7, "[GInterface " + id + "] Sending GCRP me join...");
-		byte[] myinfo;
 		
 		//make sure we got myinfo from main server first
-		synchronized(usernameToMyInfo) {
-			String key = getUsername().toLowerCase();
-			
-			while(usernameToMyInfo.containsKey(key) && usernameToMyInfo.get(key).length == 0) {
-				try {
-					usernameToMyInfo.wait();
-				} catch(InterruptedException ie) {}
-			}
-			
-			if(!usernameToMyInfo.containsKey(key)) {
-				Main.println(6, "[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
-				return false;
-			} else {
-				myinfo = usernameToMyInfo.get(key);
-			}
+		if(myinfo == null) {
+			Main.println(6, "[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
+			return false;
 		}
 		
 		String password = getPassword();
@@ -1098,7 +1091,7 @@ public class GarenaInterface {
 			myinfo[40] = port[0];
 			myinfo[41] = port[1];
 		}
-		
+
 		//put internal port, in big endian
 		byte[] port = GarenaEncrypt.shortToByteArray((short) room_socket.getPort());
 		myinfo[42] = (byte) port[0];
@@ -2152,15 +2145,6 @@ public class GarenaInterface {
 
 	public void disconnected(int x, boolean alert) {
 		if(x == GARENA_MAIN && socket != null && socket.isConnected()) {
-			//clear myinfo if we were grabbing it
-			synchronized(usernameToMyInfo) {
-				String key = getUsername().toLowerCase();
-				
-				if(usernameToMyInfo.containsKey(key) && usernameToMyInfo.get(key).length == 0) {
-					usernameToMyInfo.remove(key);
-				}
-			}
-			
 			try {
 				socket.close();
 			} catch(IOException ioe) {

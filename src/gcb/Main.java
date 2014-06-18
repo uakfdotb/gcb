@@ -242,6 +242,14 @@ public class Main {
 		
 		if(!restart && !initPeer(garena, restart)) return false;
 		
+		//authenticate with login server
+		if(!garena.sendGSPSessionInit()) return false;
+		if(!garena.readGSPSessionInitReply()) return false;
+		if(!garena.sendGSPSessionHello()) return false;
+		if(!garena.readGSPSessionHelloReply()) return false;
+		if(!garena.sendGSPSessionLogin()) return false;
+		if(!garena.readGSPSessionLoginReply()) return false;
+		
 		if(!restart) {
 			GarenaThread gsp_thread = new GarenaThread(garena, null, GarenaThread.GSP_LOOP);
 			gsp_thread.start();
