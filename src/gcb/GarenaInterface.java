@@ -1054,14 +1054,20 @@ public class GarenaInterface {
 		//make sure we got myinfo from main server first
 		synchronized(usernameToMyInfo) {
 			String key = getUsername().toLowerCase();
+			long start = System.currentTimeMillis(); //time when we start waiting
 			
-			while(usernameToMyInfo.containsKey(key) && usernameToMyInfo.get(key).length == 0) {
+			while(usernameToMyInfo.containsKey(key) && usernameToMyInfo.get(key).length == 0 && System.currentTimeMillis() - start < 25000) {
 				try {
-					usernameToMyInfo.wait();
+					usernameToMyInfo.wait(30000);
 				} catch(InterruptedException ie) {}
 			}
 			
-			if(!usernameToMyInfo.containsKey(key)) {
+			if(!usernameToMyInfo.containsKey(key) || usernameToMyInfo.get(key).length == 0) {
+				if(usernameToMyInfo.containsKey(key)) {
+					//terminate the lease of whoever was grabbing myinfo
+					usernameToMyInfo.remove(key);
+				}
+				
 				Main.println(6, "[GInterface " + id + "] Unable to proceed: myinfo not received via GSP");
 				return false;
 			} else {
@@ -2152,15 +2158,6 @@ public class GarenaInterface {
 
 	public void disconnected(int x, boolean alert) {
 		if(x == GARENA_MAIN && socket != null && socket.isConnected()) {
-			//clear myinfo if we were grabbing it
-			synchronized(usernameToMyInfo) {
-				String key = getUsername().toLowerCase();
-				
-				if(usernameToMyInfo.containsKey(key) && usernameToMyInfo.get(key).length == 0) {
-					usernameToMyInfo.remove(key);
-				}
-			}
-			
 			try {
 				socket.close();
 			} catch(IOException ioe) {
