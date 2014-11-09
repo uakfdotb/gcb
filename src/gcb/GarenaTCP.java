@@ -286,6 +286,9 @@ public class GarenaTCP extends Thread {
 
 						garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 						Main.println(12, "[GarenaTCP " + conn_id + "] debug@connack@" + System.currentTimeMillis() + ": fast retransmitting seq=" + curr.seq + " in connection " + conn_id);
+						worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_RETRANSMISSION_COUNT);
+                        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_PACKETS);
+                        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_BYTES, curr.data.length);
 					}
 				}
 			}
@@ -305,7 +308,9 @@ public class GarenaTCP extends Thread {
 		}
 
 		Main.println(12, "[GarenaTCP " + conn_id + "] debug@data@" + System.currentTimeMillis() + ": received SEQ=" + seq + "; remote ACK=" + ack + "; len=" + length + " in connection " + conn_id);
-
+        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_RECEIVE_PACKETS);
+        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_RECEIVE_BYTES, length);
+        
 		//acknowledge packets
 		synchronized(packets) {
 			for(int i = 0; i < packets.size(); i++) {
@@ -518,7 +523,11 @@ public class GarenaTCP extends Thread {
 					
 					garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), curr.seq, this.ack, curr.data, curr.data.length, buf);
 					Main.println(12, "[GarenaTCP " + conn_id + "] debug@" + System.currentTimeMillis() + ": standard retransmitting in connection " + conn_id);
-					
+
+			        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_PACKETS);
+			        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_BYTES, curr.data.length);
+			        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_RETRANSMISSION_COUNT);
+			        
 					//update the retransmission queue, since the time of this element changed
 					packetRetransmitQueue.poll();
 					packetRetransmitQueue.add(curr);
@@ -653,7 +662,10 @@ public class GarenaTCP extends Thread {
 	
 			//don't use buf here so there isn't thread problems
 			garena.sendTCPData(remote_address, remote_port, conn_id, lastTime(), seq, ack, currentData, currentLength, lbuf);
-		
+
+	        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_PACKETS);
+	        worker.pool.incrementStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_BYTES, currentLength);
+	        
 			//increment sequence number
 			synchronized(this) {
 				seq++;

@@ -615,6 +615,29 @@ public class Main {
 					uptimeString);
 			
 			Main.println(0, statusString);
+			
+			//TCP-specific stats
+			if(tcpPool.isStatisticsEnabled()) {
+                long transmitPackets = tcpPool.getStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_PACKETS);
+                long transmitBytes = tcpPool.getStatistics(GarenaTCPPool.STATISTIC_TRANSMIT_BYTES);
+                long receivePackets = tcpPool.getStatistics(GarenaTCPPool.STATISTIC_RECEIVE_PACKETS);
+                long receiveBytes = tcpPool.getStatistics(GarenaTCPPool.STATISTIC_RECEIVE_BYTES);
+                long retransmissionCount = tcpPool.getStatistics(GarenaTCPPool.STATISTIC_RETRANSMISSION_COUNT);
+                
+                double retransmitPercent = (double) retransmissionCount / transmitPackets;
+                double receiveBytesPerPacket = (double) receiveBytes / receivePackets;
+                double transmitBytesPerPacket = (double) transmitBytes / transmitPackets;
+                double packetsPerSecond = (double) (transmitPackets + receivePackets) / uptime;
+                
+                String tcpStatusString = String.format(
+                        "[STATUS TCP] r%%: %.2f; rx b/p: %.1f; tx b/p: %.1f; pps: %.1f",
+                        retransmitPercent,
+                        receiveBytesPerPacket,
+                        transmitBytesPerPacket,
+                        packetsPerSecond);
+                
+                Main.println(0, tcpStatusString);
+			}
 		}
 	}
 }

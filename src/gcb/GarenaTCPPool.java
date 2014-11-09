@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GarenaTCPPool extends Thread {
 	Map<Integer, GarenaTCP> tcpConnections;
@@ -21,6 +22,14 @@ public class GarenaTCPPool extends Thread {
 	
 	//configuration
 	int connectionsPerWorker;
+	
+	//statistics
+	public static int STATISTIC_TRANSMIT_PACKETS = 0; //count of outgoing GarenaTCP packets
+	public static int STATISTIC_TRANSMIT_BYTES = 1; //count of outgoing GarenaTCP bytes
+	public static int STATISTIC_RECEIVE_PACKETS = 2; //count of incoming GarenaTCP packets
+	public static int STATISTIC_RECEIVE_BYTES = 3; //count of incoming GarenaTCP bytes
+	public static int STATISTIC_RETRANSMISSION_COUNT = 4; //retransmission packet count
+	AtomicLong[] statistics = new AtomicLong[5];
 	
 	public GarenaTCPPool() {
 		tcpConnections = new HashMap<Integer, GarenaTCP>();
@@ -35,6 +44,12 @@ public class GarenaTCPPool extends Thread {
 		
 		//configuration
 		connectionsPerWorker = GCBConfig.configuration.getInt("gcb_tcp_connectionsperworker", 5);
+        
+		if(GCBConfig.configuration.getBoolean("gcb_tcp_enablestats", false)) {
+            for(int i = 0; i < statistics.length; i++) {
+                statistics[i] = new AtomicLong();
+            }
+		}
 	}
 	
 	public void enqueue(GarenaInterface garena, InetAddress address, int port, byte[] bytes) {
@@ -139,6 +154,30 @@ public class GarenaTCPPool extends Thread {
 		
 		return worker;
 	}
+    
+    public void incrementStatistics(int type) {
+        if(statistics != null) {
+            statistics[type].incrementAndGet();
+        }
+    }
+    
+    public void incrementStatistics(int type, int amount) {
+        if(statistics != null) {
+            statistics[type].addAndGet(amount);
+        }
+    }
+    
+    public boolean isStatisticsEnabled() {
+        return statistics != null;
+    }
+    
+    public Long getStatistics(int type) {
+        if(statistics != null) {
+            return statistics[type].get();
+        } else {
+            return null;
+        }
+    }
 	
 	public void run() {
 		while(true) {
@@ -239,6 +278,10 @@ class TCPWorker extends Thread {
 	
 	public int count() {
 		return tcpConnections.size();
+	}
+	
+	public GarenaTCPPool getPool() {
+	    return pool;
 	}
 
 	public void removeTCPConnection(int conn_id) {
