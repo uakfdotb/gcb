@@ -19,6 +19,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -202,7 +203,9 @@ public class GarenaInterface {
 		//connect
 		Main.println(5, "[GInterface " + id + "] Connecting to " + main_address.getHostAddress() + "...");
 		try {
-			socket = new Socket(main_address, 7456, bindAddress, 0);
+			socket = new Socket();
+			socket.bind(new InetSocketAddress(bindAddress, 0));
+			socket.connect(new InetSocketAddress(main_address, 7456), 10000);
 			Main.println(7, "[GInterface " + id + "] Using local port: " + socket.getLocalPort());
 		} catch(IOException ioe) {
 			if(Main.DEBUG) {
