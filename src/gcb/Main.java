@@ -58,8 +58,8 @@ public class Main {
 	 * WARNING: in the source code, println method uses the x in 2^x to identify the different logging levels,
 	 *  while in configuration you should add the 1, 2, 4, 8, etc. values
 	 */
-	static int logLevel;
-	
+	static int logLevel = 1023;
+
 	boolean botDisable;
 	boolean reverse;
 	long lastLog; //when the log file(s) were created
