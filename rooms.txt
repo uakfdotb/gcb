@@ -457,7 +457,6 @@ name: Russia DotA Room 19 (1.26a)               id:196715  sid:3   server:203.11
 name: Russia DotA Room 18 (1.26a)               id:196716  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
 name: Russia DotA Tournaments Room (1.26a)      id:196754  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
 name: Russian DotA League Room                  id:196787  sid:3   server:203.117.124.18  gid:1012  game:WC3/RPG*      ml:18 
-name: Россия TD комната 09 (1.26a)              id:196789  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
 name: Russia TD Room 08 (1.26a)                 id:196790  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
 name: Russia TD Room 07 (1.26a)                 id:196791  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
 name: Russia TD Room 06 (1.26a)                 id:196798  sid:3   server:203.117.124.18  gid:1001  game:WC3/RPG       ml:1  
