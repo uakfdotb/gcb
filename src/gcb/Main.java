@@ -72,6 +72,9 @@ public class Main {
 
 	PluginManager plugins;
 	Map<Integer, GarenaInterface> garenaConnections;
+	Map<Integer, GarenaThread> gspThreads;
+	Map<Integer, GarenaThread> gcrpThreads;
+	Map<Integer, GarenaThread> peerThreads;
 	WC3Interface wc3i;
 	ChatThread chatthread;
 	SQLThread sqlthread;
@@ -130,6 +133,9 @@ public class Main {
 		
 		bots = new HashMap<Integer, GChatBot>();
 		garenaConnections = new HashMap<Integer, GarenaInterface>();
+		gspThreads = new HashMap<Integer, GarenaThread>();
+		gcrpThreads = new HashMap<Integer, GarenaThread>();
+		peerThreads = new HashMap<Integer, GarenaThread>();
 		
 		TIMER.schedule(new StatusTask(), 10000, GCBConfig.configuration.getInt("gcb_status", 60) * 1000);
 	}
@@ -250,9 +256,10 @@ public class Main {
 		if(!garena.sendGSPSessionLogin()) return false;
 		if(!garena.readGSPSessionLoginReply()) return false;
 		
-		if(!restart) {
+		if(!this.gspThreads.containsKey(garena.id)) {
 			GarenaThread gsp_thread = new GarenaThread(garena, null, GarenaThread.GSP_LOOP);
 			gsp_thread.start();
+			this.gspThreads.put(garena.id, gsp_thread);
 		}
 
 		if(restart) {
@@ -267,10 +274,11 @@ public class Main {
 	public boolean initPeer(GarenaInterface garena, boolean restart) {
 		if(!garena.initPeer()) return false;
 		
-		if(loadPL && !restart) {
+		if(loadPL && !this.peerThreads.containsKey(garena.id)) {
 			//startup GP2PP system
 			GarenaThread pl = new GarenaThread(garena, wc3i, GarenaThread.PEER_LOOP);
 			pl.start();
+			this.peerThreads.put(garena.id, pl);
 		}
 		
 		return true;
@@ -330,9 +338,10 @@ public class Main {
 		if(!garena.initRoom()) return false;
 		if(!garena.sendGCRPMeJoin()) return false;
 
-		if(!restart) {
+		if(!this.gcrpThreads.containsKey(garena.id)) {
 			GarenaThread gcrp_thread = new GarenaThread(garena, wc3i, GarenaThread.GCRP_LOOP);
 			gcrp_thread.start();
+			this.gcrpThreads.put(garena.id, gcrp_thread);
 		}
 		
 		// we ought to say we're starting the game; we'll do later too
