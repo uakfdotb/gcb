@@ -221,7 +221,7 @@ public class GarenaTCP extends Thread {
 				buf.putInt(remote_id);
 				buf.putInt(garena.room_id);
 
-				if(member != null) {
+				if(member != null && member.country.length() >= 2) {
 					buf.putInt(member.experience);
 					buf.put(member.country.substring(0, 2).getBytes());
 				} else {
