@@ -212,6 +212,9 @@ public class GarenaInterface {
 				ioe.printStackTrace();
 			}
 
+			try { socket.close(); } catch(Exception e) {}
+			socket = null;
+
 			Main.println(6, "[GInterface " + id + "] Error while connecting to main host: " + ioe.getLocalizedMessage());
 			return false;
 		}
@@ -923,7 +926,7 @@ public class GarenaInterface {
 		}
 
 		try {
-			out.write(lbuf.array());
+			if(out != null) out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
 			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPRequestFriend: " + ioe.getLocalizedMessage());
@@ -959,7 +962,7 @@ public class GarenaInterface {
 		}
 
 		try {
-			out.write(lbuf.array());
+			if(out != null) out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
 			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPJoinedRoom: " + ioe.getLocalizedMessage());
@@ -996,7 +999,7 @@ public class GarenaInterface {
 		}
 
 		try {
-			out.write(lbuf.array());
+			if(out != null) out.write(lbuf.array());
 			return true;
 		} catch(IOException ioe) {
 			Main.println(6, "[GInterface " + id + "] I/O error in sendGSPXP: " + ioe.getLocalizedMessage());
