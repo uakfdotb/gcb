@@ -337,6 +337,11 @@ public class WC3Interface {
 										} else {
 											game = games.get(garenaEntryKey);
 										}
+										
+										//replace packet's war3version with the configured one, if any
+										if(GCBConfig.configuration.getInt("gcb_broadcastfilter_war3version", 0) != 0) {
+											newPacket.putInt(8, GCBConfig.configuration.getInt("gcb_broadcastfilter_war3version", 0));
+										}
 
 										//replace packet's entry key from GHost with our generated one
 										newPacket.putInt(16, garenaEntryKey);
